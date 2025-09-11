@@ -10,12 +10,12 @@ function App() {
       <CustomNavbar /> {/* Render the Navbar component */}
       <header>
         {/* Clerk authentication buttons */}
-        <SignedOut>
+        {/* <SignedOut>
           <SignInButton />
         </SignedOut>
         <SignedIn>
           <UserButton />
-        </SignedIn>
+        </SignedIn> */}
       </header>
       
 
