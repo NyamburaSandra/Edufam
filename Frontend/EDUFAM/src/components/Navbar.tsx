@@ -15,10 +15,6 @@ const CustomNavbar: React.FC = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#dashboard">Dashboard</Nav.Link>
-            <Nav.Link href="#messages">Messages</Nav.Link>
-            <Nav.Link href="#calendar">Calendar</Nav.Link>
-            <Nav.Link href="#grades">Grades</Nav.Link>
           </Nav>
           <Nav>
             {/* Search Icon and Bar */}
@@ -42,7 +38,7 @@ const CustomNavbar: React.FC = () => {
             {/* Notifications */}
             <Nav.Item className="d-flex align-items-center">
               <Button variant="link" className="text-white position-relative">
-                <i className="bi bi-bell"></i> {/* Placeholder for Bootstrap Icon */}
+                <i className="bi bi-bell fs-4"></i> {/* Placeholder for Bootstrap Icon */}
                 <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                   3
                   <span className="visually-hidden">unread messages</span>
@@ -57,17 +53,7 @@ const CustomNavbar: React.FC = () => {
             <SignedIn>
               <UserButton />
             </SignedIn>
-            <Dropdown as={Nav.Item}>
-              <Dropdown.Toggle as={Nav.Link} className="text-white">
-                <span className="me-2">JS</span> John Smith
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item href="#profile">Profile</Dropdown.Item>
-                <Dropdown.Item href="#settings">Settings</Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item href="#logout">Logout</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+            
           </Nav>
         </Navbar.Collapse>
       </Container>
