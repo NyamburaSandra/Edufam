@@ -1,16 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// import { useState } from "react";
+import "./App.css";
+
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  
 
   return (
     <>
-   
+      <header>
+        {/* Clerk authentication buttons */}
+        <SignedOut>
+          <SignInButton />
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </header>
+
+      <main>
+        <h1>Parents screen</h1>
+        {/* Example Parent screen */}
+        <div>
+          
+        </div>
+      </main>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
