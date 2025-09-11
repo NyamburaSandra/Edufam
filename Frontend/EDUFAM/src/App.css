@@ -1,0 +1,89 @@
+/* Main Layout Styling */
+#root {
+  min-height: 100vh;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+  padding-bottom: 2rem;
+}
+
+/* Footer Styling */
+footer {
+  flex-shrink: 0;
+  width: 100%;
+  margin-top: auto;
+}
+
+/* Social Media Icons Styling */
+.social-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: none !important;
+}
+
+.social-icon i {
+  font-size: 1.2rem;
+}
+
+/* Facebook */
+.social-icon.facebook {
+  background-color: #1877f2 !important;
+  color: white !important;
+}
+
+.social-icon.facebook:hover {
+  background-color: #0d65d9 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(24, 119, 242, 0.3);
+}
+
+/* Twitter/X */
+.social-icon.twitter {
+  background-color: #000000 !important;
+  color: white !important;
+}
+
+.social-icon.twitter:hover {
+  background-color: #333333 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Instagram */
+.social-icon.instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%) !important;
+  color: white !important;
+}
+
+.social-icon.instagram:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(220, 39, 67, 0.3);
+}
+
+/* LinkedIn */
+.social-icon.linkedin {
+  background-color: #0a66c2 !important;
+  color: white !important;
+}
+
+.social-icon.linkedin:hover {
+  background-color: #0952a0 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(10, 102, 194, 0.3);
+}
+
+/* Add smooth transition for all hover effects */
+.social-icon {
+  transition: all 0.3s ease !important;
+}

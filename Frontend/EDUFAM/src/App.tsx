@@ -6,28 +6,19 @@ import Footer from "./components/Footer"; // Import the Footer component
 
 function App() {
   return (
-    <>
+    <div className="app-container">
       <CustomNavbar /> {/* Render the Navbar component */}
       <header>
         {/* Clerk authentication buttons */}
-        {/* <SignedOut>
-          <SignInButton />
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn> */}
+        
       </header>
       
-
       <main>
-        
         <ParentDashboard /> {/* Render the ParentDashboard component */}
       </main>
       <Footer /> {/* Render the Footer component */}
-    </>
+    </div>
   );
 }
 
 export default App;
-
-// 
