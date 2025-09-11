@@ -1,7 +1,17 @@
 import React from 'react';
-import { Container } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { useClerk } from '@clerk/clerk-react';
 
 const ParentDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { signOut } = useClerk();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/welcome');
+  };
+
   return (
     <Container className="my-4">
       <h2 className="mb-3">Parent Dashboard</h2>
