@@ -1,30 +1,22 @@
-// import { useState } from "react";
 import "./App.css";
-
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
+import CustomNavbar from "./components/Navbar"; // Import the Navbar component
+import ParentDashboard from "./components/ParentDashboard"; // Import the ParentDashboard component
+import Footer from "./components/Footer"; // Import the Footer component
 
 function App() {
-  
-
   return (
     <>
-      <header>
-        {/* Clerk authentication buttons */}
-        <SignedOut>
-          <SignInButton />
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
-      </header>
+      <CustomNavbar /> {/* Render the Navbar component */}
+      <div className="flex-grow-1">
+        
 
-      <main>
-        <h1>Parents screen</h1>
-        {/* Example Parent screen */}
-        <div>
+        <main>
           
-        </div>
-      </main>
+          <ParentDashboard /> {/* Render the ParentDashboard component */}
+        </main>
+      </div>
+      <Footer /> {/* Render the Footer component */}
     </>
   );
 }
