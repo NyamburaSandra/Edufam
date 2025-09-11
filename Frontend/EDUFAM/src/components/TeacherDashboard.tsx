@@ -8,13 +8,23 @@ const TeacherDashboard: React.FC = () => {
 			<Container fluid className="my-4">
 				<Row className="teacher-dashboard-row">
 				<Col md={3} className="bg-light p-0">
-								<ListGroup variant="flush" className="sidebar">
-									<ListGroup.Item action active={activeKey === 'dashboard'} onClick={() => setActiveKey('dashboard')}>Dashboard</ListGroup.Item>
-									<ListGroup.Item action active={activeKey === 'results'} onClick={() => setActiveKey('results')}>Results</ListGroup.Item>
-									<ListGroup.Item action active={activeKey === 'events'} onClick={() => setActiveKey('events')}>Events</ListGroup.Item>
-									<ListGroup.Item action active={activeKey === 'attendance'} onClick={() => setActiveKey('attendance')}>Attendance</ListGroup.Item>
-									<ListGroup.Item action active={activeKey === 'fees'} onClick={() => setActiveKey('fees')}>Fees</ListGroup.Item>
-								</ListGroup>
+											<ListGroup variant="flush" className="sidebar">
+												<ListGroup.Item action active={activeKey === 'dashboard'} onClick={() => setActiveKey('dashboard')}>
+													<i className="bi bi-speedometer2 me-2"></i> Dashboard
+												</ListGroup.Item>
+												<ListGroup.Item action active={activeKey === 'results'} onClick={() => setActiveKey('results')}>
+													<i className="bi bi-file-earmark-bar-graph me-2"></i> Results
+												</ListGroup.Item>
+												<ListGroup.Item action active={activeKey === 'events'} onClick={() => setActiveKey('events')}>
+													<i className="bi bi-calendar-event me-2"></i> Events
+												</ListGroup.Item>
+												<ListGroup.Item action active={activeKey === 'attendance'} onClick={() => setActiveKey('attendance')}>
+													<i className="bi bi-check2-square me-2"></i> Attendance
+												</ListGroup.Item>
+												<ListGroup.Item action active={activeKey === 'fees'} onClick={() => setActiveKey('fees')}>
+													<i className="bi bi-cash-stack me-2"></i> Fees
+												</ListGroup.Item>
+											</ListGroup>
 				</Col>
 			<Col md={9} className="p-4 teacher-dashboard-section">
 								<Tab.Content>

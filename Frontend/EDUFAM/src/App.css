@@ -154,6 +154,23 @@ footer {
   padding-top: 0;
 }
 
+/* Sidebar icon colors */
+.sidebar .bi-speedometer2 {
+  color: #0d6efd; /* blue */
+}
+.sidebar .bi-file-earmark-bar-graph {
+  color: #198754; /* green */
+}
+.sidebar .bi-calendar-event {
+  color: #fd7e14; /* orange */
+}
+.sidebar .bi-check2-square {
+  color: #6f42c1; /* purple */
+}
+.sidebar .bi-cash-stack {
+  color: #dc3545; /* red */
+}
+
 @media (max-width: 768px) {
   .sidebar {
     position: static;
