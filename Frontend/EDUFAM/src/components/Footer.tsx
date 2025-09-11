@@ -5,7 +5,7 @@ import { Container, Row, Col, InputGroup, Button, FormControl } from "react-boot
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-edufam-dark text-white py-2 mt-5">
+    <footer className="bg-edufam-dark text-white py-5 mt-5">
       <Container>
         <Row>
           <Col md={3} className="mb-4 mb-md-0">
@@ -36,10 +36,10 @@ const Footer: React.FC = () => {
           <Col md={3} className="mb-4 mb-md-0">
             <h5 className="mb-3">Connect With Us</h5>
             <div className="d-flex mb-3">
-              <Button variant="outline-light" className="rounded-circle me-2"><i className="bi bi-facebook"></i></Button>
-              <Button variant="outline-light" className="rounded-circle me-2"><i className="bi bi-twitter"></i></Button>
-              <Button variant="outline-light" className="rounded-circle me-2"><i className="bi bi-instagram"></i></Button>
-              <Button variant="outline-light" className="rounded-circle"><i className="bi bi-linkedin"></i></Button>
+              <Button variant="outline-light" className="rounded-circle me-2 social-icon facebook"><i className="bi bi-facebook"></i></Button>
+              <Button variant="outline-light" className="rounded-circle me-2 social-icon twitter"><i className="bi bi-twitter-x"></i></Button>
+              <Button variant="outline-light" className="rounded-circle me-2 social-icon instagram"><i className="bi bi-instagram"></i></Button>
+              <Button variant="outline-light" className="rounded-circle social-icon linkedin"><i className="bi bi-linkedin"></i></Button>
             </div>
             <div className="mt-4">
               <p className="text-white">Subscribe to our newsletter</p>
@@ -55,8 +55,8 @@ const Footer: React.FC = () => {
         </Row>
         
         <Row className="mt-4 pt-4 border-top border-secondary">
-          <Col className="text-center text-white">
-            <p>&copy; {new Date().getFullYear()} EDUFAM. All rights reserved.</p>
+          <Col className="text-center text-muted">
+            <p className="text-white">&copy; {new Date().getFullYear()} EDUFAM. All rights reserved.</p>
           </Col>
         </Row>
       </Container>
