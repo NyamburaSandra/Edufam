@@ -4,8 +4,6 @@ import "./App.css";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 
 function App() {
-  
-
   return (
     <>
       <header>
@@ -19,7 +17,7 @@ function App() {
       </header>
 
       <main>
-        <h1>Parents screen</h1>
+        <h1>Teachers screen</h1>
         {/* Example Parent screen */}
         <div>
           
