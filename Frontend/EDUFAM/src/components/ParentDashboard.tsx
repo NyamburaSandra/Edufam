@@ -14,13 +14,112 @@ const ParentDashboard: React.FC = () => {
     recentGrades: [
       { subject: "Mathematics", grade: "A" },
       { subject: "English", grade: "B+" },
-      { subject: "Science", grade: "A-" }
+      { subject: "Science", grade: "A-" },
+      { subject: "Kiswahili", grade: "A-" },
+      { subject: "Art", grade: "A-" }
     ] as Grade[],
-    attendance: 95
+    attendance: 90
+    };
+
+  // Example notifications
+  const notifications = [
+    {
+      id: 1,
+      message: "Parent-Teacher Meeting scheduled",
+      date: "2025-09-20",
+      event: "Parent-Teacher Meeting",
+      description: "Join us for a discussion on your child's progress and school updates.",
+      extra: "Your presence is highly encouraged to foster better communication.",
+      start: "10:00 AM",
+      end: "12:00 PM",
+      photo: "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      id: 2,
+      message: "Mid-term Exams coming up",
+      date: "2025-09-15",
+      event: "Mid-term Exams",
+      description: "Mid-term exams for all classes. Ensure your child is prepared.",
+      extra: "Please check the exam timetable and help your child revise.",
+      start: "8:00 AM",
+      end: "1:00 PM",
+      photo: "https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80"
+    },
+    {
+      id: 3,
+      message: "School Holiday announced",
+      date: "2025-09-25",
+      event: "School Holiday",
+      description: "School will be closed for a public holiday. Enjoy your break!",
+      extra: "Classes will resume as usual after the holiday.",
+      start: "All Day",
+      end: "All Day",
+      photo: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80"
+    },
+  ];
+
+  const handleConfirmAttendance = (event: string) => {
+    alert(`Attendance confirmed for: ${event}`);
   };
 
   return (
     <Container className="py-4">
+      <Row>
+        <Col md={12} style={{ padding: 0 }}>
+          <Card className="mb-4" style={{ margin: 0 }}>
+            <Card.Header>
+              <h5 className="mb-0" style={{ color: '#1e0a3c' }}>Recent Notifications</h5>
+            </Card.Header>
+            <ListGroup variant="flush">
+              {notifications.map((notif) => (
+                <ListGroup.Item
+                  key={notif.id}
+                  className="d-flex flex-column flex-md-row align-items-md-center"
+                  style={{ border: 'none', borderBottom: 'none', marginBottom: '1.2rem', background: 'transparent' }}
+                >
+                  <div style={{ minWidth: 80, marginRight: 20, marginBottom: 10 }}>
+                    <img
+                      src={notif.photo}
+                      alt={notif.event}
+                      style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 16, boxShadow: '0 2px 8px rgba(30,10,60,0.08)' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <strong style={{ color: '#1e0a3c' }}>{notif.message}</strong>
+                    <div className="text-muted" style={{ fontSize: "0.9em" }}>{notif.date}</div>
+                    <div style={{ fontSize: "0.95em", margin: "0.25em 0" }}>{notif.description}</div>
+                    <div style={{ fontSize: "0.92em", color: '#555', marginBottom: 2 }}>{notif.extra}</div>
+                    <div style={{ fontSize: "0.95em" }}>
+                      <span className="fw-bold">Time:</span> {notif.start} - {notif.end}
+                    </div>
+                  </div>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mt-2 mt-md-0"
+                    style={{
+                      background: 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '20px',
+                      fontWeight: 600,
+                      letterSpacing: '0.5px',
+                      padding: '0.4rem 1.2rem',
+                      boxShadow: '0 2px 8px rgba(30,10,60,0.08)',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseOver={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #6c63ff 0%, #1e0a3c 100%)')}
+                    onMouseOut={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)')}
+                    onClick={() => handleConfirmAttendance(notif.event)}
+                  >
+                    Learn More
+                  </Button>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </Card>
+        </Col>
+      </Row>
       <Row>
         <Col md={8}>
           <Card className="mb-4">

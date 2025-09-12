@@ -5,16 +5,44 @@ import './Sidebar.css';
 // URL for the logo image - update this with your actual logo path
 const LOGO_URL = '/src/assets/edufam-logo.png';
 
-const Sidebar = () => {
+const Sidebar = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   return (
-    <div className="sidebar">
+    <div
+      className="sidebar"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: 250,
+        height: "100vh",
+        background: "#1e0a3c", // Dark purple background
+        boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
+        zIndex: 2000,
+        transition: "left 0.3s"
+      }}
+    >
+      <button
+        onClick={onClose}
+        aria-label="Close sidebar"
+        style={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          background: "none",
+          border: "none",
+          fontSize: 24,
+          cursor: "pointer"
+        }}
+      >
+        <i className="bi bi-x"></i>
+      </button>
       <div className="sidebar-header">
-        <img src={LOGO_URL} alt="EduFam Logo" className="sidebar-logo" />
+        {/* <img src={LOGO_URL} alt="EduFam Logo" className="sidebar-logo" /> */}
         <h3>EduFam</h3>
       </div>
       
       <Nav className="flex-column">
-        <Nav.Item>
+        {/* <Nav.Item>
           <Nav.Link as={Link} to="/parent" className="sidebar-link">
             <i className="bi bi-house"></i>
             <span>Parent Dashboard</span>
@@ -26,7 +54,7 @@ const Sidebar = () => {
             <i className="bi bi-mortarboard"></i>
             <span>Teacher Dashboard</span>
           </Nav.Link>
-        </Nav.Item>
+        </Nav.Item> */}
         
         <Nav.Item>
           <Nav.Link as={Link} to="/profile" className="sidebar-link">
