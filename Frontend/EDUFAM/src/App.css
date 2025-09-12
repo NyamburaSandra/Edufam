@@ -1,9 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* Reset default margin and padding for body and #root */
 body, #root {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   height: 100vh;
+}
+
+/* Set default font for body */
+body {
+  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* App container takes full height and uses flexbox for layout */
@@ -132,12 +139,16 @@ footer.bg-edufam-dark {
 
 /* Sidebar styling */
 .sidebar {
-  position: sticky;
-  top: 70px; /* Adjust based on Navbar height */
-  min-height: calc(100vh - 70px); /* Full height minus Navbar */
-  height: calc(100vh - 70px);
-  border-right: 1px solid #e0e0e0;
-  background: #f8f9fa;
+  position: fixed;
+  top: 56px; /* Height of navbar, adjust if needed */
+  left: 0;
+  width: 240px;
+  height: calc(100vh - 56px - 120px); /* Subtract estimated footer height */
+  min-height: calc(100vh - 56px - 120px);
+  max-height: calc(100vh - 56px - 120px);
+  overflow-y: auto;
+  border-right: 2px solid #e0e0e0 !important; /* Add visible separation */
+  background: transparent !important;
   z-index: 1;
 }
 
@@ -149,8 +160,13 @@ footer.bg-edufam-dark {
 }
 
 .teacher-dashboard-section {
-  margin-top: 0;
-  padding-top: 0;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-left: 0 !important;
+  margin-left: 240px !important; /* Offset for sidebar width */
+  position: relative;
+  left: 0;
+  width: auto;
 }
 
 .teacher-dashboard-section h3, .teacher-dashboard-section h4 {
@@ -221,6 +237,20 @@ footer.bg-edufam-dark {
 
 .navbar .navbar-brand .font-bold {
   color: #fb7100 !important;
+}
+
+/* Sidebar active and hover state */
+.sidebar .list-group-item.action.active,
+.sidebar .list-group-item.action:active,
+.sidebar .list-group-item.active,
+.sidebar .list-group-item:active {
+  background: radial-gradient(circle, rgba(238, 174, 202, 1) 0%, rgba(148, 187, 233, 1) 100%) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.sidebar .list-group-item.action:hover {
+  background-color: #fff2e6 !important;
 }
 
 @media (max-width: 768px) {
