@@ -59,6 +59,10 @@ footer {
   padding-top: 0;
 }
 
+footer.bg-edufam-dark {
+  background-color: #1e0a3c !important;
+}
+
 /* Social Media Icons Styling */
 .social-icon {
   width: 40px;
@@ -169,6 +173,54 @@ footer {
 }
 .sidebar .bi-cash-stack {
   color: #dc3545; /* red */
+}
+
+/* Navbar styling */
+.bg-edufam-dark {
+  background-color: #f5f5f5 !important;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .text-xl,
+.navbar .font-bold,
+.navbar .text-white {
+  color: #000 !important;
+}
+
+.navbar .bi {
+  color: #000 !important;
+}
+
+/* Sign In button styling */
+.navbar .sign-in-btn {
+  background-color: #e0e0e0 !important;
+  color: #000 !important;
+  border: none;
+  border-radius: 25px !important;
+}
+
+.navbar .sign-in-btn .bi {
+  color: #000 !important;
+  font-size: 1.5rem;
+}
+
+.navbar .sign-in-btn:hover {
+  background-color: #fb7100 !important;
+}
+
+.navbar .sign-in-btn:hover,
+.navbar .sign-in-btn:hover .bi {
+  color: #f5f5f5 !important;
+}
+
+/* Add shadow effect to the bottom of the navbar */
+.navbar {
+  box-shadow: 0 4px 12px -2px rgba(128,128,128,0.18);
+}
+
+.navbar .navbar-brand .font-bold {
+  color: #fb7100 !important;
 }
 
 @media (max-width: 768px) {
