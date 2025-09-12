@@ -1,7 +1,6 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
-import CustomNavbar from "./components/Navbar";
 import ParentDashboard from "./components/ParentDashboard";
 import TeacherDashboard from "./components/TeacherDashboard";
 import Profile from "./components/Profile";
@@ -16,7 +15,6 @@ function App() {
   return (
     <div className="app-wrapper">
       <div className="main-content">
-        <CustomNavbar />
         <div className="content-wrapper">
           <main style={{ marginTop: 24 }}>
             <Routes>
