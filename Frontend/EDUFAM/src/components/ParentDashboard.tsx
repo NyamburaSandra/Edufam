@@ -119,18 +119,30 @@ const ParentDashboard: React.FC = () => {
                   </div>
                 </Col>
                 <Col md={4}>
-                  <h6>Recent Grades</h6>
-                  <ListGroup variant="flush">
-                    {childData.recentGrades.map((grade, index) => (
-                      <ListGroup.Item 
-                        key={index} 
-                        className="d-flex justify-content-between align-items-center"
-                      >
-                        {grade.subject}
-                        <Badge className="custom-grade-badge">{grade.grade}</Badge>
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
+                  <h6>Overall Performance</h6>
+                  <div style={{ fontSize: '1.1em', fontWeight: 600, color: '#1e0a3c', marginBottom: 8 }}>
+                    Grade: A-
+                  </div>
+                  <div style={{ color: '#6c63ff', fontWeight: 500, marginBottom: 8 }}>
+                    Term: 3, 2025
+                  </div>
+                  <Button
+                    variant="primary"
+                    style={{
+                      background: 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)',
+                      border: 'none',
+                      borderRadius: 20,
+                      fontWeight: 700,
+                      fontSize: '1.08rem',
+                      letterSpacing: 0.5,
+                      padding: '0.6rem 1.4rem',
+                      boxShadow: '0 2px 8px rgba(30,10,60,0.10)',
+                      color: '#fff',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    Download PDF
+                  </Button>
                 </Col>
                 <Col md={4} className="text-center">
                   <div className="attendance-circle">

@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
-import { Navbar, Container, Nav, Form, FormControl, Button, InputGroup, Dropdown } from 'react-bootstrap';
+import { Navbar, Container, Nav, Form, FormControl, Button, InputGroup } from 'react-bootstrap';
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 
-interface CustomNavbarProps {
-  onToggleSidebar: () => void;
-}
-
-const CustomNavbar: React.FC<CustomNavbarProps> = ({ onToggleSidebar }) => {
+const CustomNavbar: React.FC = () => {
   const [isSearchVisible, setSearchVisible] = useState(false);
 
   return (
     <Navbar className="bg-edufam-dark" variant="dark" expand="lg">
       <Container>
-        <Button variant="link" onClick={onToggleSidebar} className="text-white">
-          <i className="bi bi-list"></i>
-        </Button>
         <Navbar.Brand href="#home">
           {/* Logo */}
           <span className="ml-2 text-xl font-bold">EDUFAM</span>

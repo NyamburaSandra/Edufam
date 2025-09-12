@@ -11,19 +11,13 @@ import Feedback from "./components/Feedback";
 import Settings from "./components/Settings";
 import Help from "./components/Help";
 import Footer from "./components/Footer";
-import Sidebar from "./components/Sidebar";
-import { useState } from "react";
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="app-wrapper">
       <div className="main-content">
-        <CustomNavbar onToggleSidebar={() => setSidebarOpen((open) => !open)} />
+        <CustomNavbar />
         <div className="content-wrapper">
-          {sidebarOpen && (
-            <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          )}
           <main style={{ marginTop: 24 }}>
             <Routes>
               <Route path="/" element={<Navigate to="/parent" replace />} />

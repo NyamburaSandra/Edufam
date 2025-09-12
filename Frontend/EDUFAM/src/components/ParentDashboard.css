@@ -160,6 +160,11 @@
   border-bottom: none;
 }
 
+/* Set all p tags to have a grey font color */
+p {
+  color: #6c757d !important;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   .attendance-circle {
