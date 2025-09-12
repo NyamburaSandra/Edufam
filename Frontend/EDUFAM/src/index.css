@@ -1,3 +1,10 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+/* @import "tailwindcss"; */
+
+
+/* You can also add custom global styles here */
 body {
   background-color: #f5f5f5;
   display: flex;

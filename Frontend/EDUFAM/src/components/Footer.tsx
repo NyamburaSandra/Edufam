@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
       <Container>
         <Row>
           <Col md={3} className="mb-4 mb-md-0">
-            <h5 className="mb-3">EduConnect</h5>
+            <h5 className="mb-3">EduFam</h5>
             <p className="text-white">Bridging the communication gap between teachers and parents for student success.</p>
           </Col>
           

@@ -1,3 +1,198 @@
+/* Main Layout Styling */
+/* App Layout */
+#root {
+  min-height: 100vh;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column; /* Change to column */
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.content-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+.main-content {
+  flex: 1;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  /* transition: margin-left 0.3s ease; */
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  margin-bottom: 2rem;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .dashboard-header {
+    padding: 1rem;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+/* Card Styling */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: none;
+  font-weight: 600;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* Button Styling */
+.btn {
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Controls */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Footer Styling */
+footer {
+  flex-shrink: 0;
+  width: 100%;
+  margin-top: auto;
+}
+
+/* Social Media Icons Styling */
+.social-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: none !important;
+}
+
+.social-icon i {
+  font-size: 1.2rem;
+}
+
+/* Facebook */
+.social-icon.facebook {
+  background-color: #1877f2 !important;
+  color: white !important;
+}
+
+.social-icon.facebook:hover {
+  background-color: #0d65d9 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(24, 119, 242, 0.3);
+}
+
+/* Twitter/X */
+.social-icon.twitter {
+  background-color: #000000 !important;
+  color: white !important;
+}
+
+.social-icon.twitter:hover {
+  background-color: #333333 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Instagram */
+.social-icon.instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%) !important;
+  color: white !important;
+}
+
+.social-icon.instagram:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(220, 39, 67, 0.3);
+}
+
+/* LinkedIn */
+.social-icon.linkedin {
+  background-color: #0a66c2 !important;
+  color: white !important;
+}
+
+.social-icon.linkedin:hover {
+  background-color: #0952a0 !important;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(10, 102, 194, 0.3);
+}
+
+/* Add smooth transition for all hover effects */
+.social-icon {
+  transition: all 0.3s ease !important;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Reset default margin and padding for body and #root */
