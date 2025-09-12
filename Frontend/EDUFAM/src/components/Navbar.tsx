@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
-
-import { Navbar, Container, Nav, Form, FormControl, Button, InputGroup, Dropdown } from 'react-bootstrap';
+import React from 'react';
+import { Navbar, Container, Nav, Button } from 'react-bootstrap';
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 
 const CustomNavbar: React.FC = () => {
-  const [isSearchVisible, setSearchVisible] = useState(false);
-
   return (
     <Navbar className="bg-edufam-dark" variant="dark" expand="lg">
       <Container>
@@ -18,7 +15,6 @@ const CustomNavbar: React.FC = () => {
           <Nav className="me-auto">
           </Nav>
           <Nav>
-
             {/* User Account */}
             <SignedOut>
               <SignInButton>
@@ -31,7 +27,6 @@ const CustomNavbar: React.FC = () => {
             <SignedIn>
               <UserButton />
             </SignedIn>
-            
           </Nav>
         </Navbar.Collapse>
       </Container>
