@@ -8,7 +8,7 @@ const TeacherDashboard: React.FC = () => {
 
 	return (
 		<>
-			<Container fluid className="my-4">
+			<Container fluid className="my-4" >
 				<Row className="teacher-dashboard-row g-0">
 					<Col md={3} className="p-0">
 						<ListGroup variant="flush" className="sidebar">

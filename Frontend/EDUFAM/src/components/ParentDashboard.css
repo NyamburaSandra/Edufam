@@ -1,5 +1,7 @@
 /* ParentDashboard.css */
-
+body{
+  margin-top: auto;
+}
 /* Child Profile Styles */
 .attendance-circle {
   width: 120px;
@@ -163,6 +165,40 @@
 /* Set all p tags to have a grey font color */
 p {
   color: #6c757d !important;
+}
+
+/* Ensure navbar is above, dashboard/sidebar below */
+.navbar {
+  z-index: 1050;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.parent-dashboard-row {
+  margin-top: 100px !important;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar {
+  margin-top: 0 !important;
+  position: relative;
+  z-index: 2;
+}
+
+.parent-dashboard-content {
+  margin-top: 0 !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* If you have a dashboard tab section, ensure it is not hidden */
+.dashboard-tab-section {
+  margin-top: 0 !important;
+  position: relative;
+  z-index: 2;
 }
 
 /* Responsive Styles */

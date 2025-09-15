@@ -77,177 +77,215 @@ const ParentDashboard: React.FC = () => {
     { id: 3, title: "School Holiday", date: "2025-09-25", type: "holiday" }
   ];
 
+  const sectionRefs = {
+    childProfile: React.useRef<HTMLDivElement>(null),
+    fees: React.useRef<HTMLDivElement>(null),
+    notifications: React.useRef<HTMLDivElement>(null),
+    feedback: React.useRef<HTMLDivElement>(null),
+  };
+
+  const scrollToSection = (section: keyof typeof sectionRefs) => {
+    const offset = 80; // Height of navbar
+    const ref = sectionRefs[section].current;
+    if (ref) {
+      const top = ref.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <Container className="py-4">
-      {/* Top row: Child Profile and Fees side by side */}
-      <Row>
-        <Col md={8}>
-          <Card className="mb-4">
-            {/* Child Profile */}
-            <Card.Header>
-              <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Child Profile</h5>
-            </Card.Header>
-            <Card.Body>
-              <Row>
-                <Col md={4} className="text-center">
-                  <img
-                    src={childData.photo}
-                    alt={childData.name}
-                    className="rounded-circle mb-3"
-                    style={{ width: "120px", height: "120px", objectFit: "cover", border: '3px solid #1e0a3c', background: '#fff' }}
-                  />
-                  <h4>{childData.name}</h4>
-                  <p className="text-muted">{childData.class}</p>
-                  {/* Restore chat buttons */}
-                  <div className="d-flex flex-column gap-2 mt-3">
-                    <Button className="modern-action-btn" style={{ width: '100%' }}>
-                      <i className="bi bi-chat-dots me-2"></i> Chat with Teacher
-                    </Button>
-                    <Button className="modern-action-btn" style={{ width: '100%' }}>
-                      <i className="bi bi-people me-2"></i> Group Chat
-                    </Button>
-                  </div>
-                </Col>
-                <Col md={4}>
-                  <h6>Overall Performance</h6>
-                  <div style={{ fontSize: '1.1em', fontWeight: 600, color: '#1e0a3c', marginBottom: 8 }}>
-                    Grade: A-
-                  </div>
-                  <div style={{ color: '#6c63ff', fontWeight: 500, marginBottom: 8 }}>
-                    Term: 3, 2025
-                  </div>
-                  <Button
-                    variant="primary"
-                    style={{
-                      background: 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)',
-                      border: 'none',
-                      borderRadius: 20,
-                      fontWeight: 700,
-                      fontSize: '1.08rem',
-                      letterSpacing: 0.5,
-                      padding: '0.6rem 1.4rem',
-                      boxShadow: '0 2px 8px rgba(30,10,60,0.10)',
-                      color: '#fff',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    Download PDF
-                  </Button>
-                </Col>
-                <Col md={4} className="text-center">
-                  <div className="attendance-circle">
-                    <h6>Attendance</h6>
-                    <div className="percentage">
-                      <h3>{childData.attendance}%</h3>
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
+    <Container fluid className="py-4">
+      <Row className="parent-dashboard-row g-0">
+        <Col md={3} className="p-0">
+          <ListGroup variant="flush" className="sidebar">
+            <ListGroup.Item action onClick={() => scrollToSection('childProfile')}>
+              <i className="bi bi-person-badge me-2"></i> Child Profile
+            </ListGroup.Item>
+            <ListGroup.Item action onClick={() => scrollToSection('fees')}>
+              <i className="bi bi-cash-stack me-2"></i> Fees
+            </ListGroup.Item>
+            <ListGroup.Item action onClick={() => scrollToSection('notifications')}>
+              <i className="bi bi-bell me-2"></i> Notifications
+            </ListGroup.Item>
+            <ListGroup.Item action onClick={() => scrollToSection('feedback')}>
+              <i className="bi bi-chat-left-text me-2"></i> Feedback
+            </ListGroup.Item>
+          </ListGroup>
         </Col>
-        <Col md={4}>
-          <Card className="mb-4 fee-status-card">
-            {/* Fee Status */}
-            <Card.Header>
-              <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Fee Status</h5>
-            </Card.Header>
-            <Card.Body>
-              <Row>
-                <Col md={4}>
-                  <h6>Total Fee</h6>
-                  <h4>$5000</h4>
-                </Col>
-                <Col md={4}>
-                  <h6>Paid Amount</h6>
-                  <h4 className="text-success">$3000</h4>
-                </Col>
-                <Col md={4}>
-                  <h6>Due Amount</h6>
-                  <h4 className="text-danger">$2000</h4>
-                </Col>
-              </Row>
-              <div className="mt-3">
-                <p>Next payment due: 2025-09-30</p>
-                <Button
-                  variant="primary"
-                  className="modern-action-btn"
-                  style={{
-                    width: '100%',
-                  }}
-                  onMouseOver={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #6c63ff 0%, #1e0a3c 100%)')}
-                  onMouseOut={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)')}
-                >
-                  Pay Now
-                </Button>
+        <Col md={9} style={{ marginLeft: '250px' }}>
+          <div style={{  gap: '32px' }}>
+            <div style={{ flex: 1 }}>
+              <div ref={sectionRefs.childProfile}>
+                {/* Child Profile Section */}
+                <Card className="mb-4">
+                  <Card.Header>
+                    <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Child Profile</h5>
+                  </Card.Header>
+                  <Card.Body>
+                    <Row>
+                      <Col md={4} className="text-center">
+                        <img
+                          src={childData.photo}
+                          alt={childData.name}
+                          className="rounded-circle mb-3"
+                          style={{ width: "120px", height: "120px", objectFit: "cover", border: '3px solid #1e0a3c', background: '#fff' }}
+                        />
+                        <h4>{childData.name}</h4>
+                        <p className="text-muted">{childData.class}</p>
+                        <div className="d-flex flex-column gap-2 mt-3">
+                          <Button className="modern-action-btn" style={{ width: '100%' }}>
+                            <i className="bi bi-chat-dots me-2"></i> Chat with Teacher
+                          </Button>
+                          <Button className="modern-action-btn" style={{ width: '100%' }}>
+                            <i className="bi bi-people me-2"></i> Group Chat
+                          </Button>
+                        </div>
+                      </Col>
+                      <Col md={4}>
+                        <h6>Overall Performance</h6>
+                        <div style={{ fontSize: '1.1em', fontWeight: 600, color: '#1e0a3c', marginBottom: 8 }}>
+                          Grade: A-
+                        </div>
+                        <div style={{ color: '#6c63ff', fontWeight: 500, marginBottom: 8 }}>
+                          Term: 3, 2025
+                        </div>
+                        <Button
+                          variant="primary"
+                          style={{
+                            background: 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)',
+                            border: 'none',
+                            borderRadius: 20,
+                            fontWeight: 700,
+                            fontSize: '1.08rem',
+                            letterSpacing: 0.5,
+                            padding: '0.6rem 1.4rem',
+                            boxShadow: '0 2px 8px rgba(30,10,60,0.10)',
+                            color: '#fff',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          Download PDF
+                        </Button>
+                      </Col>
+                      <Col md={4} className="text-center">
+                        <div className="attendance-circle">
+                          <h6>Attendance</h6>
+                          <div className="percentage">
+                            <h3>{childData.attendance}%</h3>
+                          </div>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
               </div>
-            </Card.Body>
-          </Card>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div ref={sectionRefs.fees}>
+                {/* Fees Section */}
+                <Card className="mb-4 fee-status-card">
+                  <Card.Header>
+                    <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Fee Status</h5>
+                  </Card.Header>
+                  <Card.Body>
+                    <Row>
+                      <Col md={4}>
+                        <h6>Total Fee</h6>
+                        <h4>$5000</h4>
+                      </Col>
+                      <Col md={4}>
+                        <h6>Paid Amount</h6>
+                        <h4 className="text-success">$3000</h4>
+                      </Col>
+                      <Col md={4}>
+                        <h6>Due Amount</h6>
+                        <h4 className="text-danger">$2000</h4>
+                      </Col>
+                    </Row>
+                    <div className="mt-3">
+                      <p>Next payment due: 2025-09-30</p>
+                      <Button
+                        variant="primary"
+                        className="modern-action-btn"
+                        style={{ width: '100%' }}
+                        onMouseOver={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #6c63ff 0%, #1e0a3c 100%)')}
+                        onMouseOut={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)')}
+                      >
+                        Pay Now
+                      </Button>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </div>
+            </div>
+          </div>
         </Col>
       </Row>
 
       {/* Notifications section */}
       <Row>
-        <Col md={12} style={{ padding: 0 }}>
-          <Card className="mb-4" style={{ margin: 0 }}>
-            {/* Recent Notifications */}
-            <Card.Header>
-              <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Recent Notifications</h5>
-            </Card.Header>
-            <ListGroup variant="flush">
-              {notifications.map((notif) => (
-                <ListGroup.Item
-                  key={notif.id}
-                  className="d-flex flex-column flex-md-row align-items-md-center"
-                  style={{ border: 'none', borderBottom: 'none', marginBottom: '1.2rem', background: 'transparent' }}
-                >
-                  <div style={{ minWidth: 80, marginRight: 20, marginBottom: 10 }}>
-                    <img
-                      src={notif.photo}
-                      alt={notif.event}
-                      style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 16, boxShadow: '0 2px 8px rgba(30,10,60,0.08)' }}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <strong style={{ color: '#1e0a3c' }}>{notif.message}</strong>
-                    <div className="text-muted" style={{ fontSize: "0.9em" }}>{notif.date}</div>
-                    <div style={{ fontSize: "0.95em", margin: "0.25em 0" }}>{notif.description}</div>
-                    <div style={{ fontSize: "0.92em", color: '#555', marginBottom: 2 }}>{notif.extra}</div>
-                    <div style={{ fontSize: "0.95em" }}>
-                      <span className="fw-bold">Time:</span> {notif.start} - {notif.end}
-                    </div>
-                  </div>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="mt-2 mt-md-0 modern-action-btn"
-                    style={{
-                      // background and color handled by class
-                      border: 'none',
-                      borderRadius: '20px',
-                      fontWeight: 600,
-                      letterSpacing: '0.5px',
-                      padding: '0.4rem 1.2rem',
-                      boxShadow: '0 2px 8px rgba(30,10,60,0.08)',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseOver={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #6c63ff 0%, #1e0a3c 100%)')}
-                    onMouseOut={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)')}
-                    onClick={() => handleConfirmAttendance(notif.event)}
+        <Col md={12} >
+          <div ref={sectionRefs.notifications}>
+            <Card className="mb-4" style={{ marginLeft: '250px' }}>
+              {/* Recent Notifications */}
+              <Card.Header>
+                <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Recent Notifications</h5>
+              </Card.Header>
+              <ListGroup variant="flush">
+                {notifications.map((notif) => (
+                  <ListGroup.Item
+                    key={notif.id}
+                    className="d-flex flex-column flex-md-row align-items-md-center"
+                    style={{ border: 'none', borderBottom: 'none', marginBottom: '1.2rem', background: 'transparent' }}
                   >
-                    Learn More
-                  </Button>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </Card>
+                    <div style={{ minWidth: 80, marginRight: 20, marginBottom: 10 }}>
+                      <img
+                        src={notif.photo}
+                        alt={notif.event}
+                        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 16, boxShadow: '0 2px 8px rgba(30,10,60,0.08)' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <strong style={{ color: '#1e0a3c' }}>{notif.message}</strong>
+                      <div className="text-muted" style={{ fontSize: "0.9em" }}>{notif.date}</div>
+                      <div style={{ fontSize: "0.95em", margin: "0.25em 0" }}>{notif.description}</div>
+                      <div style={{ fontSize: "0.92em", color: '#555', marginBottom: 2 }}>{notif.extra}</div>
+                      <div style={{ fontSize: "0.95em" }}>
+                        <span className="fw-bold">Time:</span> {notif.start} - {notif.end}
+                      </div>
+                    </div>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="mt-2 mt-md-0 modern-action-btn"
+                      style={{
+                        // background and color handled by class
+                        border: 'none',
+                        borderRadius: '20px',
+                        fontWeight: 600,
+                        letterSpacing: '0.5px',
+                        padding: '0.4rem 1.2rem',
+                        boxShadow: '0 2px 8px rgba(30,10,60,0.08)',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseOver={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #6c63ff 0%, #1e0a3c 100%)')}
+                      onMouseOut={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)')}
+                      onClick={() => handleConfirmAttendance(notif.event)}
+                    >
+                      Learn More
+                    </Button>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </Card>
+          </div>
         </Col>
       </Row>
 
       {/* School Calendar section */}
       <Row>
         <Col md={12}>
-          <Card className="mb-4" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)', border: 'none', boxShadow: '0 4px 24px rgba(108,99,255,0.10)' }}>
+          <Card className="mb-4" style={{ marginLeft: '250px', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)', border: 'none', boxShadow: '0 4px 24px rgba(108,99,255,0.10)' }}>
             {/* School Calendar */}
             <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>School Calendar</h5>
@@ -345,46 +383,48 @@ const ParentDashboard: React.FC = () => {
       {/* Feedback section */}
       <Row>
         <Col md={12}>
-          <Card className="mb-4 feedback-card-gradient" style={{ background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
-            {/* Feedback / Request Meeting */}
-            <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0 }}>
-              <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Feedback / Request Meeting</h5>
-            </Card.Header>
-            <Card.Body>
-              <Form onSubmit={(e) => { e.preventDefault(); }}>
-                <Form.Group className="mb-3">
-                  <Form.Label style={{ color: '#a83279', fontWeight: 600 }}>Concern Type</Form.Label>
-                  <Form.Select style={{ background: '#fff', border: '1.5px solid #a83279', borderRadius: 10, color: '#6c63ff', fontWeight: 500 }}>
-                    <option value="">Select concern type...</option>
-                    <option value="academic">Academic</option>
-                    <option value="behavior">Behavior</option>
-                    <option value="health">Health</option>
-                  </Form.Select>
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label style={{ color: '#a83279', fontWeight: 600 }}>Message</Form.Label>
-                  <Form.Control as="textarea" rows={3} style={{ background: '#fff', border: '1.5px solid #a83279', borderRadius: 10, color: '#6c63ff', fontWeight: 500 }} />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Check type="checkbox" label="Request Callback" style={{ color: '#a83279', fontWeight: 500 }} />
-                </Form.Group>
-                <Button variant="primary" type="submit" style={{
-                  background: 'linear-gradient(90deg, #a83279 0%, #6c63ff 100%)',
-                  border: 'none',
-                  borderRadius: 20,
-                  fontWeight: 700,
-                  fontSize: '1.08rem',
-                  letterSpacing: 0.5,
-                  padding: '0.6rem 1.4rem',
-                  boxShadow: '0 2px 8px rgba(171,71,188,0.10)',
-                  color: '#fff',
-                  transition: 'all 0.2s',
-                }}>
-                  Submit Feedback
-                </Button>
-              </Form>
-            </Card.Body>
-          </Card>
+          <div ref={sectionRefs.feedback}>
+            <Card className="mb-4 feedback-card-gradient" style={{ marginLeft: '250px', background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
+              {/* Feedback / Request Meeting */}
+              <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0 }}>
+                <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Feedback / Request Meeting</h5>
+              </Card.Header>
+              <Card.Body>
+                <Form onSubmit={(e) => { e.preventDefault(); }}>
+                  <Form.Group className="mb-3">
+                    <Form.Label style={{ color: '#a83279', fontWeight: 600 }}>Concern Type</Form.Label>
+                    <Form.Select style={{ background: '#fff', border: '1.5px solid #a83279', borderRadius: 10, color: '#6c63ff', fontWeight: 500 }}>
+                      <option value="">Select concern type...</option>
+                      <option value="academic">Academic</option>
+                      <option value="behavior">Behavior</option>
+                      <option value="health">Health</option>
+                    </Form.Select>
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label style={{ color: '#a83279', fontWeight: 600 }}>Message</Form.Label>
+                    <Form.Control as="textarea" rows={3} style={{ background: '#fff', border: '1.5px solid #a83279', borderRadius: 10, color: '#6c63ff', fontWeight: 500 }} />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Check type="checkbox" label="Request Callback" style={{ color: '#a83279', fontWeight: 500 }} />
+                  </Form.Group>
+                  <Button variant="primary" type="submit" style={{
+                    background: 'linear-gradient(90deg, #a83279 0%, #6c63ff 100%)',
+                    border: 'none',
+                    borderRadius: 20,
+                    fontWeight: 700,
+                    fontSize: '1.08rem',
+                    letterSpacing: 0.5,
+                    padding: '0.6rem 1.4rem',
+                    boxShadow: '0 2px 8px rgba(171,71,188,0.10)',
+                    color: '#fff',
+                    transition: 'all 0.2s',
+                  }}>
+                    Submit Feedback
+                  </Button>
+                </Form>
+              </Card.Body>
+            </Card>
+          </div>
         </Col>
       </Row>
     </Container>

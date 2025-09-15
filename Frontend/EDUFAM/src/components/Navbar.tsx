@@ -4,9 +4,9 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-reac
 
 const CustomNavbar: React.FC = () => {
   return (
-    <Navbar className="bg-edufam-dark" variant="dark" expand="lg">
+    <Navbar className="bg-edufam-dark" variant="dark" expand="lg" fixed="top">
       <Container>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand href="#home" >
           {/* Logo Text */}
           <span className="ml-2 text-xl font-bold">EDUFAM</span>
         </Navbar.Brand>
