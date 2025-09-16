@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 /* Main Layout Styling */
 /* App Layout */
 #root {
@@ -118,8 +119,8 @@ main {
 .form-control:focus {
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
-
-/* Footer Styling */
+/*
+Footer Styling
 footer {
   flex-shrink: 0;
   width: 100%;
@@ -191,9 +192,9 @@ footer {
 /* Add smooth transition for all hover effects */
 .social-icon {
   transition: all 0.3s ease !important;
-}
+} 
+ 
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Reset default margin and padding for body and #root */
 body, #root {
@@ -254,11 +255,24 @@ main {
 }
 
 /* Footer styling */
-footer {
+
+footer.footer-fullwidth {
   flex-shrink: 0;
-  width: 100%;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   margin-top: 0;
   padding-top: 0;
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+.footer-inner {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
 }
 
 footer.bg-edufam-dark {

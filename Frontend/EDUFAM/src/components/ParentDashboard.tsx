@@ -112,7 +112,7 @@ const ParentDashboard: React.FC = () => {
             </ListGroup.Item>
           </ListGroup>
         </Col>
-        <Col md={9} style={{ marginLeft: '250px', marginTop: '40px' }}>
+        <Col md={9} style={{ marginLeft: '150px', marginTop: '40px' }}>
           <div style={{  gap: '32px' }}>
             <div style={{ flex: 1 }}>
               <div ref={sectionRefs.childProfile}>
@@ -226,7 +226,7 @@ const ParentDashboard: React.FC = () => {
       <Row>
         <Col md={12} >
           <div ref={sectionRefs.notifications}>
-            <Card className="mb-4" style={{ marginLeft: '250px' }}>
+            <Card className="mb-4" style={{ marginLeft: '150px' }}>
               {/* Recent Notifications */}
               <Card.Header>
                 <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Recent Notifications</h5>
@@ -285,7 +285,7 @@ const ParentDashboard: React.FC = () => {
       {/* School Calendar section */}
       <Row>
         <Col md={12}>
-          <Card className="mb-4" style={{ marginLeft: '250px', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)', border: 'none', boxShadow: '0 4px 24px rgba(108,99,255,0.10)' }}>
+          <Card className="mb-4" style={{ marginLeft: '150px', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)', border: 'none', boxShadow: '0 4px 24px rgba(108,99,255,0.10)' }}>
             {/* School Calendar */}
             <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>School Calendar</h5>
@@ -384,7 +384,7 @@ const ParentDashboard: React.FC = () => {
       <Row>
         <Col md={12}>
           <div ref={sectionRefs.feedback}>
-            <Card className="mb-4 feedback-card-gradient" style={{ marginLeft: '250px', background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
+            <Card className="mb-4 feedback-card-gradient" style={{ marginLeft: '150px', background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
               {/* Feedback / Request Meeting */}
               <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0 }}>
                 <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Feedback / Request Meeting</h5>
