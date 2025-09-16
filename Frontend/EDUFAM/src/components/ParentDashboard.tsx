@@ -95,19 +95,6 @@ const ParentDashboard: React.FC = () => {
   const handleConfirmAttendance = (event: string) => {
     alert(`Attendance confirmed for: ${event}`);
   };
-
-  // Helper to get days in current month
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth(); // 0-indexed
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const calendarEvents = [
-    { id: 1, title: "Mid-term Exams", date: "2025-09-15", type: "exam" },
-    { id: 2, title: "Parent-Teacher Meeting", date: "2025-09-20", type: "meeting" },
-    { id: 3, title: "School Holiday", date: "2025-09-25", type: "holiday" }
-  ];
-
   const sectionRefs = {
     childProfile: React.useRef<HTMLDivElement>(null),
     fees: React.useRef<HTMLDivElement>(null),
@@ -174,9 +161,6 @@ const ParentDashboard: React.FC = () => {
                       </Col>
                       <Col md={4}>
                         <h6>Overall Performance</h6>
-                        <div style={{ fontSize: '1.1em', fontWeight: 600, color: '#1e0a3c', marginBottom: 8 }}>
-                          Grade: A-
-                        </div>
                         <div style={{ color: '#6c63ff', fontWeight: 500, marginBottom: 8 }}>
                           Term: 3, 2025
                         </div>
