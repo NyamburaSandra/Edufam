@@ -1,3 +1,34 @@
+
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { parse, startOfWeek, getDay, format } from 'date-fns';
+import enUS from 'date-fns/locale/en-US';
+
+const locales = {
+  'en-US': enUS,
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
+  getDay,
+  locales,
+});
+
+// Example events array (replace with your real event data)
+const bigCalendarEvents = [
+  {
+    title: 'Maths Contest',
+    start: new Date(2025, 8, 22, 10, 0),
+    end: new Date(2025, 8, 22, 12, 0),
+  },
+  {
+    title: 'Parents Meeting',
+    start: new Date(2025, 8, 25, 14, 0),
+    end: new Date(2025, 8, 25, 16, 0),
+  },
+];
 import React from 'react';
 import { Container, Row, Col, Card, Button, Form, ListGroup } from 'react-bootstrap';
 
@@ -282,98 +313,22 @@ const ParentDashboard: React.FC = () => {
         </Col>
       </Row>
 
-      {/* School Calendar section */}
+      {/* Events Calendar section (react-big-calendar) */}
       <Row>
         <Col md={12}>
-          <Card className="mb-4" style={{ marginLeft: '150px', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)', border: 'none', boxShadow: '0 4px 24px rgba(108,99,255,0.10)' }}>
-            {/* School Calendar */}
+          <Card className="mb-4" style={{ marginLeft: '150px', background: '#fb7100', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
             <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>School Calendar</h5>
-              <span style={{ fontWeight: 500, color: '#6c63ff', fontSize: '1.08em', background: '#f3f7ff', borderRadius: 8, padding: '4px 14px', marginLeft: 12 }}>
-                {now.toLocaleString('default', { month: 'long' })} {year}
-              </span>
+              <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Events Calendar</h5>
             </Card.Header>
             <Card.Body>
-              {/* Calendar grid for current month */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(7, 1fr)',
-                gap: '0.7rem',
-                marginBottom: '1.5rem',
-                background: 'rgba(255,255,255,0.7)',
-                borderRadius: 18,
-                boxShadow: '0 2px 12px rgba(108,99,255,0.07)',
-                padding: '1.2rem 0.7rem'
-              }}>
-                {Array.from({ length: daysInMonth }, (_, i) => {
-                  const day = i + 1;
-                  const event = calendarEvents.find(e => Number(e.date.split('-')[2]) === day && Number(e.date.split('-')[1]) === month + 1 && Number(e.date.split('-')[0]) === year);
-                  let eventColor = '#fff';
-                  let eventText = '#1e0a3c';
-                  let badgeBg = '#6c63ff';
-                  if (event) {
-                    if (event.type === 'exam') {
-                      eventColor = 'linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%)';
-                      eventText = '#b80000';
-                      badgeBg = '#ff6b6b';
-                    } else if (event.type === 'meeting') {
-                      eventColor = 'linear-gradient(90deg, #c9ffbf 0%, #ffafbd 100%)';
-                      eventText = '#185a9d';
-                      badgeBg = '#43cea2';
-                    } else if (event.type === 'holiday') {
-                      eventColor = 'linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%)';
-                      eventText = '#6c63ff';
-                      badgeBg = '#6c63ff';
-                    }
-                  }
-                  return (
-                    <div
-                      key={day}
-                      style={{
-                        border: 'none',
-                        borderRadius: 14,
-                        minHeight: 70,
-                        background: event ? eventColor : 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)',
-                        color: event ? eventText : '#333',
-                        boxShadow: event ? '0 4px 16px rgba(108,99,255,0.10)' : '0 1px 3px rgba(30,10,60,0.04)',
-                        position: 'relative',
-                        padding: 10,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        justifyContent: 'flex-start',
-                        transition: 'transform 0.15s, box-shadow 0.15s',
-                        cursor: event ? 'pointer' : 'default',
-                      }}
-                      onMouseOver={e => {
-                        e.currentTarget.style.transform = 'scale(1.04)';
-                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(108,99,255,0.18)';
-                      }}
-                      onMouseOut={e => {
-                        e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = event ? '0 4px 16px rgba(108,99,255,0.10)' : '0 1px 3px rgba(30,10,60,0.04)';
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, fontSize: '1.1em', opacity: 0.85 }}>{day}</span>
-                      {event && (
-                        <div style={{ fontSize: '0.93em', marginTop: 4, fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                          <span>{event.title}</span>
-                          <span style={{
-                            background: badgeBg,
-                            color: '#fff',
-                            borderRadius: 8,
-                            fontSize: '0.78em',
-                            fontWeight: 700,
-                            marginLeft: 8,
-                            padding: '2px 8px',
-                            letterSpacing: 0.2,
-                            boxShadow: '0 1px 4px rgba(30,10,60,0.10)'
-                          }}>{event.type}</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+              <div style={{ height: 500, background: "#fff", borderRadius: "8px", padding: "16px" }}>
+                <Calendar
+                  localizer={localizer}
+                  events={bigCalendarEvents}
+                  startAccessor="start"
+                  endAccessor="end"
+                  style={{ height: 400 }}
+                />
               </div>
             </Card.Body>
           </Card>
