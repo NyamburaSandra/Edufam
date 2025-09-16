@@ -99,20 +99,20 @@ const ParentDashboard: React.FC = () => {
         <Col md={3} className="p-0">
           <ListGroup variant="flush" className="sidebar">
             <ListGroup.Item action onClick={() => scrollToSection('childProfile')}>
-              <i className="bi bi-person-badge me-2"></i> Child Profile
+              <i className="bi bi-person-badge me-2" style={{ color: '#6c63ff' }}></i> Child Profile
             </ListGroup.Item>
             <ListGroup.Item action onClick={() => scrollToSection('fees')}>
-              <i className="bi bi-cash-stack me-2"></i> Fees
+              <i className="bi bi-cash-stack me-2" style={{ color: '#fb7100' }}></i> Fees
             </ListGroup.Item>
             <ListGroup.Item action onClick={() => scrollToSection('notifications')}>
-              <i className="bi bi-bell me-2"></i> Notifications
+              <i className="bi bi-bell me-2" style={{ color: '#43cea2' }}></i> Notifications
             </ListGroup.Item>
             <ListGroup.Item action onClick={() => scrollToSection('feedback')}>
-              <i className="bi bi-chat-left-text me-2"></i> Feedback
+              <i className="bi bi-chat-left-text me-2" style={{ color: '#a83279' }}></i> Feedback
             </ListGroup.Item>
           </ListGroup>
         </Col>
-        <Col md={9} style={{ marginLeft: '250px' }}>
+        <Col md={9} style={{ marginLeft: '250px', marginTop: '40px' }}>
           <div style={{  gap: '32px' }}>
             <div style={{ flex: 1 }}>
               <div ref={sectionRefs.childProfile}>

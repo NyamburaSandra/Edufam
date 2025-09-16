@@ -25,7 +25,7 @@ const CustomNavbar: React.FC = () => {
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <UserButton />
+              <UserButton afterSignOutUrl="/welcome" />
             </SignedIn>
           </Nav>
         </Navbar.Collapse>

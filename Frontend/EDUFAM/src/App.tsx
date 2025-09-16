@@ -5,6 +5,8 @@ import ParentDashboard from "./components/ParentDashboard";
 import TeacherDashboard from "./components/TeacherDashboard";
 import Footer from "./components/Footer";
 import { useUser } from "@clerk/clerk-react";
+import { Routes, Route } from 'react-router-dom';
+import Welcome from "./components/Welcome";
 
 function App() {
   const { user } = useUser();
@@ -15,10 +17,12 @@ function App() {
       <CustomNavbar />
       <div className="flex-grow-1">
         <main>
-          {isTeacher ? <TeacherDashboard /> : <ParentDashboard />}
+          <Routes>
+            <Route path="/welcome" element={<><Welcome /><Footer /></>} />
+            <Route path="/" element={isTeacher ? <TeacherDashboard /> : <><ParentDashboard /><Footer /></>} />
+          </Routes>
         </main>
       </div>
-      <Footer />
     </>
   );
 }
