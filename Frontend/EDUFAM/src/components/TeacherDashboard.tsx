@@ -7,16 +7,31 @@ const TeacherDashboard: React.FC = () => {
 	const [selectedSummaryClass, setSelectedSummaryClass] = useState("");
 	const { addEvent } = useEvents();
 
-	// State for event form
+	// State for event form, now includes image
 	const [eventForm, setEventForm] = useState({
 		title: '',
 		date: '',
 		time: '',
 		description: '',
+		image: '', // data URL
 	});
+	const [imagePreview, setImagePreview] = useState<string | null>(null);
 
 	const handleEventFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		setEventForm({ ...eventForm, [e.target.name]: e.target.value });
+		const { name, value } = e.target;
+		setEventForm({ ...eventForm, [name]: value });
+	};
+
+	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files && e.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setEventForm(prev => ({ ...prev, image: reader.result as string }));
+				setImagePreview(reader.result as string);
+			};
+			reader.readAsDataURL(file);
+		}
 	};
 
 	const handleAddEvent = (e: React.FormEvent) => {
@@ -31,8 +46,10 @@ const TeacherDashboard: React.FC = () => {
 			start,
 			end,
 			description: eventForm.description,
+			image: eventForm.image,
 		});
-		setEventForm({ title: '', date: '', time: '', description: '' });
+		setEventForm({ title: '', date: '', time: '', description: '', image: '' });
+		setImagePreview(null);
 		alert('Event added! It will appear in the Parent Dashboard.');
 	};
 
@@ -148,87 +165,111 @@ const TeacherDashboard: React.FC = () => {
 										)}
 									</div>
 								</Tab.Pane>
-								<Tab.Pane eventKey="results" active={activeKey === 'results'}>
-									<h3>Upload Results</h3>
-									<Form>
-										<Form.Group className="mb-3">
-											<Form.Label>Class/Stream</Form.Label>
-											<Form.Select>
-												<option value="">Select class...</option>
-												<option value="1 Ivory">Class 1 Ivory</option>
-												<option value="1 Pearl">Class 1 Pearl</option>
-												<option value="2 Ivory">Class 2 Ivory</option>
-												<option value="2 Pearl">Class 2 Pearl</option>
-												<option value="3 Ivory">Class 3 Ivory</option>
-												<option value="3 Pearl">Class 3 Pearl</option>
-												<option value="4 Ivory">Class 4 Ivory</option>
-												<option value="4 Pearl">Class 4 Pearl</option>
-												<option value="5 Ivory">Class 5 Ivory</option>
-												<option value="5 Pearl">Class 5 Pearl</option>
-												<option value="6 Ivory">Class 6 Ivory</option>
-												<option value="6 Pearl">Class 6 Pearl</option>
-												<option value="7 Ivory">Class 7 Ivory</option>
-												<option value="7 Pearl">Class 7 Pearl</option>
-												<option value="8 Ivory">Class 8 Ivory</option>
-												<option value="8 Pearl">Class 8 Pearl</option>
-											</Form.Select>
-										</Form.Group>
-										<Form.Group className="mb-3">
-											<Form.Label>Student Results (CSV or Excel)</Form.Label>
-											<Form.Control type="file" />
-										</Form.Group>
-										<Button variant="primary">Upload Results</Button>
-									</Form>
-								</Tab.Pane>
-												<Tab.Pane eventKey="events" active={activeKey === 'events'}>
-													<h3>Add School Event</h3>
-													<Form onSubmit={handleAddEvent}>
+												<Tab.Pane eventKey="results" active={activeKey === 'results'}>
+													<h3>Upload Results</h3>
+													<Form>
 														<Form.Group className="mb-3">
-															<Form.Label>Event Name</Form.Label>
-															<Form.Control
-																type="text"
-																placeholder="Enter event name"
-																name="title"
-																value={eventForm.title}
-																onChange={handleEventFormChange}
-																required
-															/>
+															<Form.Label>Student Name</Form.Label>
+															<Form.Control type="text" placeholder="Enter student name" />
 														</Form.Group>
 														<Form.Group className="mb-3">
-															<Form.Label>Date</Form.Label>
-															<Form.Control
-																type="date"
-																name="date"
-																value={eventForm.date}
-																onChange={handleEventFormChange}
-																required
-															/>
+															<Form.Label>Student ID</Form.Label>
+															<Form.Control type="text" placeholder="Enter student ID" />
 														</Form.Group>
 														<Form.Group className="mb-3">
-															<Form.Label>Time</Form.Label>
-															<Form.Control
-																type="time"
-																name="time"
-																value={eventForm.time}
-																onChange={handleEventFormChange}
-																required
-															/>
+															<Form.Label>Class/Stream</Form.Label>
+															<Form.Select>
+																<option value="">Select class...</option>
+																<option value="1 Ivory">Class 1 Ivory</option>
+																<option value="1 Pearl">Class 1 Pearl</option>
+																<option value="2 Ivory">Class 2 Ivory</option>
+																<option value="2 Pearl">Class 2 Pearl</option>
+																<option value="3 Ivory">Class 3 Ivory</option>
+																<option value="3 Pearl">Class 3 Pearl</option>
+																<option value="4 Ivory">Class 4 Ivory</option>
+																<option value="4 Pearl">Class 4 Pearl</option>
+																<option value="5 Ivory">Class 5 Ivory</option>
+																<option value="5 Pearl">Class 5 Pearl</option>
+																<option value="6 Ivory">Class 6 Ivory</option>
+																<option value="6 Pearl">Class 6 Pearl</option>
+																<option value="7 Ivory">Class 7 Ivory</option>
+																<option value="7 Pearl">Class 7 Pearl</option>
+																<option value="8 Ivory">Class 8 Ivory</option>
+																<option value="8 Pearl">Class 8 Pearl</option>
+															</Form.Select>
 														</Form.Group>
 														<Form.Group className="mb-3">
-															<Form.Label>Description</Form.Label>
-															<Form.Control
-																as="textarea"
-																rows={2}
-																placeholder="Enter event description"
-																name="description"
-																value={eventForm.description}
-																onChange={handleEventFormChange}
-															/>
+															<Form.Label>Student Image</Form.Label>
+															<Form.Control type="file" accept="image/*" />
 														</Form.Group>
-														{/* Event Image upload can be added to backend integration */}
-														<Button variant="primary" type="submit">Add Event</Button>
+														<Form.Group className="mb-3">
+															<Form.Label>Student Results (CSV or Excel)</Form.Label>
+															<Form.Control type="file" />
+														</Form.Group>
+														<Button variant="primary">Upload Results</Button>
 													</Form>
 												</Tab.Pane>
+																<Tab.Pane eventKey="events" active={activeKey === 'events'}>
+																	<h3>Add School Event</h3>
+																	<Form onSubmit={handleAddEvent}>
+																		<Form.Group className="mb-3">
+																			<Form.Label>Event Name</Form.Label>
+																			<Form.Control
+																				type="text"
+																				placeholder="Enter event name"
+																				name="title"
+																				value={eventForm.title}
+																				onChange={handleEventFormChange}
+																				required
+																			/>
+																		</Form.Group>
+																		<Form.Group className="mb-3">
+																			<Form.Label>Date</Form.Label>
+																			<Form.Control
+																				type="date"
+																				name="date"
+																				value={eventForm.date}
+																				onChange={handleEventFormChange}
+																				required
+																			/>
+																		</Form.Group>
+																		<Form.Group className="mb-3">
+																			<Form.Label>Time</Form.Label>
+																			<Form.Control
+																				type="time"
+																				name="time"
+																				value={eventForm.time}
+																				onChange={handleEventFormChange}
+																				required
+																			/>
+																		</Form.Group>
+																		<Form.Group className="mb-3">
+																			<Form.Label>Description</Form.Label>
+																			<Form.Control
+																				as="textarea"
+																				rows={2}
+																				placeholder="Enter event description"
+																				name="description"
+																				value={eventForm.description}
+																				onChange={handleEventFormChange}
+																			/>
+																		</Form.Group>
+																		<Form.Group className="mb-3">
+																			<Form.Label>Event Image</Form.Label>
+																			<Form.Control
+																				type="file"
+																				accept="image/*"
+																				onChange={handleImageChange}
+																			/>
+																			{imagePreview && (
+																				<div style={{ marginTop: 10 }}>
+																					<img src={imagePreview} alt="Event Preview" style={{ maxWidth: 200, maxHeight: 120, borderRadius: 8 }} />
+																				</div>
+																			)}
+																		</Form.Group>
+																		<Button variant="primary" type="submit">Add Event</Button>
+																	</Form>
+																</Tab.Pane>
 								<Tab.Pane eventKey="attendance" active={activeKey === 'attendance'}>
 									<h3>Attendance</h3>
 									<Form>
