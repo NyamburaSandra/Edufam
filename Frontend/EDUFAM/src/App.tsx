@@ -4,22 +4,20 @@ import CustomNavbar from "./components/Navbar";
 import ParentDashboard from "./components/ParentDashboard";
 import TeacherDashboard from "./components/TeacherDashboard";
 import Footer from "./components/Footer";
-import { useUser } from "@clerk/clerk-react";
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Welcome from "./components/Welcome";
 
 function App() {
-  const { user } = useUser();
-  const teacherEmail = "sandranyambura72@gmail.com";
-  const isTeacher = user?.primaryEmailAddress?.emailAddress === teacherEmail;
   return (
     <>
       <CustomNavbar />
       <div className="flex-grow-1">
         <main>
           <Routes>
+            <Route path="/" element={<Navigate to="/welcome" replace />} />
             <Route path="/welcome" element={<><Welcome /><Footer /></>} />
-            <Route path="/" element={isTeacher ? <TeacherDashboard /> : <><ParentDashboard /><Footer /></>} />
+            <Route path="/parent" element={<><ParentDashboard /><Footer /></>} />
+            <Route path="/teacher" element={<TeacherDashboard />} />
           </Routes>
         </main>
       </div>
