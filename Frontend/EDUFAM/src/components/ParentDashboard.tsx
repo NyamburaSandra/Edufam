@@ -1,7 +1,8 @@
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { parse, startOfWeek, getDay, format } from 'date-fns';
-import { enUS } from 'date-fns/locale/en-US';
+import { enUS } from 'date-fns/locale';
+import { useEvents } from '../context/useEvents';
 
 const locales = {
   'en-US': enUS,
@@ -14,20 +15,6 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-
-// Example events array (replace with your real event data)
-const bigCalendarEvents = [
-  {
-    title: 'Maths Contest',
-    start: new Date(2025, 8, 22, 10, 0),
-    end: new Date(2025, 8, 22, 12, 0),
-  },
-  {
-    title: 'Parents Meeting',
-    start: new Date(2025, 8, 25, 14, 0),
-    end: new Date(2025, 8, 25, 16, 0),
-  },
-];
 import React from 'react';
 import { Container, Row, Col, Card, Button, Form, ListGroup } from 'react-bootstrap';
 
@@ -54,44 +41,38 @@ const ParentDashboard: React.FC = () => {
     attendance: 90
   };
 
-  // Example notifications
-  const notifications = [
-    {
-      id: 1,
-      message: "Parent-Teacher Meeting scheduled",
-      date: "2025-09-20",
-      event: "Parent-Teacher Meeting",
-      description: "Join us for a discussion on your child's progress and school updates.",
-      extra: "Your presence is highly encouraged to foster better communication.",
-      start: "10:00 AM",
-      end: "12:00 PM",
-      photo: "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-      id: 2,
-      message: "Mid-term Exams coming up",
-      date: "2025-09-15",
-      event: "Mid-term Exams",
-      description: "Mid-term exams for all classes. Ensure your child is prepared.",
-      extra: "Please check the exam timetable and help your child revise.",
-      start: "8:00 AM",
-      end: "1:00 PM",
-      photo: "https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80"
-    },
-    {
-      id: 3,
-      message: "School Holiday announced",
-      date: "2025-09-25",
-      event: "School Holiday",
-      description: "School will be closed for a public holiday. Enjoy your break!",
-      extra: "Classes will resume as usual after the holiday.",
-      start: "All Day",
-      end: "All Day",
-      photo: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80"
-    },
-  ];
 
-  const handleConfirmAttendance = (event: string) => {
+  // Use events from context
+  const { events } = useEvents();
+  const now = new Date();
+  type Notification = {
+    id: number;
+    message: string;
+    date: string;
+    event: string;
+    description: string;
+    extra: string;
+    start: string;
+    end: string;
+    photo: string;
+  };
+  const notifications: Notification[] = events
+    .filter((e) => e.start > now)
+    .sort((a, b) => a.start.getTime() - b.start.getTime())
+    .slice(0, 5)
+    .map((e) => ({
+      id: e.id,
+      message: e.title,
+      date: e.start.toLocaleDateString(),
+      event: e.title,
+      description: e.description,
+      extra: '',
+      start: e.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      end: e.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      photo: '',
+    }));
+
+  const handleConfirmAttendance = (event: string): void => {
     alert(`Attendance confirmed for: ${event}`);
   };
   const sectionRefs = {
@@ -101,7 +82,7 @@ const ParentDashboard: React.FC = () => {
     feedback: React.useRef<HTMLDivElement>(null),
   };
 
-  const scrollToSection = (section: keyof typeof sectionRefs) => {
+  const scrollToSection = (section: keyof typeof sectionRefs): void => {
     const offset = 80; // Height of navbar
     const ref = sectionRefs[section].current;
     if (ref) {
@@ -253,11 +234,7 @@ const ParentDashboard: React.FC = () => {
                     style={{ border: 'none', borderBottom: 'none', marginBottom: '1.2rem', background: 'transparent' }}
                   >
                     <div style={{ minWidth: 80, marginRight: 20, marginBottom: 10 }}>
-                      <img
-                        src={notif.photo}
-                        alt={notif.event}
-                        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 16, boxShadow: '0 2px 8px rgba(30,10,60,0.08)' }}
-                      />
+                      {/* Optionally add an icon or default image here */}
                     </div>
                     <div style={{ flex: 1 }}>
                       <strong style={{ color: '#1e0a3c' }}>{notif.message}</strong>
@@ -273,7 +250,6 @@ const ParentDashboard: React.FC = () => {
                       size="sm"
                       className="mt-2 mt-md-0 modern-action-btn"
                       style={{
-                        // background and color handled by class
                         border: 'none',
                         borderRadius: '20px',
                         fontWeight: 600,
@@ -299,7 +275,7 @@ const ParentDashboard: React.FC = () => {
       {/* Events Calendar section (react-big-calendar) */}
       <Row>
         <Col md={12}>
-          <Card className="mb-4" style={{ marginLeft: '150px', background: '#fb7100', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
+          <Card className="mb-4" style={{ marginLeft: '150px', background: '#cf84c7', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
             <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Events Calendar</h5>
             </Card.Header>
@@ -307,7 +283,7 @@ const ParentDashboard: React.FC = () => {
               <div style={{ height: 500, background: "#fff", borderRadius: "8px", padding: "16px" }}>
                 <Calendar
                   localizer={localizer}
-                  events={bigCalendarEvents}
+                  events={events}
                   startAccessor="start"
                   endAccessor="end"
                   style={{ height: 400 }}
@@ -328,7 +304,7 @@ const ParentDashboard: React.FC = () => {
                 <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Feedback / Request Meeting</h5>
               </Card.Header>
               <Card.Body>
-                <Form onSubmit={(e) => { e.preventDefault(); }}>
+                <Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => { e.preventDefault(); }}>
                   <Form.Group className="mb-3">
                     <Form.Label style={{ color: '#a83279', fontWeight: 600 }}>Concern Type</Form.Label>
                     <Form.Select style={{ background: '#fff', border: '1.5px solid #a83279', borderRadius: 10, color: '#6c63ff', fontWeight: 500 }}>

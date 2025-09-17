@@ -1,9 +1,40 @@
 import React, { useState } from 'react';
+import { useEvents } from '../context/useEvents';
 import { Container, Row, Col, Button, Form, ListGroup, Tab } from 'react-bootstrap';
 
 const TeacherDashboard: React.FC = () => {
 	const [activeKey, setActiveKey] = useState('dashboard');
 	const [selectedSummaryClass, setSelectedSummaryClass] = useState("");
+	const { addEvent } = useEvents();
+
+	// State for event form
+	const [eventForm, setEventForm] = useState({
+		title: '',
+		date: '',
+		time: '',
+		description: '',
+	});
+
+	const handleEventFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+		setEventForm({ ...eventForm, [e.target.name]: e.target.value });
+	};
+
+	const handleAddEvent = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!eventForm.title || !eventForm.date || !eventForm.time) return;
+		const [hour, minute] = eventForm.time.split(':').map(Number);
+		const start = new Date(eventForm.date);
+		start.setHours(hour, minute, 0, 0);
+		const end = new Date(start.getTime() + 60 * 60 * 1000); // 1 hour duration
+		addEvent({
+			title: eventForm.title,
+			start,
+			end,
+			description: eventForm.description,
+		});
+		setEventForm({ title: '', date: '', time: '', description: '' });
+		alert('Event added! It will appear in the Parent Dashboard.');
+	};
 
 	return (
 		<>
@@ -149,32 +180,55 @@ const TeacherDashboard: React.FC = () => {
 										<Button variant="primary">Upload Results</Button>
 									</Form>
 								</Tab.Pane>
-								<Tab.Pane eventKey="events" active={activeKey === 'events'}>
-									<h3>Add School Event</h3>
-									<Form>
-										<Form.Group className="mb-3">
-											<Form.Label>Event Name</Form.Label>
-											<Form.Control type="text" placeholder="Enter event name" />
-										</Form.Group>
-										<Form.Group className="mb-3">
-											<Form.Label>Date</Form.Label>
-											<Form.Control type="date" />
-										</Form.Group>
-										<Form.Group className="mb-3">
-											<Form.Label>Time</Form.Label>
-											<Form.Control type="time" />
-										</Form.Group>
-										<Form.Group className="mb-3">
-											<Form.Label>Description</Form.Label>
-											<Form.Control as="textarea" rows={2} placeholder="Enter event description" />
-										</Form.Group>
-										<Form.Group className="mb-3">
-											<Form.Label>Event Image</Form.Label>
-											<Form.Control type="file" accept="image/*" />
-										</Form.Group>
-										<Button variant="primary">Add Event</Button>
-									</Form>
-								</Tab.Pane>
+												<Tab.Pane eventKey="events" active={activeKey === 'events'}>
+													<h3>Add School Event</h3>
+													<Form onSubmit={handleAddEvent}>
+														<Form.Group className="mb-3">
+															<Form.Label>Event Name</Form.Label>
+															<Form.Control
+																type="text"
+																placeholder="Enter event name"
+																name="title"
+																value={eventForm.title}
+																onChange={handleEventFormChange}
+																required
+															/>
+														</Form.Group>
+														<Form.Group className="mb-3">
+															<Form.Label>Date</Form.Label>
+															<Form.Control
+																type="date"
+																name="date"
+																value={eventForm.date}
+																onChange={handleEventFormChange}
+																required
+															/>
+														</Form.Group>
+														<Form.Group className="mb-3">
+															<Form.Label>Time</Form.Label>
+															<Form.Control
+																type="time"
+																name="time"
+																value={eventForm.time}
+																onChange={handleEventFormChange}
+																required
+															/>
+														</Form.Group>
+														<Form.Group className="mb-3">
+															<Form.Label>Description</Form.Label>
+															<Form.Control
+																as="textarea"
+																rows={2}
+																placeholder="Enter event description"
+																name="description"
+																value={eventForm.description}
+																onChange={handleEventFormChange}
+															/>
+														</Form.Group>
+														{/* Event Image upload can be added to backend integration */}
+														<Button variant="primary" type="submit">Add Event</Button>
+													</Form>
+												</Tab.Pane>
 								<Tab.Pane eventKey="attendance" active={activeKey === 'attendance'}>
 									<h3>Attendance</h3>
 									<Form>

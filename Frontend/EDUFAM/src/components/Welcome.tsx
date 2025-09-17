@@ -3,15 +3,21 @@ import CustomNavbar from './Navbar';
 import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 
+
 const Welcome: React.FC = () => {
-	const { isSignedIn } = useUser();
+	const { isSignedIn, user } = useUser();
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (isSignedIn) {
-			navigate('/');
+		if (isSignedIn && user) {
+			const teacherEmail = "sandranyambura72@gmail.com";
+			if (user.primaryEmailAddress?.emailAddress === teacherEmail) {
+				navigate('/teacher', { replace: true });
+			} else {
+				navigate('/parent', { replace: true });
+			}
 		}
-	}, [isSignedIn, navigate]);
+	}, [isSignedIn, user, navigate]);
 
 	return (
 		<>
