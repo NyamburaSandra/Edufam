@@ -3,9 +3,13 @@ import React from 'react';
 import { InputGroup, Button, FormControl } from "react-bootstrap";
 
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  className?: string;
+}
+
+const Footer: React.FC<FooterProps> = ({ className = "" }) => {
   return (
-    <footer className="bg-edufam-dark text-white py-5 mt-5 footer-fullwidth">
+    <footer className={`bg-edufam-dark text-white py-5 mt-5 footer-fullwidth ${className}`}>
       <div className="footer-inner">
         <div className="row">
           <div className="col-md-3 mb-4 mb-md-0">
