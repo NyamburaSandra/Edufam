@@ -28,7 +28,7 @@
       "grade": "A-",
   "fileName": "MaryJohnson_Term3_Results.pdf",
   "fileDataUrl": "data:application/pdf;base64,JVBERi0xLjQKJcfs...fakebase64...",
-  "parentEmail": "maryjohnson.parent@email.com"
+  "parentEmail": "maryjohnson.parent@gmail.com"
     }
   ],
   "feedback": [
@@ -38,7 +38,7 @@
       "message": "My child is struggling with the math homework. Can you provide extra help?"
     },
     {
-      "parentEmail": "johnsmith.parent@email.com",
+      "parentEmail": "johnsmith.parent@gmail.com",
       "concern": "Attendance",
       "message": "John will be absent next week due to family reasons."
     },
