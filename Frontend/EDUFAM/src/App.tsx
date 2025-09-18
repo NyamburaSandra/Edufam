@@ -19,7 +19,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/welcome" replace />} />
               <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
-              <Route path="/parent" element={<ParentDashboard />} />
+              <Route path="/parent/*" element={<ParentDashboard />} />
               <Route path="/teacher" element={<><CustomNavbar /><TeacherDashboard /></>} />
               <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
             </Routes>
