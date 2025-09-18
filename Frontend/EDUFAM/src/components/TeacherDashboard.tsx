@@ -131,23 +131,52 @@ const TeacherDashboard: React.FC = () => {
 			<Container fluid className="my-4" >
 				<Row className="teacher-dashboard-row g-0">
 					<Col md={3} className="p-0">
-						<ListGroup variant="flush" className="sidebar">
-							<ListGroup.Item action active={activeKey === 'dashboard'} onClick={() => setActiveKey('dashboard')}>
-								<i className="bi bi-speedometer2 me-2"></i> Dashboard
-							</ListGroup.Item>
-							<ListGroup.Item action active={activeKey === 'results'} onClick={() => setActiveKey('results')}>
-								<i className="bi bi-file-earmark-bar-graph me-2"></i> Results
-							</ListGroup.Item>
-							<ListGroup.Item action active={activeKey === 'events'} onClick={() => setActiveKey('events')}>
-								<i className="bi bi-calendar-event me-2"></i> Events
-							</ListGroup.Item>
-							<ListGroup.Item action active={activeKey === 'attendance'} onClick={() => setActiveKey('attendance')}>
-								<i className="bi bi-check2-square me-2"></i> Attendance
-							</ListGroup.Item>
-						</ListGroup>
+						<div className="teacher-sidebar bg-light border-end" style={{ minHeight: '100vh', position: 'fixed', width: '250px' }}>
+							<div className="p-3 border-bottom">
+								<h5 className="mb-0 text-primary">Teacher Panel</h5>
+							</div>
+							<ListGroup variant="flush" className="teacher-nav">
+								<ListGroup.Item 
+									action 
+									active={activeKey === 'dashboard'} 
+									onClick={() => setActiveKey('dashboard')}
+									className="border-0 py-3"
+								>
+									<i className="bi bi-house-door me-3"></i> 
+									<span>Dashboard</span>
+								</ListGroup.Item>
+								<ListGroup.Item 
+									action 
+									active={activeKey === 'results'} 
+									onClick={() => setActiveKey('results')}
+									className="border-0 py-3"
+								>
+									<i className="bi bi-clipboard-data me-3"></i> 
+									<span>Upload Results</span>
+								</ListGroup.Item>
+								<ListGroup.Item 
+									action 
+									active={activeKey === 'events'} 
+									onClick={() => setActiveKey('events')}
+									className="border-0 py-3"
+								>
+									<i className="bi bi-calendar-plus me-3"></i> 
+									<span>Add Events</span>
+								</ListGroup.Item>
+								<ListGroup.Item 
+									action 
+									active={activeKey === 'attendance'} 
+									onClick={() => setActiveKey('attendance')}
+									className="border-0 py-3"
+								>
+									<i className="bi bi-person-check me-3"></i> 
+									<span>Attendance</span>
+								</ListGroup.Item>
+							</ListGroup>
+						</div>
 					</Col>
-					<Col md={9} className="p-4 teacher-dashboard-section">
-						<div style={{ marginTop: '40px' }}>
+					<Col md={9} className="p-4 teacher-dashboard-section" style={{ marginLeft: '250px' }}>
+						<div className="teacher-content">
 							<Tab.Content>
 								<Tab.Pane eventKey="dashboard" active={activeKey === 'dashboard'}>
 									<div className="row dashboard-tab-section">

@@ -4,7 +4,7 @@ import { parse, startOfWeek, getDay, format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useEvents } from '../context/useEvents';
 import React, { useState } from 'react';
-import { Container, Row, Col, Card, Button, Form, ListGroup, Table, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Table, Badge } from 'react-bootstrap';
 import { Routes, Route } from 'react-router-dom';
 import CustomNavbar from './Navbar';
 import Sidebar from './Sidebar';
@@ -30,6 +30,10 @@ const ParentDashboard: React.FC = () => {
   const { results } = useResults();
   const { attendance } = useAttendance();
   
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   // Show the latest uploaded result if available
   const latestResult = results.length > 0 ? results[results.length - 1] : null;
   const latestAttendance = attendance.length > 0 ? attendance[attendance.length - 1] : null;
@@ -49,10 +53,6 @@ const ParentDashboard: React.FC = () => {
     fileName: '',
     fileDataUrl: '',
     attendance: latestAttendance ? latestAttendance.attendancePercent : 0,
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
   };
 
   // Parent navigation items
@@ -100,18 +100,30 @@ const ParentDashboard: React.FC = () => {
       <CustomNavbar notifications={notifications} />
       
       <div className="parent-dashboard">
-        {/* Sidebar Toggle Button */}
+        {/* Mobile Sidebar Toggle Button */}
+        <Button
+          variant="primary"
+          className="toggle-sidebar-btn d-md-none"
+          onClick={toggleSidebar}
+        >
+          {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
+        </Button>
+        
+        {/* Sidebar Toggle Button for Desktop */}
         <Button
           variant="outline-primary"
-          className="mb-3 ms-3"
+          className="mb-3 ms-3 d-none d-md-block"
           onClick={toggleSidebar}
           style={{ position: 'fixed', top: '70px', left: '10px', zIndex: 1025 }}
         >
-          ☰ Menu
+          {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
         </Button>
 
         {/* Sidebar */}
-        <Sidebar navItems={parentNavItems} isOpen={sidebarOpen} />
+        <Sidebar 
+          navItems={parentNavItems} 
+          isOpen={sidebarOpen} 
+        />
 
         {/* Main Content */}
         <div 
@@ -275,7 +287,6 @@ const ParentDashboard: React.FC = () => {
   function ChildInformationView() {
     // Get all users and filter for current parent's children
     const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
-    const currentParentEmail = 'parent@example.com'; // This would come from authentication context
     
     // Find current parent
     const currentParent = users.find((user: any) => user.type === 'parent');
@@ -297,7 +308,7 @@ const ParentDashboard: React.FC = () => {
     const [selectedChild, setSelectedChild] = useState(children[0] || null);
 
     // Generate some demo academic data
-    const generateAcademicData = (child: any) => {
+    const generateAcademicData = () => {
       const subjects = ['Mathematics', 'English', 'Science', 'Social Studies', 'Swahili'];
       return subjects.map(subject => ({
         subject,
@@ -306,7 +317,7 @@ const ParentDashboard: React.FC = () => {
       }));
     };
 
-    const generateAttendanceData = (child: any) => {
+    const generateAttendanceData = () => {
       return {
         present: Math.floor(Math.random() * 10 + 85), // 85-95% attendance
         absent: Math.floor(Math.random() * 5 + 2),
@@ -446,7 +457,7 @@ const ParentDashboard: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {generateAcademicData(selectedChild).map((subject, index) => (
+                        {generateAcademicData().map((subject, index) => (
                           <tr key={index}>
                             <td>{subject.subject}</td>
                             <td>
@@ -493,7 +504,7 @@ const ParentDashboard: React.FC = () => {
               <Card.Body>
                 <Row>
                   {(() => {
-                    const attendance = generateAttendanceData(selectedChild);
+                    const attendance = generateAttendanceData();
                     const total = attendance.present + attendance.absent;
                     const percentage = Math.round((attendance.present / total) * 100);
                     

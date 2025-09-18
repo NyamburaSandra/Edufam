@@ -70,7 +70,7 @@ const AdminDashboard: React.FC = () => {
           onClick={toggleSidebar}
           style={{ position: 'fixed', top: '70px', left: '10px', zIndex: 1025 }}
         >
-          ☰ Menu
+          {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
         </Button>
 
       {/* Sidebar */}
