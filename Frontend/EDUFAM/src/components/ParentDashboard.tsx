@@ -100,7 +100,7 @@ const ParentDashboard: React.FC = () => {
       <Container fluid className="py-4">
   <Row className="parent-dashboard-row g-0">
         <Col md={3} className="p-0">
-          <ListGroup variant="flush" className="sidebar" style={{ marginTop: '12px' }}>
+          <ListGroup variant="flush" className="sidebar parent-sidebar" style={{ marginTop: '12px' }}>
             <ListGroup.Item action onClick={() => scrollToSection('childProfile')}>
               <i className="bi bi-person-badge me-2" style={{ color: '#6c63ff' }}></i> Child Profile
             </ListGroup.Item>

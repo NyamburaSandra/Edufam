@@ -1,3 +1,7 @@
+/* Force green background for parent dashboard sidebar, override global sidebar */
+.parent-sidebar {
+  background: #43cea2 !important;
+}
 /* ParentDashboard.css */
 body{
   margin-top: auto;
@@ -175,6 +179,7 @@ p {
   left: 0;
   width: 100%;
 }
+
 .parent-dashboard-row {
   margin-top: 100px !important;
   min-height: calc(100vh - 100px - 80px); /* 100px navbar, 80px footer est. */
@@ -184,13 +189,15 @@ p {
 
 .sidebar {
   height: 100%;
-  min-height: calc(100vh - 100px - 80px); /* fill to footer */
-  background: #fff;
-  border-right: 1.5px solid #e9ecef;
+  min-height: 0;
+  max-height: calc(100vh - 100px - 80px); /* stop at footer */
+  background: #43cea2;
+  border-right: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   padding-bottom: 40px;
+  overflow-y: auto;
 }
 
 .sidebar {

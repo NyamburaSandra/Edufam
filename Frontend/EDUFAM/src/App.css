@@ -118,13 +118,6 @@ main {
 .form-control:focus {
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
-/*
-Footer Styling
-footer {
-  flex-shrink: 0;
-  width: 100%;
-  margin-top: auto;
-}
 
 /* Social Media Icons Styling */
 .social-icon {
@@ -256,9 +249,9 @@ footer.footer-fullwidth {
 }
 
 footer.footer-parent-dashboard {
-  width: calc(100% - 150px);
-  margin-left: 150px;
-  margin-right: 0px;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
 }
 
 .footer-inner {
@@ -349,7 +342,7 @@ footer.bg-edufam-dark {
   min-height: calc(100vh - 56px - 120px);
   max-height: calc(100vh - 56px - 120px);
   overflow-y: auto;
-  border-right: 2px solid #e0e0e0 !important; /* Add visible separation */
+  border-right: none !important;
   background: transparent !important;
   z-index: 1;
 }
