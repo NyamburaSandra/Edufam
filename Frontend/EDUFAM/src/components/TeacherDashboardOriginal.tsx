@@ -8,7 +8,7 @@ import { Container, Row, Col, Button, Form, ListGroup, Tab } from 'react-bootstr
 
 
 const TeacherDashboardOriginal: React.FC = () => {
-    const [activeKey, setActiveKey] = useState('feedback');
+    const [activeKey, setActiveKey] = useState('dashboard');
     const [selectedSummaryClass, setSelectedSummaryClass] = useState("");
     const [summaryType, setSummaryType] = useState<'results' | 'events' | 'attendance'>('results');
     const { addEvent, events } = useEvents();

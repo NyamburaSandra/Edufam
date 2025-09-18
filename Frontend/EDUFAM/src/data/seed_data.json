@@ -116,22 +116,5 @@
       "end": "2025-10-02T15:00:00",
       "description": "Annual science fair for all students."
     }
-  ],
-  "feedback": [
-    {
-      "parentEmail": "janedoe.parent@email.com",
-      "concern": "Academic Performance",
-      "message": "My child is struggling with maths. Can we schedule a meeting to discuss?"
-    },
-    {
-      "parentEmail": "johnsmith.parent@email.com",
-      "concern": "Behavior",
-      "message": "I've noticed some behavioral issues. Please let me know how I can help."
-    },
-    {
-      "parentEmail": "maryjohnson.parent@email.com",
-      "concern": "Homework",
-      "message": "The homework load seems heavy. Is there any way to reduce it?"
-    }
   ]
 }
