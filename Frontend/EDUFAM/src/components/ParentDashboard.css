@@ -1,5 +1,5 @@
 /* Force green background for parent dashboard sidebar, override global sidebar */
-.parent-sidebar {
+.parent-dashboard-row .sidebar {
   background: #43cea2 !important;
 }
 /* ParentDashboard.css */
