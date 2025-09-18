@@ -13,11 +13,17 @@ export interface NavItem {
 interface AdminSidebarProps {
   navItems: NavItem[];
   isOpen: boolean;
+  title?: string; // Optional title for the sidebar
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen, title }) => {
   return (
     <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+      {title && (
+        <div className="sidebar-title p-3 border-bottom bg-primary text-white">
+          <h5 className="mb-0">{title}</h5>
+        </div>
+      )}
       {navItems.map((item) => (
         <NavLink
           key={item.path}

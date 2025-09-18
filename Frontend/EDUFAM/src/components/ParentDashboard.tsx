@@ -34,9 +34,14 @@ const ParentDashboard: React.FC = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // Replace this with real auth context or prop in production
+  const loggedInParentEmail = "janedoe.parent@email.com";
+  // Filter results and attendance for this parent
+  const parentResults = results.filter(r => (r as any).parentEmail === loggedInParentEmail);
+  const parentAttendance = attendance.filter(a => (a as any).parentEmail === loggedInParentEmail);
   // Show the latest uploaded result if available
-  const latestResult = results.length > 0 ? results[results.length - 1] : null;
-  const latestAttendance = attendance.length > 0 ? attendance[attendance.length - 1] : null;
+  const latestResult = parentResults.length > 0 ? parentResults[parentResults.length - 1] : null;
+  const latestAttendance = parentAttendance.length > 0 ? parentAttendance[parentAttendance.length - 1] : null;
   const childData = latestResult ? {
     studentName: latestResult.studentName,
     studentId: latestResult.studentId,
@@ -62,7 +67,6 @@ const ParentDashboard: React.FC = () => {
     { path: '/parent/event-calendar', label: 'Event Calendar', icon: 'bi bi-calendar-event' },
     { path: '/parent/feedback', label: 'Feedback', icon: 'bi bi-chat-left-text' },
   ];
-
 
   // Use events from context
   const { events } = useEvents();
@@ -94,80 +98,8 @@ const ParentDashboard: React.FC = () => {
       photo: '',
     }));
 
-  return (
-    <>
-      {/* Add Navbar with notifications for parent */}
-      <CustomNavbar notifications={notifications} />
-      
-      <div className="parent-dashboard">
-        {/* Mobile Sidebar Toggle Button */}
-        <Button
-          variant="primary"
-          className="toggle-sidebar-btn d-md-none"
-          onClick={toggleSidebar}
-        >
-          {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
-        </Button>
-        
-        {/* Sidebar Toggle Button for Desktop */}
-        <Button
-          variant="outline-primary"
-          className="mb-3 ms-3 d-none d-md-block"
-          onClick={toggleSidebar}
-          style={{ position: 'fixed', top: '70px', left: '10px', zIndex: 1025 }}
-        >
-          {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
-        </Button>
-
-        {/* Sidebar */}
-        <Sidebar 
-          navItems={parentNavItems} 
-          isOpen={sidebarOpen} 
-        />
-
-        {/* Main Content */}
-        <div 
-          className={`parent-content ${sidebarOpen ? 'sidebar-open' : ''}`}
-          style={{
-            marginLeft: sidebarOpen ? '250px' : '0',
-            transition: 'margin-left 0.3s ease-in-out',
-            padding: '20px',
-            paddingTop: '100px'
-          }}
-        >
-          <Container fluid>
-            <Routes>
-              <Route path="/" element={<ParentMainDashboard />} />
-              <Route path="/child-info" element={<ChildInformationView />} />
-              <Route path="/event-calendar" element={<EventCalendarView />} />
-              <Route path="/feedback" element={<FeedbackView />} />
-            </Routes>
-          </Container>
-        </div>
-
-        {/* Backdrop for mobile */}
-        {sidebarOpen && (
-          <div
-            className="sidebar-backdrop"
-            onClick={toggleSidebar}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              zIndex: 1010,
-              display: window.innerWidth <= 768 ? 'block' : 'none'
-            }}
-          />
-        )}
-      </div>
-    </>
-  );
-
   // Component for the main dashboard content
-  function ParentMainDashboard() {
+  const ParentMainDashboard = () => {
     return (
       <>
         {/* Child Profile Section */}
@@ -281,10 +213,10 @@ const ParentDashboard: React.FC = () => {
         </Card>
       </>
     );
-  }
+  };
 
   // Placeholder components for other sidebar routes
-  function ChildInformationView() {
+  const ChildInformationView = () => {
     // Get all users and filter for current parent's children
     const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
     
@@ -604,9 +536,9 @@ const ParentDashboard: React.FC = () => {
         )}
       </>
     );
-  }
+  };
 
-  function EventCalendarView() {
+  const EventCalendarView = () => {
     return (
       <Card>
         <Card.Header><h5>Event Calendar</h5></Card.Header>
@@ -623,9 +555,9 @@ const ParentDashboard: React.FC = () => {
         </Card.Body>
       </Card>
     );
-  }
+  };
 
-  function FeedbackView() {
+  const FeedbackView = () => {
     return (
       <Card className="feedback-card-gradient" style={{ background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
         <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0 }}>
@@ -672,7 +604,79 @@ const ParentDashboard: React.FC = () => {
         </Card.Body>
       </Card>
     );
-  }
+  };
+
+  return (
+    <>
+      {/* Add Navbar with notifications for parent */}
+      <CustomNavbar notifications={notifications} />
+      
+      <div className="parent-dashboard">
+        {/* Mobile Sidebar Toggle Button */}
+        <Button
+          variant="primary"
+          className="toggle-sidebar-btn d-md-none"
+          onClick={toggleSidebar}
+        >
+          {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
+        </Button>
+        
+        {/* Sidebar Toggle Button for Desktop */}
+        <Button
+          variant="outline-primary"
+          className="mb-3 ms-3 d-none d-md-block"
+          onClick={toggleSidebar}
+          style={{ position: 'fixed', top: '70px', left: '10px', zIndex: 1025 }}
+        >
+          {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
+        </Button>
+
+        {/* Sidebar */}
+        <Sidebar 
+          navItems={parentNavItems} 
+          isOpen={sidebarOpen} 
+        />
+
+        {/* Main Content */}
+        <div 
+          className={`parent-content ${sidebarOpen ? 'sidebar-open' : ''}`}
+          style={{
+            marginLeft: sidebarOpen ? '250px' : '0',
+            transition: 'margin-left 0.3s ease-in-out',
+            padding: '20px',
+            paddingTop: '100px'
+          }}
+        >
+          <Container fluid>
+            <Routes>
+              <Route path="/" element={<ParentMainDashboard />} />
+              <Route path="/child-info" element={<ChildInformationView />} />
+              <Route path="/event-calendar" element={<EventCalendarView />} />
+              <Route path="/feedback" element={<FeedbackView />} />
+            </Routes>
+          </Container>
+        </div>
+
+        {/* Backdrop for mobile */}
+        {sidebarOpen && (
+          <div
+            className="sidebar-backdrop"
+            onClick={toggleSidebar}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              zIndex: 1010,
+              display: window.innerWidth <= 768 ? 'block' : 'none'
+            }}
+          />
+        )}
+      </div>
+    </>
+  );
 };
 
 export default ParentDashboard;

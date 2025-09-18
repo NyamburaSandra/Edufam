@@ -6,6 +6,7 @@ export interface AttendanceEntry {
   studentName: string;
   studentClass: string;
   term: string;
+  parentEmail: string;
   attendancePercent: number;
 }
 
