@@ -6,8 +6,9 @@
       "studentClass": "Class 1 ",
       "term": "Term 1",
       "grade": "A",
-      "fileName": "JaneDoe_Term1_Results.pdf",
-      "fileDataUrl": "data:application/pdf;base64,JVBERi0xLjQKJcfs...fakebase64..."
+  "fileName": "JaneDoe_Term1_Results.pdf",
+  "fileDataUrl": "data:application/pdf;base64,JVBERi0xLjQKJcfs...fakebase64...",
+  "parentEmail": "janedoe.parent@email.com"
     },
     {
       "studentId": "7B",
@@ -15,8 +16,9 @@
       "studentClass": "Class 2 ",
       "term": "Term 2",
       "grade": "B+",
-      "fileName": "JohnSmith_Term2_Results.pdf",
-      "fileDataUrl": "data:application/pdf;base64,JVBERi0xLjQKJcfs...fakebase64..."
+  "fileName": "JohnSmith_Term2_Results.pdf",
+  "fileDataUrl": "data:application/pdf;base64,JVBERi0xLjQKJcfs...fakebase64...",
+  "parentEmail": "johnsmith.parent@email.com"
     },
     {
       "studentId": "5C",
@@ -24,8 +26,9 @@
       "studentClass": "Class 3 ",
       "term": "Term 3",
       "grade": "A-",
-      "fileName": "MaryJohnson_Term3_Results.pdf",
-      "fileDataUrl": "data:application/pdf;base64,JVBERi0xLjQKJcfs...fakebase64..."
+  "fileName": "MaryJohnson_Term3_Results.pdf",
+  "fileDataUrl": "data:application/pdf;base64,JVBERi0xLjQKJcfs...fakebase64...",
+  "parentEmail": "maryjohnson.parent@email.com"
     }
   ],
   "attendance": [
@@ -35,7 +38,8 @@
       "studentClass": "Class 1 ",
       "term": "Term 1",
       "weeks": [true, true, true, true, true, true, true, false, false],
-      "attendancePercent": 78
+  "attendancePercent": 78,
+  "parentEmail": "janedoe.parent@email.com"
     },
     {
       "studentId": "7B",
@@ -43,7 +47,8 @@
       "studentClass": "Class 2 ",
       "term": "Term 2",
       "weeks": [true, true, true, true, true, true, true, true, true],
-      "attendancePercent": 100
+  "attendancePercent": 100,
+  "parentEmail": "johnsmith.parent@email.com"
     },
     {
       "studentId": "5C",
@@ -51,7 +56,8 @@
       "studentClass": "Class 3 ",
       "term": "Term 3",
       "weeks": [true, false, true, false, true, false, true, false, true],
-      "attendancePercent": 56
+  "attendancePercent": 56,
+  "parentEmail": "maryjohnson.parent@email.com"
     },
     {
       "studentId": "8D",
@@ -59,7 +65,8 @@
       "studentClass": "Class 1 ",
       "term": "Term 2",
       "weeks": [true, true, false, false, true, true, false, false, false],
-      "attendancePercent": 44
+  "attendancePercent": 44,
+  "parentEmail": "samuellee.parent@email.com"
     },
     {
       "studentId": "9E",
@@ -67,7 +74,8 @@
       "studentClass": "Class 2 ",
       "term": "Term 3",
       "weeks": [true, true, true, true, false, false, false, false, false],
-      "attendancePercent": 44
+  "attendancePercent": 44,
+  "parentEmail": "emilyclark.parent@email.com"
     },
     {
       "studentId": "10F",
@@ -75,7 +83,8 @@
       "studentClass": "Class 3 ",
       "term": "Term 1",
       "weeks": [true, true, true, true, true, true, true, true, false],
-      "attendancePercent": 89
+  "attendancePercent": 89,
+  "parentEmail": "michaelbrown.parent@email.com"
     }
   ],
   "events": [

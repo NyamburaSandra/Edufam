@@ -25,11 +25,16 @@ const localizer = dateFnsLocalizer({
 });
 
 const ParentDashboard: React.FC = () => {
+  // Replace this with real auth context or prop in production
+  const loggedInParentEmail = "janedoe.parent@email.com";
   const { results } = useResults();
   const { attendance } = useAttendance();
+  // Filter results and attendance for this parent
+  const parentResults = results.filter(r => r.parentEmail === loggedInParentEmail);
+  const parentAttendance = attendance.filter(a => a.parentEmail === loggedInParentEmail);
   // Show the latest uploaded result if available
-  const latestResult = results.length > 0 ? results[results.length - 1] : null;
-  const latestAttendance = attendance.length > 0 ? attendance[attendance.length - 1] : null;
+  const latestResult = parentResults.length > 0 ? parentResults[parentResults.length - 1] : null;
+  const latestAttendance = parentAttendance.length > 0 ? parentAttendance[parentAttendance.length - 1] : null;
   const childData = latestResult ? {
     studentName: latestResult.studentName,
     studentId: latestResult.studentId,

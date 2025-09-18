@@ -7,6 +7,7 @@ export interface ResultEntry {
   studentClass: string;
   term: string;
   grade: string;
+  parentEmail: string;
   fileName?: string;
   fileDataUrl?: string;
 }

@@ -24,14 +24,15 @@ const TeacherDashboard: React.FC = () => {
 		});
 
 	// State for results form
-		const [resultsForm, setResultsForm] = useState({
-			studentName: '',
-			studentId: '',
-			studentClass: '',
-			term: '',
-			grade: '',
-			file: null as File | null,
-		});
+		   const [resultsForm, setResultsForm] = useState({
+			   studentName: '',
+			   studentId: '',
+			   studentClass: '',
+			   term: '',
+			   grade: '',
+			   parentEmail: '',
+			   file: null as File | null,
+		   });
 	const handleResultsFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			setResultsForm({ ...resultsForm, file: e.target.files[0] });
@@ -39,18 +40,19 @@ const TeacherDashboard: React.FC = () => {
 	};
 
 	// State for attendance form
-		const [attendanceForm, setAttendanceForm] = useState({
-			studentId: '',
-			studentName: '',
-			studentClass: '',
-			term: '',
-			weeks: Array(9).fill(false) as boolean[],
-		});
+		   const [attendanceForm, setAttendanceForm] = useState({
+			   studentId: '',
+			   studentName: '',
+			   studentClass: '',
+			   term: '',
+			   parentEmail: '',
+			   weeks: Array(9).fill(false) as boolean[],
+		   });
 
-		const handleAttendanceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-			const { name, value } = e.target;
-			setAttendanceForm({ ...attendanceForm, [name]: value });
-		};
+		   const handleAttendanceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+			   const { name, value } = e.target;
+			   setAttendanceForm({ ...attendanceForm, [name]: value });
+		   };
 
 		const handleWeekCheckboxChange = (weekIdx: number) => {
 			setAttendanceForm(prev => {
@@ -66,24 +68,25 @@ const TeacherDashboard: React.FC = () => {
 	};
 
 
-		const handleAttendanceUpload = (e: React.FormEvent) => {
-			e.preventDefault();
-			if (!attendanceForm.studentId || !attendanceForm.studentName || !attendanceForm.studentClass || !attendanceForm.term) {
-				alert('Please fill in all required fields.');
-				return;
-			}
-			const weeksPresent = attendanceForm.weeks.filter(Boolean).length;
-			const attendancePercent = Math.round((weeksPresent / 9) * 100);
-			addAttendance({
-				studentId: attendanceForm.studentId,
-				studentName: attendanceForm.studentName,
-				studentClass: attendanceForm.studentClass,
-				term: attendanceForm.term,
-				attendancePercent
-			});
-			setAttendanceForm({ studentId: '', studentName: '', studentClass: '', term: '', weeks: Array(9).fill(false) });
-			alert('Attendance uploaded!');
-		};
+		   const handleAttendanceUpload = (e: React.FormEvent) => {
+			   e.preventDefault();
+			   if (!attendanceForm.studentId || !attendanceForm.studentName || !attendanceForm.studentClass || !attendanceForm.term || !attendanceForm.parentEmail) {
+				   alert('Please fill in all required fields.');
+				   return;
+			   }
+			   const weeksPresent = attendanceForm.weeks.filter(Boolean).length;
+			   const attendancePercent = Math.round((weeksPresent / 9) * 100);
+			   addAttendance({
+				   studentId: attendanceForm.studentId,
+				   studentName: attendanceForm.studentName,
+				   studentClass: attendanceForm.studentClass,
+				   term: attendanceForm.term,
+				   parentEmail: attendanceForm.parentEmail,
+				   attendancePercent
+			   });
+			   setAttendanceForm({ studentId: '', studentName: '', studentClass: '', term: '', parentEmail: '', weeks: Array(9).fill(false) });
+			   alert('Attendance uploaded!');
+		   };
 
 	const handleEventFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
@@ -109,10 +112,10 @@ const TeacherDashboard: React.FC = () => {
 			alert('Event added! It will appear in the Parent Dashboard.');
 		};
 
-	const handleResultsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setResultsForm({ ...resultsForm, [name]: value });
-	};
+	   const handleResultsInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		   const { name, value } = e.target;
+		   setResultsForm({ ...resultsForm, [name]: value });
+	   };
 
 	const handleResultsSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const { name, value } = e.target;
@@ -121,34 +124,35 @@ const TeacherDashboard: React.FC = () => {
 
 
 
-		const handleResultsUpload = async (e: React.FormEvent) => {
-			e.preventDefault();
-			if (!resultsForm.studentName || !resultsForm.studentId || !resultsForm.studentClass || !resultsForm.term || !resultsForm.grade) {
-				alert('Please fill in all required fields.');
-				return;
-			}
-			let fileName: string | undefined = undefined;
-			let fileDataUrl: string | undefined = undefined;
-			if (resultsForm.file) {
-				fileName = resultsForm.file.name;
-				fileDataUrl = await new Promise<string>((resolve, reject) => {
-					const reader = new FileReader();
-					reader.onload = () => resolve(reader.result as string);
-					reader.onerror = reject;
-					reader.readAsDataURL(resultsForm.file!);
-				});
-			}
-			addResult({
-				studentName: resultsForm.studentName,
-				studentId: resultsForm.studentId,
-				studentClass: resultsForm.studentClass,
-				term: resultsForm.term,
-				grade: resultsForm.grade,
-				...(fileName && fileDataUrl ? { fileName, fileDataUrl } : {})
-			});
-			setResultsForm({ studentName: '', studentId: '', studentClass: '', term: '', grade: '', file: null });
-			alert('Results uploaded!');
-		};
+		   const handleResultsUpload = async (e: React.FormEvent) => {
+			   e.preventDefault();
+			   if (!resultsForm.studentName || !resultsForm.studentId || !resultsForm.studentClass || !resultsForm.term || !resultsForm.grade || !resultsForm.parentEmail) {
+				   alert('Please fill in all required fields.');
+				   return;
+			   }
+			   let fileName: string | undefined = undefined;
+			   let fileDataUrl: string | undefined = undefined;
+			   if (resultsForm.file) {
+				   fileName = resultsForm.file.name;
+				   fileDataUrl = await new Promise<string>((resolve, reject) => {
+					   const reader = new FileReader();
+					   reader.onload = () => resolve(reader.result as string);
+					   reader.onerror = reject;
+					   reader.readAsDataURL(resultsForm.file!);
+				   });
+			   }
+			   addResult({
+				   studentName: resultsForm.studentName,
+				   studentId: resultsForm.studentId,
+				   studentClass: resultsForm.studentClass,
+				   term: resultsForm.term,
+				   grade: resultsForm.grade,
+				   parentEmail: resultsForm.parentEmail,
+				   ...(fileName && fileDataUrl ? { fileName, fileDataUrl } : {})
+			   });
+			   setResultsForm({ studentName: '', studentId: '', studentClass: '', term: '', grade: '', parentEmail: '', file: null });
+			   alert('Results uploaded!');
+		   };
 
 	return (
 		<Container fluid className="my-4">
@@ -327,22 +331,26 @@ const TeacherDashboard: React.FC = () => {
 																													<option value="term3">Term 3</option>
 																												</Form.Select>
 																											</Form.Group>
-																						<Form.Group className="mb-3">
-																							<Form.Label>Grade</Form.Label>
-																							<Form.Select name="grade" value={resultsForm.grade} onChange={handleResultsSelectChange} required>
-																								<option value="">Select grade...</option>
-																								<option value="A">A</option>
-																								<option value="B+">B+</option>
-																								<option value="B">B</option>
-																								<option value="B-">B-</option>
-																								<option value="C+">C+</option>
-																								<option value="C">C</option>
-																								<option value="C-">C-</option>
-																								<option value="D+">D+</option>
-																								<option value="D">D</option>
-																								<option value="D-">D-</option>
-																							</Form.Select>
-																						</Form.Group>
+																						   <Form.Group className="mb-3">
+																							   <Form.Label>Grade</Form.Label>
+																							   <Form.Select name="grade" value={resultsForm.grade} onChange={handleResultsSelectChange} required>
+																								   <option value="">Select grade...</option>
+																								   <option value="A">A</option>
+																								   <option value="B+">B+</option>
+																								   <option value="B">B</option>
+																								   <option value="B-">B-</option>
+																								   <option value="C+">C+</option>
+																								   <option value="C">C</option>
+																								   <option value="C-">C-</option>
+																								   <option value="D+">D+</option>
+																								   <option value="D">D</option>
+																								   <option value="D-">D-</option>
+																							   </Form.Select>
+																						   </Form.Group>
+																						   <Form.Group className="mb-3">
+																							   <Form.Label>Parent Email</Form.Label>
+																							   <Form.Control type="email" placeholder="Enter parent email" name="parentEmail" value={resultsForm.parentEmail} onChange={handleResultsInputChange} required />
+																						   </Form.Group>
 																						<Form.Group className="mb-3">
 																							<Form.Label>Student Results (Excel or PDF)</Form.Label>
 																							<Form.Control type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/pdf,.pdf" onChange={handleResultsFileChange} required />
@@ -380,6 +388,10 @@ const TeacherDashboard: React.FC = () => {
 																																	<option value="term2">Term 2</option>
 																																	<option value="term3">Term 3</option>
 																																</Form.Select>
+																															</Form.Group>
+																															<Form.Group className="mb-3">
+																																<Form.Label>Parent Email</Form.Label>
+																																<Form.Control type="email" placeholder="Enter parent email" name="parentEmail" value={attendanceForm.parentEmail} onChange={handleAttendanceInputChange} required />
 																															</Form.Group>
 																										<Form.Group className="mb-3">
 																											<Form.Label>Mark Attendance for Weeks 1-9</Form.Label>
