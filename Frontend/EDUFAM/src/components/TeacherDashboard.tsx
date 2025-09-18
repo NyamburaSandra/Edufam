@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import feedbackData from '../data/seed_data.json';
 import { useEvents } from '../context/useEvents';
 import { useResults } from '../context/ResultsContextHook';
 import { useAttendance } from '../context/AttendanceContextHook';
@@ -471,6 +472,23 @@ const TeacherDashboard: React.FC = () => {
 																									</Form>
 																								</Tab.Pane>
 											)}
+											{activeKey === 'feedback' && (
+  <Tab.Pane eventKey="feedback" active>
+    <h3>Parent Feedback</h3>
+		<div className="mt-4">
+			<ul className="list-group">
+						{/* Display feedback from seed_data.json */}
+						{(feedbackData.feedback as Array<{ parentEmail: string; concern: string; message: string }> ).map((fb, idx) => (
+							<li className="list-group-item" key={idx}>
+								<strong>Parent Email:</strong> {fb.parentEmail}<br/>
+								<strong>Concern Type:</strong> {fb.concern}<br/>
+								<strong>Message:</strong> {fb.message}
+							</li>
+						))}
+			</ul>
+		</div>
+  </Tab.Pane>
+)}
 						</Tab.Content>
 					</div>
 				</Col>

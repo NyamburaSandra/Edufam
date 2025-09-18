@@ -31,6 +31,23 @@
   "parentEmail": "maryjohnson.parent@email.com"
     }
   ],
+  "feedback": [
+    {
+      "parentEmail": "janedoeparent@gmail.com",
+      "concern": "Homework",
+      "message": "My child is struggling with the math homework. Can you provide extra help?"
+    },
+    {
+      "parentEmail": "johnsmith.parent@email.com",
+      "concern": "Attendance",
+      "message": "John will be absent next week due to family reasons."
+    },
+    {
+      "parentEmail": "maryjohnson.parent@email.com",
+      "concern": "Results",
+      "message": "Can I get more details about the last test results?"
+    }
+  ],
   "attendance": [
     {
       "studentId": "12A",
