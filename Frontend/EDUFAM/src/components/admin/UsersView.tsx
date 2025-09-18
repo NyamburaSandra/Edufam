@@ -1,16 +1,147 @@
-import React, { useState, useMemo } from 'react';
-import { Container, Row, Col, Card, Form, Button, Table, Badge, Alert, Nav, Tab } from 'react-bootstrap';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Container, Row, Col, Card, Form, Button, Table, Badge, Alert, Nav, Tab, ListGroup } from 'react-bootstrap';
 
 type EdufamUser = {
   id: number;
   type: 'teacher' | 'student' | 'parent';
   name: string;
   email: string;
+  studentId?: string; // Add studentId for students
   class?: string;
   subject?: string;
   status?: 'pending' | 'approved' | 'rejected';
   childId?: number;
+  children?: string[]; // Array of student IDs for parent-child linking
   dateAdded?: string;
+};
+
+type ChildSelectorProps = {
+  selectedChildren: string[];
+  onChildrenChange: (children: string[]) => void;
+};
+
+const ChildSelector: React.FC<ChildSelectorProps> = ({ selectedChildren, onChildrenChange }) => {
+  const [newChildId, setNewChildId] = useState('');
+
+  // Get students from localStorage for selection
+  const getStudents = (): EdufamUser[] => {
+    const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
+    return users.filter((user: EdufamUser) => user.type === 'student');
+  };
+
+  const students = getStudents();
+
+  const handleAddChild = () => {
+    if (newChildId.trim() && !selectedChildren.includes(newChildId.trim())) {
+      const updatedChildren = [...selectedChildren, newChildId.trim()];
+      onChildrenChange(updatedChildren);
+      setNewChildId('');
+    }
+  };
+
+  const handleRemoveChild = (childId: string) => {
+    const updatedChildren = selectedChildren.filter(id => id !== childId);
+    onChildrenChange(updatedChildren);
+  };
+
+  const handleSelectFromList = (studentId: string) => {
+    if (!selectedChildren.includes(studentId)) {
+      const updatedChildren = [...selectedChildren, studentId];
+      onChildrenChange(updatedChildren);
+    }
+  };
+
+  return (
+    <div>
+      {/* Manual Input */}
+      <div className="mb-3">
+        <Form.Label>Add Child by Student ID</Form.Label>
+        <div className="d-flex gap-2">
+          <Form.Control
+            type="text"
+            placeholder="Enter Student ID"
+            value={newChildId}
+            onChange={(e) => setNewChildId(e.target.value)}
+            size="sm"
+          />
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={handleAddChild}
+            disabled={!newChildId.trim()}
+          >
+            <i className="bi bi-plus"></i> Add
+          </Button>
+        </div>
+      </div>
+
+      {/* Available Students */}
+      {students.length > 0 && (
+        <div className="mb-3">
+          <Form.Label>Or Select from Existing Students</Form.Label>
+          <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+            <ListGroup variant="flush">
+              {students.map(student => (
+                <ListGroup.Item
+                  key={student.id}
+                  className="d-flex justify-content-between align-items-center py-2"
+                  style={{ fontSize: '0.85em' }}
+                >
+                  <div>
+                    <strong>{student.name}</strong>
+                    <br />
+                    <small className="text-muted">
+                      ID: {student.studentId} | Class: {student.class}
+                    </small>
+                  </div>
+                  <Button
+                    variant="outline-success"
+                    size="sm"
+                    onClick={() => handleSelectFromList(student.studentId || '')}
+                    disabled={selectedChildren.includes(student.studentId || '')}
+                  >
+                    {selectedChildren.includes(student.studentId || '') ? (
+                      <i className="bi bi-check"></i>
+                    ) : (
+                      <i className="bi bi-plus"></i>
+                    )}
+                  </Button>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          </div>
+        </div>
+      )}
+
+      {/* Selected Children */}
+      {selectedChildren.length > 0 && (
+        <div>
+          <Form.Label>Selected Children ({selectedChildren.length})</Form.Label>
+          <div className="d-flex flex-wrap gap-1">
+            {selectedChildren.map(childId => (
+              <Badge
+                key={childId}
+                bg="primary"
+                className="d-flex align-items-center gap-1"
+                style={{ fontSize: '0.8em' }}
+              >
+                {childId}
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="p-0 text-white"
+                  onClick={() => handleRemoveChild(childId)}
+                  style={{ fontSize: '0.7em', lineHeight: 1 }}
+                >
+                  <i className="bi bi-x"></i>
+                </Button>
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const CLASS_OPTIONS = [
@@ -44,9 +175,24 @@ const UsersView: React.FC = () => {
     type: 'student',
     name: '',
     email: '',
+    studentId: '',
     class: '',
-    subject: ''
+    subject: '',
+    children: [] as string[] // Array of student IDs for parent-child linking
   });
+
+  // Reset specific fields when user type changes
+  useEffect(() => {
+    if (formData.type !== 'parent') {
+      setFormData(prev => ({ ...prev, children: [] }));
+    }
+    if (formData.type !== 'student') {
+      setFormData(prev => ({ ...prev, studentId: '', class: '' }));
+    }
+    if (formData.type !== 'teacher') {
+      setFormData(prev => ({ ...prev, subject: '' }));
+    }
+  }, [formData.type]);
 
   // Utility functions
   const getUsers = (): EdufamUser[] => JSON.parse(localStorage.getItem('edufam_users') || '[]');
@@ -64,7 +210,8 @@ const UsersView: React.FC = () => {
     const users = getUsers();
     return users.filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           user.email.toLowerCase().includes(searchTerm.toLowerCase());
+                           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (user.studentId && user.studentId.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesType = filterType === 'all' || user.type === filterType;
       return matchesSearch && matchesType;
     });
@@ -83,20 +230,28 @@ const UsersView: React.FC = () => {
   }, [getUsers(), pendingAccounts]);
 
   // Handlers
-  const handleFormChange = (field: string, value: string) => {
+  const handleFormChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) {
-      showMessage('Please fill in all required fields', 'danger');
-      return;
-    }
-
-    if (formData.type === 'student' && !formData.class) {
-      showMessage('Please select a class for the student', 'danger');
-      return;
+    
+    // Validation based on user type
+    if (formData.type === 'student') {
+      if (!formData.name.trim() || !formData.studentId.trim()) {
+        showMessage('Please fill in all required fields (name and student ID)', 'danger');
+        return;
+      }
+      if (!formData.class) {
+        showMessage('Please select a class for the student', 'danger');
+        return;
+      }
+    } else {
+      if (!formData.name.trim() || !formData.email.trim()) {
+        showMessage('Please fill in all required fields', 'danger');
+        return;
+      }
     }
 
     if (formData.type === 'teacher' && !formData.subject) {
@@ -109,16 +264,19 @@ const UsersView: React.FC = () => {
       id: Date.now(),
       type: formData.type as 'teacher' | 'student' | 'parent',
       name: formData.name.trim(),
-      email: formData.email.trim(),
+      email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
+      studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
       class: formData.type === 'student' ? formData.class : undefined,
       subject: formData.type === 'teacher' ? formData.subject : undefined,
+      children: formData.type === 'parent' ? formData.children : undefined,
       status: 'approved',
       dateAdded: new Date().toISOString().split('T')[0]
     };
 
-    setUsers([...users, newUser]);
-    setFormData({ type: 'student', name: '', email: '', class: '', subject: '' });
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
     showMessage(`${formData.type.charAt(0).toUpperCase() + formData.type.slice(1)} added successfully!`);
+    setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [] });
   };
 
   const handleVerify = (id: number, approved: boolean) => {
@@ -263,7 +421,7 @@ const UsersView: React.FC = () => {
                     <thead>
                       <tr>
                         <th>Name</th>
-                        <th>Email</th>
+                        <th>Email/Student ID</th>
                         <th>Type</th>
                         <th>Details</th>
                         <th>Date Added</th>
@@ -276,7 +434,13 @@ const UsersView: React.FC = () => {
                           <td>
                             <strong>{user.name}</strong>
                           </td>
-                          <td>{user.email}</td>
+                          <td>
+                            {user.type === 'student' && user.studentId ? (
+                              <span><strong>ID:</strong> {user.studentId}</span>
+                            ) : (
+                              user.email
+                            )}
+                          </td>
                           <td>
                             <Badge bg={
                               user.type === 'student' ? 'success' : 
@@ -288,7 +452,15 @@ const UsersView: React.FC = () => {
                           <td>
                             {user.type === 'student' && user.class && <span>Class: {user.class}</span>}
                             {user.type === 'teacher' && user.subject && <span>Subject: {user.subject}</span>}
-                            {user.type === 'parent' && user.childId && <span>Child ID: {user.childId}</span>}
+                            {user.type === 'parent' && user.children && user.children.length > 0 && (
+                              <div>
+                                <i className="bi bi-people me-1" style={{ color: '#6c63ff' }}></i>
+                                Children: {user.children.join(', ')}
+                              </div>
+                            )}
+                            {user.type === 'parent' && (!user.children || user.children.length === 0) && (
+                              <span className="text-muted">No children linked</span>
+                            )}
                           </td>
                           <td>{user.dateAdded || 'N/A'}</td>
                           <td>
@@ -342,14 +514,29 @@ const UsersView: React.FC = () => {
                       </Form.Group>
 
                       <Form.Group className="mb-3">
-                        <Form.Label>Email Address</Form.Label>
-                        <Form.Control 
-                          type="email"
-                          value={formData.email} 
-                          onChange={e => handleFormChange('email', e.target.value)}
-                          placeholder="Enter email address"
-                          required
-                        />
+                        {formData.type === 'student' ? (
+                          <>
+                            <Form.Label>Student ID</Form.Label>
+                            <Form.Control 
+                              type="text"
+                              value={formData.studentId} 
+                              onChange={e => handleFormChange('studentId', e.target.value)}
+                              placeholder="Enter student ID"
+                              required
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <Form.Label>Email Address</Form.Label>
+                            <Form.Control 
+                              type="email"
+                              value={formData.email} 
+                              onChange={e => handleFormChange('email', e.target.value)}
+                              placeholder="Enter email address"
+                              required
+                            />
+                          </>
+                        )}
                       </Form.Group>
                     </Col>
 
@@ -386,13 +573,34 @@ const UsersView: React.FC = () => {
                         </Form.Group>
                       )}
 
+                      {formData.type === 'parent' && (
+                        <Form.Group className="mb-3">
+                          <Form.Label>
+                            <i className="bi bi-people me-2" style={{ color: '#6c63ff' }}></i>
+                            Link Children
+                          </Form.Label>
+                          <div className="border rounded p-3" style={{ backgroundColor: '#f8f9fa' }}>
+                            <div className="mb-2">
+                              <small className="text-muted">
+                                Select students to link as children of this parent
+                              </small>
+                            </div>
+                            <ChildSelector 
+                              selectedChildren={formData.children}
+                              onChildrenChange={(children) => handleFormChange('children', children)}
+                            />
+                          </div>
+                        </Form.Group>
+                      )}
+
                       <div className="mt-4">
                         <h6>Instructions:</h6>
                         <ul className="text-muted" style={{ fontSize: '0.9em' }}>
                           <li>All fields marked with * are required</li>
-                          <li>Email addresses must be unique</li>
-                          <li>Students must be assigned to a class</li>
+                          <li>Students require a unique Student ID and class assignment</li>
+                          <li>Teachers and Parents require email addresses (must be unique)</li>
                           <li>Teachers must be assigned to a subject</li>
+                          <li>Parents can be linked to their children using Student IDs</li>
                         </ul>
                       </div>
                     </Col>
@@ -403,7 +611,7 @@ const UsersView: React.FC = () => {
                     <Button 
                       variant="secondary" 
                       className="me-2"
-                      onClick={() => setFormData({ type: 'student', name: '', email: '', class: '', subject: '' })}
+                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [] })}
                     >
                       Reset
                     </Button>

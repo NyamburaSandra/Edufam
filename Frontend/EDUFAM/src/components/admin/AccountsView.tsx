@@ -260,29 +260,6 @@ const AccountsView: React.FC = () => {
                       <Button variant="secondary" onClick={handleExportData}>
                         <i className="bi bi-download me-2"></i>Export Fee Data
                       </Button>
-                      <Button variant="outline-primary">
-                        <i className="bi bi-graph-up me-2"></i>View Analytics
-                      </Button>
-                    </div>
-                  </Card.Body>
-                </Card>
-
-                <Card>
-                  <Card.Header>
-                    <h6 className="mb-0">Summary</h6>
-                  </Card.Header>
-                  <Card.Body>
-                    <div className="mb-2">
-                      <small className="text-muted">Total Students</small>
-                      <div className="fw-bold">{stats.totalStudents}</div>
-                    </div>
-                    <div className="mb-2">
-                      <small className="text-muted">Paid in Full</small>
-                      <div className="fw-bold text-success">{stats.paidCount}</div>
-                    </div>
-                    <div>
-                      <small className="text-muted">Overdue</small>
-                      <div className="fw-bold text-danger">{stats.overdueCount}</div>
                     </div>
                   </Card.Body>
                 </Card>

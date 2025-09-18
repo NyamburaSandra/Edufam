@@ -274,9 +274,7 @@ const SettingsView: React.FC = () => {
           <Nav.Item>
             <Nav.Link eventKey="school-settings">School Settings</Nav.Link>
           </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="system-settings">System Settings</Nav.Link>
-          </Nav.Item>
+         
         </Nav>
 
         <Tab.Content>
@@ -507,69 +505,6 @@ const SettingsView: React.FC = () => {
                       </Form.Group>
                       <Button variant="primary">Update Communication Settings</Button>
                     </Form>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Tab.Pane>
-
-          {/* System Settings Tab */}
-          <Tab.Pane eventKey="system-settings">
-            <Row>
-              <Col md={6}>
-                <Card className="mb-4">
-                  <Card.Header>
-                    <h5>System Preferences</h5>
-                  </Card.Header>
-                  <Card.Body>
-                    <Form>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Academic Year</Form.Label>
-                        <Form.Select defaultValue="2025">
-                          <option value="2024">2024</option>
-                          <option value="2025">2025</option>
-                          <option value="2026">2026</option>
-                        </Form.Select>
-                      </Form.Group>
-                      <Form.Group className="mb-3">
-                        <Form.Label>Current Term</Form.Label>
-                        <Form.Select defaultValue="3">
-                          <option value="1">Term 1</option>
-                          <option value="2">Term 2</option>
-                          <option value="3">Term 3</option>
-                        </Form.Select>
-                      </Form.Group>
-                      <Button variant="primary">Update Preferences</Button>
-                    </Form>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={6}>
-                <Card className="mb-4">
-                  <Card.Header>
-                    <h5>Backup & Security</h5>
-                  </Card.Header>
-                  <Card.Body>
-                    <div className="d-flex flex-column gap-3">
-                      <div>
-                        <h6>Data Backup</h6>
-                        <p className="text-muted small">Last backup: 2025-09-17 02:00 AM</p>
-                        <Button variant="outline-primary" className="me-2">Create Backup</Button>
-                        <Button variant="outline-secondary">Download Backup</Button>
-                      </div>
-                      <hr />
-                      <div>
-                        <h6>User Sessions</h6>
-                        <p className="text-muted small">Active sessions: 24 users online</p>
-                        <Button variant="outline-warning">View Active Sessions</Button>
-                      </div>
-                      <hr />
-                      <div>
-                        <h6>System Logs</h6>
-                        <Button variant="outline-info" className="me-2">View System Logs</Button>
-                        <Button variant="outline-secondary">Export Logs</Button>
-                      </div>
-                    </div>
                   </Card.Body>
                 </Card>
               </Col>
