@@ -11,7 +11,7 @@ import CustomNavbar from '../Navbar';
 import { useEvents } from '../../context/useEvents';
 
 const AdminDashboard: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   
   // Use events from context for notifications
   const { events } = useEvents();
@@ -60,18 +60,18 @@ const AdminDashboard: React.FC = () => {
   return (
     <>
       {/* Add Navbar with notifications for admin */}
-      <CustomNavbar notifications={notifications} />
-      
+      <CustomNavbar notifications={notifications} toggleSidebar={toggleSidebar} />
+
       <div className="admin-dashboard">
         {/* Sidebar Toggle Button */}
-        <Button
+        {/* <Button
           variant="outline-primary"
           className="mb-3 ms-3"
           onClick={toggleSidebar}
           style={{ position: 'fixed', top: '70px', left: '10px', zIndex: 1025 }}
         >
           {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
-        </Button>
+        </Button> */}
 
       {/* Sidebar */}
       <AdminSidebar navItems={adminNavItems} isOpen={sidebarOpen} />

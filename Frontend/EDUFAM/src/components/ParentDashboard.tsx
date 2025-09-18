@@ -26,7 +26,7 @@ const localizer = dateFnsLocalizer({
 });
 
 const ParentDashboard: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { results } = useResults();
   const { attendance } = useAttendance();
   
@@ -609,27 +609,27 @@ const ParentDashboard: React.FC = () => {
   return (
     <>
       {/* Add Navbar with notifications for parent */}
-      <CustomNavbar notifications={notifications} />
-      
+      <CustomNavbar notifications={notifications} toggleSidebar={toggleSidebar} />
+
       <div className="parent-dashboard">
         {/* Mobile Sidebar Toggle Button */}
-        <Button
+        {/* <Button
           variant="primary"
           className="toggle-sidebar-btn d-md-none"
           onClick={toggleSidebar}
         >
           {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
-        </Button>
+        </Button> */}
         
         {/* Sidebar Toggle Button for Desktop */}
-        <Button
+        {/* <Button
           variant="outline-primary"
           className="mb-3 ms-3 d-none d-md-block"
           onClick={toggleSidebar}
           style={{ position: 'fixed', top: '70px', left: '10px', zIndex: 1025 }}
         >
           {sidebarOpen ? <i className="bi bi-x-lg"></i> : <i className="bi bi-list"></i>}
-        </Button>
+        </Button> */}
 
         {/* Sidebar */}
         <Sidebar 

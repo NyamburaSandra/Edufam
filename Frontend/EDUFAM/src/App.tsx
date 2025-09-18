@@ -3,7 +3,8 @@ import "./App.css";
 import CustomNavbar from "./components/Navbar";
 import ParentDashboard from "./components/ParentDashboard";
 import { AdminDashboard } from "./components/admin";
-import TeacherDashboard from "./components/TeacherDashboard";
+import { TeacherDashboard } from "./components/teacher";
+import TeacherDashboardOriginal from "./components/TeacherDashboardOriginal";
 import Footer from "./components/Footer";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Welcome from "./components/Welcome";
@@ -20,7 +21,8 @@ function App() {
               <Route path="/" element={<Navigate to="/welcome" replace />} />
               <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
               <Route path="/parent/*" element={<ParentDashboard />} />
-              <Route path="/teacher" element={<><CustomNavbar /><TeacherDashboard /></>} />
+              <Route path="/teacher2" element={<><CustomNavbar /><TeacherDashboardOriginal /></>} />
+              <Route path="/teacher/*" element={<><CustomNavbar /><TeacherDashboard /></>} />
               <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
             </Routes>
           </main>
