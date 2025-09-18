@@ -1,8 +1,14 @@
 import React from 'react';
 import { Navbar, Container, Nav, Button } from 'react-bootstrap';
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
+import NotificationsPopup from './NotificationsPopup';
+import type { NotificationItem } from './NotificationsPopup';
 
-const CustomNavbar: React.FC = () => {
+interface CustomNavbarProps {
+  notifications?: NotificationItem[];
+}
+
+const CustomNavbar: React.FC<CustomNavbarProps> = ({ notifications }) => {
   return (
     <Navbar className="bg-edufam-dark" variant="dark" expand="lg" fixed="top">
       <Container>
@@ -15,6 +21,10 @@ const CustomNavbar: React.FC = () => {
           <Nav className="me-auto">
           </Nav>
           <Nav>
+            {/* Show notifications bell only if notifications prop is provided */}
+            {notifications && (
+              <NotificationsPopup notifications={notifications} />
+            )}
             {/* User Account */}
             <SignedOut>
               <SignInButton>

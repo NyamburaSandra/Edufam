@@ -6,22 +6,25 @@ import TeacherDashboard from "./components/TeacherDashboard";
 import Footer from "./components/Footer";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Welcome from "./components/Welcome";
+import { ResultsProvider } from './context/ResultsContext';
+import { AttendanceProvider } from './context/AttendanceContext';
 
 function App() {
   return (
-    <>
-      <CustomNavbar />
-      <div className="flex-grow-1">
-        <main>
-          <Routes>
-            <Route path="/" element={<Navigate to="/welcome" replace />} />
-            <Route path="/welcome" element={<><Welcome /><Footer /></>} />
-            <Route path="/parent" element={<><ParentDashboard /><Footer /></>} />
-            <Route path="/teacher" element={<TeacherDashboard />} />
-          </Routes>
-        </main>
-      </div>
-    </>
+    <AttendanceProvider>
+      <ResultsProvider>
+        <div className="flex-grow-1">
+          <main>
+            <Routes>
+              <Route path="/" element={<Navigate to="/welcome" replace />} />
+              <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
+              <Route path="/parent" element={<><ParentDashboard /><Footer /></>} />
+              <Route path="/teacher" element={<><CustomNavbar /><TeacherDashboard /></>} />
+            </Routes>
+          </main>
+        </div>
+      </ResultsProvider>
+    </AttendanceProvider>
   );
 }
 

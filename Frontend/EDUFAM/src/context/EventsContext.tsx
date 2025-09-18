@@ -7,7 +7,7 @@ export interface EdufamEvent {
   start: Date;
   end: Date;
   description: string;
-  image?: string; // data URL or image path
+
 }
 
 export interface EventsContextType {

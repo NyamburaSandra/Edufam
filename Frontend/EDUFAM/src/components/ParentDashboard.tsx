@@ -3,6 +3,14 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { parse, startOfWeek, getDay, format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useEvents } from '../context/useEvents';
+import React from 'react';
+import { Container, Row, Col, Card, Button, Form, ListGroup } from 'react-bootstrap';
+import CustomNavbar from './Navbar';
+import { useResults } from '../context/ResultsContextHook';
+
+import AttendancePieChart from './AttendancePieChart';
+import { useAttendance } from '../context/AttendanceContextHook';
+
 
 const locales = {
   'en-US': enUS,
@@ -15,30 +23,29 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-import React from 'react';
-import { Container, Row, Col, Card, Button, Form, ListGroup } from 'react-bootstrap';
-
-
-interface Grade {
-  subject: string;
-  grade: string;
-}
-
-
 
 const ParentDashboard: React.FC = () => {
-  const childData = {
-    name: "Collins Mwasi",
-    class: "Grade 5-A",
-    photo: "https://randomuser.me/api/portraits/men/32.jpg", // working online image
-    recentGrades: [
-      { subject: "Mathematics", grade: "A" },
-      { subject: "English", grade: "B+" },
-      { subject: "Science", grade: "A-" },
-      { subject: "Kiswahili", grade: "A-" },
-      { subject: "Art", grade: "A-" }
-    ] as Grade[],
-    attendance: 90
+  const { results } = useResults();
+  const { attendance } = useAttendance();
+  // Show the latest uploaded result if available
+  const latestResult = results.length > 0 ? results[results.length - 1] : null;
+  const latestAttendance = attendance.length > 0 ? attendance[attendance.length - 1] : null;
+  const childData = latestResult ? {
+    studentName: latestResult.studentName,
+    studentId: latestResult.studentId,
+    studentClass: latestResult.studentClass,
+    term: latestResult.term,
+    fileName: latestResult.fileName,
+    fileDataUrl: latestResult.fileDataUrl,
+    attendance: latestAttendance ? latestAttendance.attendancePercent : 0,
+  } : {
+    studentName: 'Jane Doe',
+    studentId: '12A',
+    studentClass: 'Class 1',
+    term: '',
+    fileName: '',
+    fileDataUrl: '',
+    attendance: latestAttendance ? latestAttendance.attendancePercent : 0,
   };
 
 
@@ -71,10 +78,6 @@ const ParentDashboard: React.FC = () => {
       end: e.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       photo: '',
     }));
-
-  const handleConfirmAttendance = (event: string): void => {
-    alert(`Attendance confirmed for: ${event}`);
-  };
   const sectionRefs = {
     childProfile: React.useRef<HTMLDivElement>(null),
     fees: React.useRef<HTMLDivElement>(null),
@@ -92,10 +95,12 @@ const ParentDashboard: React.FC = () => {
   };
 
   return (
-    <Container fluid className="py-4">
-      <Row className="parent-dashboard-row g-0">
+    <>
+      <CustomNavbar notifications={notifications} />
+      <Container fluid className="py-4">
+  <Row className="parent-dashboard-row g-0">
         <Col md={3} className="p-0">
-          <ListGroup variant="flush" className="sidebar">
+          <ListGroup variant="flush" className="sidebar" style={{ marginTop: '12px' }}>
             <ListGroup.Item action onClick={() => scrollToSection('childProfile')}>
               <i className="bi bi-person-badge me-2" style={{ color: '#6c63ff' }}></i> Child Profile
             </ListGroup.Item>
@@ -110,7 +115,7 @@ const ParentDashboard: React.FC = () => {
             </ListGroup.Item>
           </ListGroup>
         </Col>
-        <Col md={9} style={{ marginLeft: '150px', marginTop: '40px' }}>
+        <Col md={9} style={{ marginLeft: '150px', marginTop: '50px' }}>
           <div style={{  gap: '32px' }}>
             <div style={{ flex: 1 }}>
               <div ref={sectionRefs.childProfile}>
@@ -121,15 +126,45 @@ const ParentDashboard: React.FC = () => {
                   </Card.Header>
                   <Card.Body>
                     <Row>
+                      <Col md={4}>
+                        <h6>Overall Performance</h6>
+                        <div style={{ color: '#6c63ff', fontWeight: 500, marginBottom: 8 }}>
+                          {childData.term ? `Term: ${childData.term.replace(/-/g, ' ').replace(/term(\d)/, 'Term $1').replace('midterm', 'Midterm').replace('endterm', 'End Term')}` : 'No results uploaded yet.'}
+                        </div>
+                        {childData.fileName && childData.fileDataUrl && (
+                          <a href={childData.fileDataUrl} download={childData.fileName}>
+                            <Button
+                              variant="primary"
+                              style={{
+                                background: 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)',
+                                border: 'none',
+                                borderRadius: 20,
+                                fontWeight: 700,
+                                fontSize: '1.08rem',
+                                letterSpacing: 0.5,
+                                padding: '0.6rem 1.4rem',
+                                boxShadow: '0 2px 8px rgba(30,10,60,0.10)',
+                                color: '#fff',
+                                transition: 'all 0.2s',
+                              }}
+                            >
+                              Download Results
+                            </Button>
+                          </a>
+                        )}
+                      </Col>
+                      
                       <Col md={4} className="text-center">
-                        <img
-                          src={childData.photo}
-                          alt={childData.name}
-                          className="rounded-circle mb-3"
-                          style={{ width: "120px", height: "120px", objectFit: "cover", border: '3px solid #1e0a3c', background: '#fff' }}
-                        />
-                        <h4>{childData.name}</h4>
-                        <p className="text-muted">{childData.class}</p>
+                        <div className="attendance-circle">
+                          <h6>Attendance</h6>
+                          <AttendancePieChart percent={childData.attendance} />
+                          <div className="percentage">
+                            <h3>{childData.attendance}%</h3>
+                          </div>
+                        </div>
+                      </Col>
+
+                      <Col md={4} className="text-center">
                         <div className="d-flex flex-column gap-2 mt-3">
                           <Button className="modern-action-btn" style={{ width: '100%' }}>
                             <i className="bi bi-chat-dots me-2"></i> Chat with Teacher
@@ -137,37 +172,6 @@ const ParentDashboard: React.FC = () => {
                           <Button className="modern-action-btn" style={{ width: '100%' }}>
                             <i className="bi bi-people me-2"></i> Group Chat
                           </Button>
-                        </div>
-                      </Col>
-                      <Col md={4}>
-                        <h6>Overall Performance</h6>
-                        <div style={{ color: '#6c63ff', fontWeight: 500, marginBottom: 8 }}>
-                          Term: 3, 2025
-                        </div>
-                        <Button
-                          variant="primary"
-                          style={{
-                            background: 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)',
-                            border: 'none',
-                            borderRadius: 20,
-                            fontWeight: 700,
-                            fontSize: '1.08rem',
-                            letterSpacing: 0.5,
-                            padding: '0.6rem 1.4rem',
-                            boxShadow: '0 2px 8px rgba(30,10,60,0.10)',
-                            color: '#fff',
-                            transition: 'all 0.2s',
-                          }}
-                        >
-                          Download PDF
-                        </Button>
-                      </Col>
-                      <Col md={4} className="text-center">
-                        <div className="attendance-circle">
-                          <h6>Attendance</h6>
-                          <div className="percentage">
-                            <h3>{childData.attendance}%</h3>
-                          </div>
                         </div>
                       </Col>
                     </Row>
@@ -217,60 +221,7 @@ const ParentDashboard: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Notifications section */}
-      <Row>
-        <Col md={12} >
-          <div ref={sectionRefs.notifications}>
-            <Card className="mb-4" style={{ marginLeft: '150px' }}>
-              {/* Recent Notifications */}
-              <Card.Header>
-                <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700 }}>Recent Notifications</h5>
-              </Card.Header>
-              <ListGroup variant="flush">
-                {notifications.map((notif) => (
-                  <ListGroup.Item
-                    key={notif.id}
-                    className="d-flex flex-column flex-md-row align-items-md-center"
-                    style={{ border: 'none', borderBottom: 'none', marginBottom: '1.2rem', background: 'transparent' }}
-                  >
-                    <div style={{ minWidth: 80, marginRight: 20, marginBottom: 10 }}>
-                      {/* Optionally add an icon or default image here */}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <strong style={{ color: '#1e0a3c' }}>{notif.message}</strong>
-                      <div className="text-muted" style={{ fontSize: "0.9em" }}>{notif.date}</div>
-                      <div style={{ fontSize: "0.95em", margin: "0.25em 0" }}>{notif.description}</div>
-                      <div style={{ fontSize: "0.92em", color: '#555', marginBottom: 2 }}>{notif.extra}</div>
-                      <div style={{ fontSize: "0.95em" }}>
-                        <span className="fw-bold">Time:</span> {notif.start} - {notif.end}
-                      </div>
-                    </div>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="mt-2 mt-md-0 modern-action-btn"
-                      style={{
-                        border: 'none',
-                        borderRadius: '20px',
-                        fontWeight: 600,
-                        letterSpacing: '0.5px',
-                        padding: '0.4rem 1.2rem',
-                        boxShadow: '0 2px 8px rgba(30,10,60,0.08)',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseOver={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #6c63ff 0%, #1e0a3c 100%)')}
-                      onMouseOut={e => (e.currentTarget.style.background = 'linear-gradient(90deg, #1e0a3c 0%, #6c63ff 100%)')}
-                      onClick={() => handleConfirmAttendance(notif.event)}
-                    >
-                      Learn More
-                    </Button>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </Card>
-          </div>
-        </Col>
-      </Row>
+      {/* Notifications section removed: now shown as popup in navbar */}
 
       {/* Events Calendar section (react-big-calendar) */}
       <Row>
@@ -342,6 +293,7 @@ const ParentDashboard: React.FC = () => {
         </Col>
       </Row>
     </Container>
+    </>
   );
 };
 
