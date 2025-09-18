@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Button } from 'react-bootstrap';
 import { Routes, Route } from 'react-router-dom';
-import Sidebar from '../Sidebar';
+import AdminSidebar from '../admin-sidebar';
 import AdminView from './AdminView';
 import AccountsView from './AccountsView';
 import SettingsView from './SettingsView';
@@ -74,7 +74,7 @@ const AdminDashboard: React.FC = () => {
         </Button>
 
       {/* Sidebar */}
-      <Sidebar navItems={adminNavItems} isOpen={sidebarOpen} />
+      <AdminSidebar navItems={adminNavItems} isOpen={sidebarOpen} />
 
       {/* Main Content */}
       <div 
