@@ -83,21 +83,43 @@ const ParentDashboard: React.FC = () => {
       end: e.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       photo: '',
     }));
-  const sectionRefs = {
-    childProfile: React.useRef<HTMLDivElement>(null),
-    fees: React.useRef<HTMLDivElement>(null),
-    notifications: React.useRef<HTMLDivElement>(null),
-    feedback: React.useRef<HTMLDivElement>(null),
-  };
+  type SectionKey = 'childProfile' | 'fees' | 'notifications' | 'calendar' | 'feedback';
 
-  const scrollToSection = (section: keyof typeof sectionRefs): void => {
-    const offset = 80; // Height of navbar
-    const ref = sectionRefs[section].current;
-    if (ref) {
-      const top = ref.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: 'smooth' });
+const sectionRefs = React.useMemo(() => ({
+  childProfile: React.createRef<HTMLDivElement>(),
+  fees: React.createRef<HTMLDivElement>(),
+  notifications: React.createRef<HTMLDivElement>(),
+  calendar: React.createRef<HTMLDivElement>(),
+  feedback: React.createRef<HTMLDivElement>(),
+}), []);
+
+const [activeSection, setActiveSection] = React.useState<SectionKey>('childProfile');
+
+const scrollToSection = (section: SectionKey): void => {
+  const offset = 80; // Height of navbar
+  const ref = sectionRefs[section].current;
+  if (ref) {
+    const top = ref.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+};
+
+React.useEffect(() => {
+  const handleScroll = () => {
+    const offsets = Object.entries(sectionRefs).map(([key, ref]) => {
+      if (ref.current) {
+        return { key: key as SectionKey, top: ref.current.getBoundingClientRect().top };
+      }
+      return { key: key as SectionKey, top: Infinity };
+    });
+    const visible = offsets.filter(o => o.top < window.innerHeight / 2 && o.top > -200);
+    if (visible.length > 0) {
+      setActiveSection(visible[0].key);
     }
   };
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, [sectionRefs]);
 
   return (
     <>
@@ -112,9 +134,9 @@ const ParentDashboard: React.FC = () => {
             <ListGroup.Item action onClick={() => scrollToSection('fees')}>
               <i className="bi bi-cash-stack me-2" style={{ color: '#fb7100' }}></i> Fees
             </ListGroup.Item>
-            <ListGroup.Item action onClick={() => scrollToSection('notifications')}>
-              <i className="bi bi-bell me-2" style={{ color: '#43cea2' }}></i> Notifications
-            </ListGroup.Item>
+              <ListGroup.Item action active={activeSection === 'calendar'} onClick={() => scrollToSection('calendar')}>
+                <i className="bi bi-calendar-event me-2" style={{ color: '#43cea2' }}></i> Calendar
+              </ListGroup.Item>
             <ListGroup.Item action onClick={() => scrollToSection('feedback')}>
               <i className="bi bi-chat-left-text me-2" style={{ color: '#a83279' }}></i> Feedback
             </ListGroup.Item>
@@ -231,7 +253,7 @@ const ParentDashboard: React.FC = () => {
       {/* Events Calendar section (react-big-calendar) */}
       <Row>
         <Col md={12}>
-          <Card className="mb-4" style={{ marginLeft: '150px', background: '#cf84c7', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
+          <Card className="mb-4" style={{ marginLeft: '150px', background: '#e8ecf1ff', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
             <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Events Calendar</h5>
             </Card.Header>
