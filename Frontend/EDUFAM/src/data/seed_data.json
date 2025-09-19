@@ -44,7 +44,7 @@
       "message": "John will be absent next week due to family reasons.",
       "requestCallback": false,
       "scheduleMeeting": false,
-      "parentEmail": "johnsmith.parent@email.com"
+      "parentEmail": "johnsmith.parent@gmail.com"
     },
     {
       "concernType": "results",
