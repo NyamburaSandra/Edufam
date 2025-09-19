@@ -1,13 +1,37 @@
 import React from 'react';
 import { Row, Col, Card, ListGroup } from 'react-bootstrap';
 
+type EdufamUser = {
+  id: number;
+  type: 'teacher' | 'student' | 'parent';
+  name: string;
+  email?: string;
+  studentId?: string;
+  class?: string;
+  subject?: string;
+  status?: 'pending' | 'approved' | 'rejected' | 'active' | 'inactive';
+  childId?: number;
+  children?: string[];
+  dateAdded?: string;
+  lastLogin?: string;
+  parentId?: number;
+  fee?: {
+    totalFee: number;
+    paidAmount: number;
+    balance: number;
+    dueDate: string;
+    status: 'paid' | 'pending' | 'overdue';
+    paymentDate: string | null;
+  };
+};
+
 const AdminView: React.FC = () => {
   // Get real data from localStorage
-  const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
-  const students = users.filter((u: any) => u.type === 'student');
-  const teachers = users.filter((u: any) => u.type === 'teacher');
-  const parents = users.filter((u: any) => u.type === 'parent');
-  const classes = [...new Set(students.map((s: any) => s.class))].filter(Boolean).length;
+  const users: EdufamUser[] = JSON.parse(localStorage.getItem('edufam_users') || '[]');
+  const students: EdufamUser[] = users.filter((u) => u.type === 'student');
+  const teachers: EdufamUser[] = users.filter((u) => u.type === 'teacher');
+  // const parents = users.filter((u) => u.type === 'parent'); // Removed unused variable
+  const classes = [...new Set(students.map((s) => s.class))].filter(Boolean).length;
 
   // Calculate real revenue based on student count (KES 30,000 per student)
   const totalRevenue = students.length * 30000;
@@ -30,8 +54,8 @@ const AdminView: React.FC = () => {
                     {(() => {
                       if (students.length === 0) return 'No students';
                       const classCounts: Record<string, number> = {};
-                      students.forEach((s: any) => {
-                        classCounts[s.class] = (classCounts[s.class] || 0) + 1;
+                      students.forEach((s) => {
+                        if (s.class) classCounts[s.class] = (classCounts[s.class] || 0) + 1;
                       });
                       const highestClass = Object.entries(classCounts).reduce((max, curr) => curr[1] > max[1] ? curr : max);
                       return `Largest: ${highestClass[0]} (${highestClass[1]})`;
@@ -49,7 +73,7 @@ const AdminView: React.FC = () => {
                     {(() => {
                       if (teachers.length === 0) return 'No teachers';
                       const subjectCounts: Record<string, number> = {};
-                      teachers.forEach((t: any) => {
+                      teachers.forEach((t) => {
                         if (t.subject) subjectCounts[t.subject] = (subjectCounts[t.subject] || 0) + 1;
                       });
                       if (Object.keys(subjectCounts).length === 0) return '';
