@@ -106,6 +106,10 @@ const ChildInformationView: React.FC = () => {
                   <p><strong>Student ID:</strong> {selectedChild.studentId || selectedChild.id}</p>
                   <p><strong>Class:</strong> {selectedChild.class || 'Class 1'}</p>
                   <p><strong>Status:</strong> <Badge bg="success">Active</Badge></p>
+                  {/* Attendance Pie under Basic Info */}
+                  <div style={{ marginTop: '1.5rem', marginLeft: '-15.5rem' }}>
+                    <ChildAttendancePie studentId={selectedChild.studentId || selectedChild.id?.toString() || ''} />
+                  </div>
                 </Col>
                 <Col md={6}>
                   <h6><i className="bi bi-calendar me-2"></i>School Information</h6>
@@ -113,22 +117,13 @@ const ChildInformationView: React.FC = () => {
                   <p><strong>Academic Year:</strong> 2025</p>
                   <p><strong>Term:</strong> Term 3</p>
                   <p><strong>School:</strong> EDUFAM Academy</p>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={12}>
-                  <ChildAttendancePie studentId={selectedChild.studentId || selectedChild.id?.toString() || ''} />
-                </Col>
-              </Row>
-              <Row>
-                <Col md={12}>
-                  {/* Results Download for Parent */}
+                  {/* Results Download under School Info */}
                   {(() => {
                     const childResults = results.filter(r => r.studentId === (selectedChild.studentId || selectedChild.id?.toString()) && r.fileName && r.fileDataUrl);
                     const latestResult = childResults.length > 0 ? childResults[childResults.length - 1] : null;
                     if (!latestResult) return null;
                     return (
-                      <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+                      <div style={{ marginTop: '1.5rem', marginLeft: '-13rem', textAlign: 'center' }}>
                         <h6>Latest Result</h6>
                         <a href={latestResult.fileDataUrl} download={latestResult.fileName}>
                           <Button
