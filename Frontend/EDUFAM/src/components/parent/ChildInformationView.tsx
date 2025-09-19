@@ -26,12 +26,20 @@ const ChildInformationView: React.FC = () => {
   // Find the logged-in parent by email (from AuthContext)
   const currentParent = users.find((u: EdufamUser) => u.type === 'parent' && u.email === user?.email);
 
-  // Get children based on parent's children array
+  // Helper to normalize IDs for matching
+  const normalizeId = (id: string | undefined) => (id || '').trim().toLowerCase();
+
+  // Get children based on parent's children array (robust matching)
   const children: EdufamUser[] = currentParent?.children && currentParent.children.length > 0
-    ? users.filter((u: EdufamUser) => u.type === 'student' && currentParent.children!.includes(u.studentId || ''))
+    ? users.filter((u: EdufamUser) =>
+        u.type === 'student' &&
+        currentParent.children!.map(normalizeId).includes(normalizeId(u.studentId))
+      )
     : [];
 
   const [selectedChild, setSelectedChild] = useState(children[0] || null);
+
+
 
   if (children.length === 0) {
     return (

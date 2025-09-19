@@ -45,13 +45,13 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 	};
 
 	return (
-		<div className="row dashboard-tab-section" style={{ minHeight: '60vh', background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: 32 }}>
+		<div className="row dashboard-tab-section" style={{ minHeight: '68vh', marginTop: '8px',background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', paddingTop: 12 }}>
 			<div className="row">
 				{summaryType === "results" && (
 					<div className="col-md-10 mx-auto">
 						<h3>Results Summary{selectedClass ? ` - ${selectedClass}` : ''}</h3>
 						<div style={tableStyle}>
-						<table className="table table-hover align-middle mb-0">
+							<table className="table table-hover align-middle mb-0">
 							<thead>
 								<tr>
 									<th style={thStyle}>Student ID</th>
