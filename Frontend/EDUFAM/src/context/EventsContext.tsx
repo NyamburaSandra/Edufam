@@ -16,8 +16,10 @@ export interface EventsContextType {
 }
 
 
+
 export const EventsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [events, setEvents] = useState<EdufamEvent[]>([
+  // Load from localStorage or use default events
+  const defaultEvents: EdufamEvent[] = [
     {
       id: 1,
       title: 'Maths Contest',
@@ -39,7 +41,20 @@ export const EventsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       end: new Date(2025, 8, 28, 23, 59),
       description: 'School will be closed for a public holiday.',
     },
-  ]);
+  ];
+  const [events, setEvents] = useState<EdufamEvent[]>(() => {
+    const stored = localStorage.getItem('edufam_events');
+    if (stored) {
+      // Dates are stored as strings, so convert them back to Date objects
+      return (JSON.parse(stored) as EdufamEvent[]).map((e) => ({ ...e, start: new Date(e.start), end: new Date(e.end) }));
+    }
+    return defaultEvents;
+  });
+
+  // Persist events to localStorage whenever they change
+  React.useEffect(() => {
+    localStorage.setItem('edufam_events', JSON.stringify(events));
+  }, [events]);
 
   const addEvent = (event: Omit<EdufamEvent, 'id'>) => {
     setEvents(prev => [
