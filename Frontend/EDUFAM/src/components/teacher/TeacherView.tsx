@@ -45,11 +45,11 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 	};
 
 	return (
-		<div className="row dashboard-tab-section" style={{ minHeight: '68vh', marginTop: '8px',background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', paddingTop: 12 }}>
+		<div className="row dashboard-tab-section" style={{ minHeight: '68vh', minWidth: '', marginTop: '8px', background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', paddingTop: 12 }}>
 			<div className="row">
 				{summaryType === "results" && (
 					<div className="col-md-10 mx-auto">
-						<h3>Results Summary{selectedClass ? ` - ${selectedClass}` : ''}</h3>
+						<h3>Results Summary{selectedClass ? ` -  Class ${selectedClass}` : ''}</h3>
 						<div style={tableStyle}>
 							<table className="table table-hover align-middle mb-0">
 							<thead>
@@ -85,7 +85,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 														variant="outline-warning"
 														size="sm"
 														style={{
-															borderRadius: '50%',
+															// borderRadius: '50%',
 															padding: '0.4em 0.5em',
 															display: 'flex',
 															alignItems: 'center',
@@ -100,10 +100,36 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 														onClick={() => handleEdit('results', idx)}
 														title="Edit"
 													>
-														<i className="bi bi-pencil-square" style={{ fontSize: '1.1em', color: '#ffc107' }}></i>
+														<i className="bi bi-pencil-square" style={{ fontSize: '1.2em', color: '#ffc107', fontWeight: 800, textShadow: '0 1px 2px #fffbe6' }}></i>
 													</Button>
-													<Button variant="outline-danger" size="sm" style={{ borderRadius: '50%', padding: '0.4em 0.5em', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #dc354522' }} onClick={() => handleDelete('results', idx)} title="Delete">
-														<i className="bi bi-trash" style={{ fontSize: '1.1em', color: '#dc3545' }}></i>
+													<Button
+														variant="outline-danger"
+														size="sm"
+														style={{
+															// borderRadius: '50%',
+															padding: '0.4em 0.5em',
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'center',
+															boxShadow: '0 1px 4px #dc354522',
+															background: 'transparent',
+															// borderColor: '#dc3545',
+															transition: 'background 0.2s'
+														}}
+														onMouseOver={e => {
+															e.currentTarget.style.background = '#ffeaea';
+															const icon = e.currentTarget.querySelector('i');
+															if (icon) icon.style.color = '#b71c1c';
+														}}
+														onMouseOut={e => {
+															e.currentTarget.style.background = 'transparent';
+															const icon = e.currentTarget.querySelector('i');
+															if (icon) icon.style.color = '#dc3545';
+														}}
+														onClick={() => handleDelete('results', idx)}
+														title="Delete"
+													>
+														<i className="bi bi-trash" style={{ fontSize: '1.2em', color: '#dc3545', fontWeight: 800, textShadow: '0 1px 2px #ffeaea', transition: 'color 0.2s' }}></i>
 													</Button>
 												</div>
 											</td>
@@ -117,7 +143,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 				)}
 				{summaryType === "events" && (
 					<div className="col-md-10 mx-auto">
-						<h3>Events Summary - {selectedClass}</h3>
+						<h3>Events Summary - Class {selectedClass}</h3>
 						<div style={tableStyle}>
 						<table className="table table-hover align-middle mb-0">
 							<thead>
@@ -179,7 +205,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 				)}
 				{summaryType === "attendance" && (
 					<div className="col-md-10 mx-auto">
-						<h3>Attendance Summary - {selectedClass}</h3>
+						<h3>Attendance Summary - Class {selectedClass}</h3>
 						<div style={tableStyle}>
 						<table className="table table-hover align-middle mb-0">
 							<thead>
@@ -192,10 +218,14 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 								</tr>
 							</thead>
 							<tbody>
-								{attendance.filter(a => a.studentClass === selectedClass).length === 0 ? (
-									<tr><td colSpan={5} className="text-center">No attendance uploaded</td></tr>
-								) : (
-									attendance.filter(a => a.studentClass === selectedClass).map((a, idx) => (
+								{(() => {
+									const filteredAttendance = selectedClass
+										? attendance.filter(a => normalizeClass(a.studentClass || '') === normalizeClass(selectedClass))
+										: attendance;
+									if (filteredAttendance.length === 0) {
+										return <tr><td colSpan={5} className="text-center">No attendance uploaded</td></tr>;
+									}
+									return filteredAttendance.map((a, idx) => (
 										<tr key={idx}>
 											<td>{a.studentId}</td>
 											<td>{a.studentName}</td>
@@ -230,8 +260,8 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 												</div>
 											</td>
 										</tr>
-									))
-								)}
+									));
+								})()}
 							</tbody>
 						</table>
 						</div>
