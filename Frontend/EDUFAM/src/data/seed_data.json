@@ -33,19 +33,25 @@
   ],
   "feedback": [
     {
-      "parentEmail": "janedoeparent@gmail.com",
-      "concern": "Homework",
-      "message": "My child is struggling with the math homework. Can you provide extra help?"
+      "concernType": "academic",
+      "message": "My child is struggling with the math homework. Can you provide extra help?",
+      "requestCallback": true,
+      "scheduleMeeting": false,
+      "parentEmail": "janedoeparent@gmail.com"
     },
     {
-      "parentEmail": "johnsmith.parent@gmail.com",
-      "concern": "Attendance",
-      "message": "John will be absent next week due to family reasons."
+      "concernType": "attendance",
+      "message": "John will be absent next week due to family reasons.",
+      "requestCallback": false,
+      "scheduleMeeting": false,
+      "parentEmail": "johnsmith.parent@email.com"
     },
     {
-      "parentEmail": "maryjohnson.parent@email.com",
-      "concern": "Results",
-      "message": "Can I get more details about the last test results?"
+      "concernType": "results",
+      "message": "Can I get more details about the last test results?",
+      "requestCallback": false,
+      "scheduleMeeting": true,
+      "parentEmail": "maryjohnson.parent@gmail.com"
     }
   ],
   "attendance": [

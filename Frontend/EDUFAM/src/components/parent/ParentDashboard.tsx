@@ -137,7 +137,7 @@ const ParentDashboard: React.FC = () => {
               <Route path="/" element={<ParentMainDashboard childData={childData} events={events} />} />
               <Route path="/child-info" element={<ChildInformationView />} />
               <Route path="/event-calendar" element={<EventCalendarView events={events} />} />
-              <Route path="/feedback" element={<FeedbackView loggedInParentEmail={loggedInParentEmail} childData={childData} />} />
+              <Route path="/feedback" element={<FeedbackView />} />
             </Routes>
           </Container>
         </div>

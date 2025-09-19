@@ -1,59 +1,34 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../context/useAuth';
+import { useFeedback } from '../../context/useFeedback';
 import { Card, Form, Button } from 'react-bootstrap';
-import { useFeedback } from '../../context/FeedbackContext';
 
-interface ChildData {
-  studentName: string;
-  studentId: string;
-  studentClass?: string;
-  term?: string;
-  fileName?: string;
-  fileDataUrl?: string;
-  attendance?: number;
-}
-
-interface FeedbackViewProps {
-  loggedInParentEmail: string;
-  childData: ChildData;
-}
-
-const FeedbackView: React.FC<FeedbackViewProps> = ({ loggedInParentEmail, childData }) => {
-  const { addFeedback } = useFeedback();
+const FeedbackView: React.FC = () => {
   const [concernType, setConcernType] = useState('');
   const [message, setMessage] = useState('');
   const [requestCallback, setRequestCallback] = useState(false);
   const [scheduleMeeting, setScheduleMeeting] = useState(false);
+  const { user } = useAuth();
+  const { addFeedback } = useFeedback();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!concernType || !message) {
-      alert('Please fill in all required fields.');
+    if (!user?.email) {
+      alert('You must be logged in as a parent to submit feedback.');
       return;
     }
-
-    // Get current parent and child info
-    const currentParent = { name: 'Parent Name', email: loggedInParentEmail };
-    const currentChild = childData.studentName ? childData : { studentName: 'Jane Doe', studentId: '12A' };
-
     addFeedback({
-      parentName: currentParent.name,
-      parentEmail: currentParent.email,
-      studentName: currentChild.studentName,
-      studentId: currentChild.studentId,
       concernType,
       message,
       requestCallback,
-      scheduleMeeting
+      scheduleMeeting,
+      parentEmail: user.email
     });
-
-    // Reset form
     setConcernType('');
     setMessage('');
     setRequestCallback(false);
     setScheduleMeeting(false);
-
-    alert('Feedback submitted successfully! The teacher will be notified.');
+    alert('Feedback submitted successfully!');
   };
 
   return (

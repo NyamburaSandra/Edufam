@@ -94,24 +94,24 @@ const TeacherDashboard: React.FC = () => {
 					}}
 				>
 					<Container fluid>
-						{/* Show summary type dropdown after class is selected */}
-						{selectedClass && (
-							<div className="mb-4" style={{ maxWidth: 300 }}>
-								<label style={{ fontWeight: 500 }}>Summary Type</label>
-								<select
-									className="form-select"
-									value={summaryType}
-									onChange={e => setSummaryType(e.target.value as 'results' | 'events' | 'attendance')}
-								>
-									<option value="results">Result Summary</option>
-									<option value="events">Event Summary</option>
-									<option value="attendance">Attendance Summary</option>
-								</select>
-							</div>
-						)}
-						{/* Pass selectedClass and summaryType as props if needed */}
 						<Routes>
-							<Route path="/" element={<TeacherView selectedClass={selectedClass} summaryType={summaryType} />} />
+							<Route path="/" element={
+								<>
+									<div className="mb-4" style={{ maxWidth: 300 }}>
+										<label style={{ fontWeight: 500 }}>Summary Type</label>
+										<select
+											className="form-select"
+											value={summaryType}
+											onChange={e => setSummaryType(e.target.value as 'results' | 'events' | 'attendance')}
+										>
+											<option value="results">Result Summary</option>
+											<option value="events">Event Summary</option>
+											<option value="attendance">Attendance Summary</option>
+										</select>
+									</div>
+									<TeacherView selectedClass={selectedClass} summaryType={summaryType} />
+								</>
+							} />
 							<Route path="/results" element={<ResultsView />} />
 							<Route path="/events" element={<EventsView />} />
 							<Route path="/attendance" element={<AttendanceView />} />

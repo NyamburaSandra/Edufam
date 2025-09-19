@@ -25,19 +25,32 @@ const TeacherSidebar: React.FC<TeacherSidebarProps> = ({ navItems, isOpen, onCla
       {navItems.map((item) => {
         if (item.dropdown) {
           return (
-            <div key={item.path} className="dropdown sidebar-dropdown mb-2">
-              <button
-                className="btn btn-secondary dropdown-toggle w-100 text-start"
-                type="button"
-                id="dashboardDropdownButton"
-                data-bs-toggle="dropdown"
-                aria-expanded={dashboardDropdownOpen}
-                style={{ background: '#f8f9fa', color: '#0a58ca', border: 'none', fontWeight: 600, fontSize: 16, borderRadius: 8, padding: '10px 14px' }}
-                onClick={() => setDashboardDropdownOpen((open) => !open)}
-              >
-                {item.icon && <i className={`${item.icon} me-2`}></i>}
-                {item.label}
-              </button>
+            <div key={item.path} className="dropdown sidebar-dropdown mb-2 d-flex flex-column">
+              <div className="d-flex align-items-center">
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) => [
+                    "btn btn-link btn-block border-bottom m-0 text-start flex-grow-1",
+                    isActive ? "active" : ""
+                  ].join(" ")}
+                  style={{ fontWeight: 600, fontSize: 16, color: '#0a58ca', borderRadius: 8, padding: '10px 14px', background: '#f8f9fa', border: 'none' }}
+                >
+                  {item.icon && <i className={`${item.icon} me-2`}></i>}
+                  {item.label}
+                </NavLink>
+                <button
+                  className="btn btn-secondary dropdown-toggle ms-2"
+                  type="button"
+                  id="dashboardDropdownButton"
+                  data-bs-toggle="dropdown"
+                  aria-expanded={dashboardDropdownOpen}
+                  style={{ background: '#f8f9fa', color: '#0a58ca', border: 'none', fontWeight: 600, fontSize: 16, borderRadius: 8, padding: '10px 14px' }}
+                  onClick={() => setDashboardDropdownOpen((open) => !open)}
+                  tabIndex={0}
+                >
+                  <span className="visually-hidden">Select class</span>
+                </button>
+              </div>
               <ul
                 className={`dropdown-menu w-100${dashboardDropdownOpen ? ' show' : ''}`}
                 aria-labelledby="dashboardDropdownButton"
