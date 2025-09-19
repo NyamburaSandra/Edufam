@@ -4,6 +4,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
+import { AuthProvider } from './context/AuthContext';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { BrowserRouter } from 'react-router-dom';
 import { EventsProvider } from './context/EventsContext';
@@ -19,7 +20,9 @@ createRoot(document.getElementById('root')!).render(
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
       <BrowserRouter>
         <EventsProvider>
-        <App />
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </EventsProvider>
       </BrowserRouter>
     </ClerkProvider>

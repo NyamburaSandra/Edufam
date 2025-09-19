@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 import { useEvents } from '../../context/useEvents';
 import { useResults } from '../../context/ResultsContextHook';
 import { useAttendance } from '../../context/AttendanceContextHook';
@@ -13,105 +14,234 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 	const { results } = useResults();
 	const { attendance } = useAttendance();
 
+	// Helper to normalize class names for comparison
+	const normalizeClass = (cls: string) => cls.replace(/class\s*/i, '').trim();
+
+	// Action handlers (implement logic as needed)
+	const handleEdit = (type: 'results' | 'events' | 'attendance', idx: number) => {
+		alert(`Edit ${type} row #${idx + 1}`);
+	};
+	const handleDelete = (type: 'results' | 'events' | 'attendance', idx: number) => {
+		if (window.confirm('Are you sure you want to delete this entry?')) {
+			alert(`Delete ${type} row #${idx + 1}`);
+		}
+	};
+
+	const tableStyle = {
+		borderRadius: 10,
+		overflow: 'hidden',
+		boxShadow: '0 2px 8px rgba(30,10,60,0.07)'
+	};
+
+	const thStyle: React.CSSProperties = {
+		background: '#6c63ff',
+		color: '#fff',
+		fontWeight: 600,
+		border: 'none',
+		letterSpacing: '0.03em',
+		textAlign: 'center' as const,
+		verticalAlign: 'middle' as const,
+		fontSize: '1.05em'
+	};
+
 	return (
-				   <div className="row dashboard-tab-section" style={{ minHeight: '60vh', background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: 32 }}>
-					   {selectedClass && (
-								<div className="row">
-									{summaryType === "results" && (
-										<div className="col-md-10 mx-auto">
-											<h3>Results Summary - {selectedClass}</h3>
-											<table className="table table-bordered">
-												<thead>
-													<tr>
-														<th>Student ID</th>
-														<th>Student Name</th>
-														<th>Grade</th>
-														<th>Term</th>
-														<th>File</th>
-													</tr>
-												</thead>
-												<tbody>
-													{results.filter(r => r.studentClass === selectedClass).length === 0 ? (
-														<tr><td colSpan={5} className="text-center">No results uploaded</td></tr>
-													) : (
-														results.filter(r => r.studentClass === selectedClass).map((r, idx) => (
-															<tr key={idx}>
-																<td>{r.studentId}</td>
-																<td>{r.studentName}</td>
-																<td>{r.grade}</td>
-																<td>{r.term}</td>
-																<td>{r.fileName ? <a href={r.fileDataUrl} target="_blank" rel="noopener noreferrer">{r.fileName}</a> : '—'}</td>
-															</tr>
-														))
-													)}
-												</tbody>
-											</table>
-										</div>
-									)}
-									{summaryType === "events" && (
-										<div className="col-md-10 mx-auto">
-											<h3>Events Summary - {selectedClass}</h3>
-											<table className="table table-bordered">
-												<thead>
-													<tr>
-														<th>Event Name</th>
-														<th>Date</th>
-														<th>Start Time</th>
-														<th>End Time</th>
-														<th>Description</th>
-													</tr>
-												</thead>
-												<tbody>
-													{events.length === 0 ? (
-														<tr><td colSpan={5} className="text-center">No events uploaded</td></tr>
-													) : (
-														events.map((ev, idx) => (
-															<tr key={idx}>
-																<td>{ev.title}</td>
-																<td>{ev.start ? new Date(ev.start).toLocaleDateString() : ''}</td>
-																<td>{ev.start ? new Date(ev.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
-																<td>{ev.end ? new Date(ev.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
-																<td>{ev.description}</td>
-															</tr>
-														))
-													)}
-												</tbody>
-											</table>
-										</div>
-									)}
-									{summaryType === "attendance" && (
-										<div className="col-md-10 mx-auto">
-											<h3>Attendance Summary - {selectedClass}</h3>
-											<table className="table table-bordered">
-												<thead>
-													<tr>
-														<th>Student ID</th>
-														<th>Student Name</th>
-														<th>Term</th>
-														<th>Attendance (%)</th>
-													</tr>
-												</thead>
-												<tbody>
-													{attendance.filter(a => a.studentClass === selectedClass).length === 0 ? (
-														<tr><td colSpan={4} className="text-center">No attendance uploaded</td></tr>
-													) : (
-														attendance.filter(a => a.studentClass === selectedClass).map((a, idx) => (
-															<tr key={idx}>
-																<td>{a.studentId}</td>
-																<td>{a.studentName}</td>
-																<td>{a.term}</td>
-																<td>{a.attendancePercent}%</td>
-															</tr>
-														))
-													)}
-												</tbody>
-											</table>
-										</div>
-									)}
+		<div className="row dashboard-tab-section" style={{ minHeight: '60vh', background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', padding: 32 }}>
+			<div className="row">
+				{summaryType === "results" && (
+					<div className="col-md-10 mx-auto">
+						<h3>Results Summary{selectedClass ? ` - ${selectedClass}` : ''}</h3>
+						<div style={tableStyle}>
+						<table className="table table-hover align-middle mb-0">
+							<thead>
+								<tr>
+									<th style={thStyle}>Student ID</th>
+									<th style={thStyle}>Student Name</th>
+									<th style={thStyle}>Grade</th>
+									<th style={thStyle}>Term</th>
+									<th style={thStyle}>File</th>
+									<th style={thStyle}>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{(selectedClass
+									? results.filter(r => normalizeClass(r.studentClass || '') === normalizeClass(selectedClass))
+									: results
+								).length === 0 ? (
+									<tr><td colSpan={6} className="text-center">No results uploaded</td></tr>
+								) : (
+									(selectedClass
+										? results.filter(r => normalizeClass(r.studentClass || '') === normalizeClass(selectedClass))
+										: results
+									).map((r, idx) => (
+										<tr key={idx}>
+											<td>{r.studentId}</td>
+											<td>{r.studentName}</td>
+											<td>{r.grade}</td>
+											<td>{r.term}</td>
+											<td>{r.fileName ? <a href={r.fileDataUrl} target="_blank" rel="noopener noreferrer">{r.fileName}</a> : '—'}</td>
+											<td>
+												<div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+													<Button
+														variant="outline-warning"
+														size="sm"
+														style={{
+															borderRadius: '50%',
+															padding: '0.4em 0.5em',
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'center',
+															boxShadow: '0 1px 4px #ffc10733',
+															background: 'transparent',
+															borderColor: '#ffc107',
+															transition: 'background 0.2s'
+														}}
+														onMouseOver={e => (e.currentTarget.style.background = '#fffbe6')}
+														onMouseOut={e => (e.currentTarget.style.background = 'transparent')}
+														onClick={() => handleEdit('results', idx)}
+														title="Edit"
+													>
+														<i className="bi bi-pencil-square" style={{ fontSize: '1.1em', color: '#ffc107' }}></i>
+													</Button>
+													<Button variant="outline-danger" size="sm" style={{ borderRadius: '50%', padding: '0.4em 0.5em', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #dc354522' }} onClick={() => handleDelete('results', idx)} title="Delete">
+														<i className="bi bi-trash" style={{ fontSize: '1.1em', color: '#dc3545' }}></i>
+													</Button>
+												</div>
+											</td>
+										</tr>
+									))
+								)}
+							</tbody>
+						</table>
+						</div>
+					</div>
+				)}
+				{summaryType === "events" && (
+					<div className="col-md-10 mx-auto">
+						<h3>Events Summary - {selectedClass}</h3>
+						<div style={tableStyle}>
+						<table className="table table-hover align-middle mb-0">
+							<thead>
+								<tr>
+									<th style={thStyle}>Event Name</th>
+									<th style={thStyle}>Date</th>
+									<th style={thStyle}>Start Time</th>
+									<th style={thStyle}>End Time</th>
+									<th style={thStyle}>Description</th>
+									<th style={thStyle}>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{events.length === 0 ? (
+									<tr><td colSpan={6} className="text-center">No events uploaded</td></tr>
+								) : (
+									events.map((ev, idx) => (
+										<tr key={idx}>
+											<td>{ev.title}</td>
+											<td>{ev.start ? new Date(ev.start).toLocaleDateString() : ''}</td>
+											<td>{ev.start ? new Date(ev.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
+											<td>{ev.end ? new Date(ev.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
+											<td>{ev.description}</td>
+											<td>
+												<div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+													<Button
+														variant="outline-warning"
+														size="sm"
+														style={{
+															borderRadius: '50%',
+															padding: '0.4em 0.5em',
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'center',
+															boxShadow: '0 1px 4px #ffc10733',
+															background: 'transparent',
+															borderColor: '#ffc107',
+															transition: 'background 0.2s'
+														}}
+														onMouseOver={e => (e.currentTarget.style.background = '#fffbe6')}
+														onMouseOut={e => (e.currentTarget.style.background = 'transparent')}
+														onClick={() => handleEdit('events', idx)}
+														title="Edit"
+													>
+														<i className="bi bi-pencil-square" style={{ fontSize: '1.1em', color: '#ffc107' }}></i>
+													</Button>
+													<Button variant="outline-danger" size="sm" style={{ borderRadius: '50%', padding: '0.4em 0.5em', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #dc354522' }} onClick={() => handleDelete('events', idx)} title="Delete">
+														<i className="bi bi-trash" style={{ fontSize: '1.1em', color: '#dc3545' }}></i>
+													</Button>
+												</div>
+											</td>
+										</tr>
+									))
+								)}
+							</tbody>
+						</table>
+						</div>
+					</div>
+				)}
+				{summaryType === "attendance" && (
+					<div className="col-md-10 mx-auto">
+						<h3>Attendance Summary - {selectedClass}</h3>
+						<div style={tableStyle}>
+						<table className="table table-hover align-middle mb-0">
+							<thead>
+								<tr>
+									<th style={thStyle}>Student ID</th>
+									<th style={thStyle}>Student Name</th>
+									<th style={thStyle}>Term</th>
+									<th style={thStyle}>Attendance (%)</th>
+									<th style={thStyle}>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{attendance.filter(a => a.studentClass === selectedClass).length === 0 ? (
+									<tr><td colSpan={5} className="text-center">No attendance uploaded</td></tr>
+								) : (
+									attendance.filter(a => a.studentClass === selectedClass).map((a, idx) => (
+										<tr key={idx}>
+											<td>{a.studentId}</td>
+											<td>{a.studentName}</td>
+											<td>{a.term}</td>
+											<td>{a.attendancePercent}%</td>
+											<td>
+												<div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+													<Button
+														variant="outline-warning"
+														size="sm"
+														style={{
+															borderRadius: '50%',
+															padding: '0.4em 0.5em',
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'center',
+															boxShadow: '0 1px 4px #ffc10733',
+															background: 'transparent',
+															borderColor: '#ffc107',
+															transition: 'background 0.2s'
+														}}
+														onMouseOver={e => (e.currentTarget.style.background = '#fffbe6')}
+														onMouseOut={e => (e.currentTarget.style.background = 'transparent')}
+														onClick={() => handleEdit('attendance', idx)}
+														title="Edit"
+													>
+														<i className="bi bi-pencil-square" style={{ fontSize: '1.1em', color: '#ffc107' }}></i>
+													</Button>
+													<Button variant="outline-danger" size="sm" style={{ borderRadius: '50%', padding: '0.4em 0.5em', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #dc354522' }} onClick={() => handleDelete('attendance', idx)} title="Delete">
+														<i className="bi bi-trash" style={{ fontSize: '1.1em', color: '#dc3545' }}></i>
+													</Button>
+												</div>
+											</td>
+										</tr>
+									))
+								)}
+							</tbody>
+						</table>
+						</div>
+					</div>
+				)}
+
 								</div>
-							)}
-				</div>
-	);
+							
+						</div>
+			);
 };
 
 export default TeacherView;

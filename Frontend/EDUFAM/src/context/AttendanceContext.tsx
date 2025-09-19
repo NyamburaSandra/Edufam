@@ -17,7 +17,17 @@ export interface AttendanceContextValue {
 
 
 export const AttendanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [attendance, setAttendance] = useState<AttendanceEntry[]>([]);
+  // Load from localStorage on init
+  const [attendance, setAttendance] = useState<AttendanceEntry[]>(() => {
+    const stored = localStorage.getItem('edufam_attendance');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Save to localStorage whenever attendance changes
+  React.useEffect(() => {
+    localStorage.setItem('edufam_attendance', JSON.stringify(attendance));
+  }, [attendance]);
+
   const addAttendance = (entry: AttendanceEntry) => setAttendance(prev => [...prev, entry]);
   return (
     <AttendanceContext.Provider value={{ attendance, addAttendance }}>

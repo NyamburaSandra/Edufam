@@ -19,7 +19,17 @@ export interface ResultsContextValue {
 
 
 export const ResultsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [results, setResults] = useState<ResultEntry[]>([]);
+  // Load from localStorage on init
+  const [results, setResults] = useState<ResultEntry[]>(() => {
+    const stored = localStorage.getItem('edufam_results');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Save to localStorage whenever results change
+  React.useEffect(() => {
+    localStorage.setItem('edufam_results', JSON.stringify(results));
+  }, [results]);
+
   const addResult = (result: ResultEntry) => setResults(prev => [...prev, result]);
   return (
     <ResultsContext.Provider value={{ results, addResult }}>

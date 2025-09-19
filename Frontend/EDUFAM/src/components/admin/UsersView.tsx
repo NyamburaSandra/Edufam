@@ -145,9 +145,9 @@ const ChildSelector: React.FC<ChildSelectorProps> = ({ selectedChildren, onChild
 };
 
 const CLASS_OPTIONS = [
-  '1 Ivory', '1 Pearl', '2 Ivory', '2 Pearl', '3 Ivory', '3 Pearl',
-  '4 Ivory', '4 Pearl', '5 Ivory', '5 Pearl', '6 Ivory', '6 Pearl',
-  '7 Ivory', '7 Pearl', '8 Ivory', '8 Pearl'
+  'Class 1',
+  'Class 2',
+  'Class 3'
 ];
 
 const SUBJECT_OPTIONS = [
@@ -206,28 +206,27 @@ const UsersView: React.FC = () => {
   };
 
   // Filtered users based on search and filter
+  const usersList = getUsers();
   const filteredUsers = useMemo(() => {
-    const users = getUsers();
-    return users.filter(user => {
+    return usersList.filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            (user.studentId && user.studentId.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesType = filterType === 'all' || user.type === filterType;
       return matchesSearch && matchesType;
     });
-  }, [searchTerm, filterType, getUsers()]);
+  }, [searchTerm, filterType, usersList]);
 
   // User statistics
   const userStats = useMemo(() => {
-    const users = getUsers();
     return {
-      total: users.length,
-      students: users.filter(u => u.type === 'student').length,
-      teachers: users.filter(u => u.type === 'teacher').length,
-      parents: users.filter(u => u.type === 'parent').length,
+      total: usersList.length,
+      students: usersList.filter(u => u.type === 'student').length,
+      teachers: usersList.filter(u => u.type === 'teacher').length,
+      parents: usersList.filter(u => u.type === 'parent').length,
       pending: pendingAccounts.filter(p => p.status === 'pending').length
     };
-  }, [getUsers(), pendingAccounts]);
+  }, [usersList, pendingAccounts]);
 
   // Handlers
   const handleFormChange = (field: string, value: string | string[]) => {
