@@ -5,6 +5,8 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { parse, startOfWeek, getDay, format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import AttendancePieChart from '../AttendancePieChart';
+import { useAttendance } from '../../context/AttendanceContextHook';
+import { useResults } from '../../context/ResultsContextHook';
 
 const locales = {
   'en-US': enUS,
@@ -42,6 +44,15 @@ interface ParentMainDashboardProps {
 }
 
 const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, events }) => {
+  const { attendance } = useAttendance();
+  const { results } = useResults();
+  // Find latest attendance for this child by studentId
+  const childAttendance = attendance.filter(a => a.studentId === childData.studentId);
+  const latestAttendance = childAttendance.length > 0 ? childAttendance[childAttendance.length - 1] : null;
+  const percent = latestAttendance ? latestAttendance.attendancePercent : 0;
+  // Find latest result for this child by studentId
+  const childResults = results.filter(r => r.studentId === childData.studentId && r.fileName && r.fileDataUrl);
+  const latestResult = childResults.length > 0 ? childResults[childResults.length - 1] : null;
   return (
     <>
       {/* Child Profile Section */}
@@ -54,10 +65,10 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
             <Col md={4}>
               <h6>Overall Performance</h6>
               <div style={{ color: '#6c63ff', fontWeight: 500, marginBottom: 8 }}>
-                {childData.term ? `Term: ${childData.term.replace(/-/g, ' ').replace(/term(\d)/, 'Term $1').replace('midterm', 'Midterm').replace('endterm', 'End Term')}` : 'No results uploaded yet.'}
+                {latestResult && latestResult.term ? `Term: ${latestResult.term.replace(/-/g, ' ').replace(/term(\d)/, 'Term $1').replace('midterm', 'Midterm').replace('endterm', 'End Term')}` : 'No results uploaded yet.'}
               </div>
-              {childData.fileName && childData.fileDataUrl && (
-                <a href={childData.fileDataUrl} download={childData.fileName}>
+              {latestResult && latestResult.fileName && latestResult.fileDataUrl && (
+                <a href={latestResult.fileDataUrl} download={latestResult.fileName}>
                   <Button
                     variant="primary"
                     style={{
@@ -82,9 +93,9 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
             <Col md={4} className="text-center">
               <div className="attendance-circle">
                 <h6>Attendance</h6>
-                <AttendancePieChart percent={childData.attendance} />
+                <AttendancePieChart percent={percent} />
                 <div className="percentage">
-                  <h3>{childData.attendance}%</h3>
+                  <h3>{percent}%</h3>
                 </div>
               </div>
             </Col>
