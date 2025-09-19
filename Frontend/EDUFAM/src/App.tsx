@@ -1,37 +1,35 @@
 import "./App.css";
 // import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import CustomNavbar from "./components/Navbar";
-import ParentDashboard from "./components/ParentDashboard";
+import { ParentDashboard } from "./components/parent";
+import { AdminDashboard } from "./components/admin";
+import { TeacherDashboard } from "./components/teacher";
 
-
-// Custom wrapper for parent dashboard with aligned footer
-const ParentDashboardWithFooter = () => (
-  <>
-    <ParentDashboard />
-    <Footer className="footer-parent-dashboard" />
-  </>
-);
-import TeacherDashboard from "./components/TeacherDashboard";
 import Footer from "./components/Footer";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Welcome from "./components/Welcome";
 import { ResultsProvider } from './context/ResultsContext';
 import { AttendanceProvider } from './context/AttendanceContext';
+import { FeedbackProvider } from './context/FeedbackContext';
 
 function App() {
   return (
     <AttendanceProvider>
       <ResultsProvider>
-        <div className="flex-grow-1">
-          <main>
-            <Routes>
-              <Route path="/" element={<Navigate to="/welcome" replace />} />
-              <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
-              <Route path="/parent" element={<ParentDashboardWithFooter />} />
-              <Route path="/teacher" element={<><CustomNavbar /><TeacherDashboard /></>} />
-            </Routes>
-          </main>
-        </div>
+        <FeedbackProvider>
+          <div className="flex-grow-1">
+            <main>
+              <Routes>
+                <Route path="/" element={<Navigate to="/welcome" replace />} />
+                <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
+                <Route path="/parent/*" element={<ParentDashboard />} />
+
+                <Route path="/teacher/*" element={<><CustomNavbar /><TeacherDashboard /></>} />
+                <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
+              </Routes>
+            </main>
+          </div>
+        </FeedbackProvider>
       </ResultsProvider>
     </AttendanceProvider>
   );

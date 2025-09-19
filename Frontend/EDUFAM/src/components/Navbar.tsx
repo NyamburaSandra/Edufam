@@ -6,12 +6,24 @@ import type { NotificationItem } from './NotificationsPopup';
 
 interface CustomNavbarProps {
   notifications?: NotificationItem[];
+  toggleSidebar?: () => void;
 }
 
-const CustomNavbar: React.FC<CustomNavbarProps> = ({ notifications }) => {
+const CustomNavbar: React.FC<CustomNavbarProps> = ({ notifications, toggleSidebar }) => {
   return (
     <Navbar className="bg-edufam-dark" variant="dark" expand="lg" fixed="top">
       <Container>
+        {/* Hamburger Menu Button */}
+        {toggleSidebar && (
+          <Button
+            variant="outline-light"
+            className="me-3 d-flex align-items-center"
+            onClick={toggleSidebar}
+            style={{ border: 'none', padding: '0.375rem 0.75rem' }}
+          >
+            <i className="bi bi-list" style={{ fontSize: '1.5rem' }}></i>
+          </Button>
+        )}
         <Navbar.Brand href="#home" >
           {/* Logo Text */}
           <span className="ml-2 text-xl font-bold">EDUFAM</span>
