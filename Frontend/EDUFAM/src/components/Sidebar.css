@@ -1,7 +1,7 @@
 .sidebar {
   background-color: #f8f9fa;
   padding: 1rem;
-  padding-top: 4rem; /* Extra space for hamburger button */
+  padding-top: 1rem; /* Extra space for hamburger button */
   margin-top: 56px; /* Height of the navbar */
   position: fixed;
   top: 0;
@@ -29,4 +29,10 @@
 .sidebar a {
   text-decoration: none;
   color: #333;
+  transition: color 0.2s;
+}
+
+.sidebar a:hover,
+.sidebar .dropdown-item:hover {
+  color: #0a58ca !important;
 }

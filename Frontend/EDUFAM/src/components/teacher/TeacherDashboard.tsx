@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { Routes, Route } from 'react-router-dom';
-import AdminSidebar from '../admin-sidebar';
+import TeacherSidebar from './TeacherSidebar';
 import { TeacherView, ResultsView, EventsView, AttendanceView, FeedbackView } from '.';
 import CustomNavbar from '../Navbar';
 import { useEvents } from '../../context/useEvents';
@@ -45,13 +45,29 @@ const TeacherDashboard: React.FC = () => {
 	};
 
 	// Teacher navigation items
-	const teacherNavItems = [
-		{ path: '/teacher', label: 'Dashboard', icon: 'bi bi-speedometer2' },
-		{ path: '/teacher/results', label: 'Upload Results', icon: 'bi bi-file-earmark-text' },
-		{ path: '/teacher/events', label: 'Add Events', icon: 'bi bi-calendar-event' },
-		{ path: '/teacher/attendance', label: 'Upload Attendance', icon: 'bi bi-person-check' },
-		{ path: '/teacher/feedback', label: 'Parent Feedback', icon: 'bi bi-chat-dots' }
-	];
+
+		// Add state for selected class and summary type
+		const [selectedClass, setSelectedClass] = useState("");
+		const [summaryType, setSummaryType] = useState<'results' | 'events' | 'attendance'>('results');
+
+		// Teacher navigation items with Dashboard as dropdown
+		const teacherNavItems = [
+			{
+				path: '/teacher',
+				label: 'Dashboard',
+				icon: 'bi bi-speedometer2',
+				dropdown: true,
+				dropdownOptions: [
+					{ value: '1', label: 'Class 1' },
+					{ value: '2', label: 'Class 2' },
+					{ value: '3', label: 'Class 3' },
+				],
+			},
+			{ path: '/teacher/results', label: 'Upload Results', icon: 'bi bi-file-earmark-text' },
+			{ path: '/teacher/events', label: 'Add Events', icon: 'bi bi-calendar-event' },
+			{ path: '/teacher/attendance', label: 'Upload Attendance', icon: 'bi bi-person-check' },
+			{ path: '/teacher/feedback', label: 'Parent Feedback', icon: 'bi bi-chat-dots' }
+		];
 
 	return (
 		<>
@@ -59,22 +75,43 @@ const TeacherDashboard: React.FC = () => {
 			<CustomNavbar notifications={notifications} toggleSidebar={toggleSidebar} />
 
 			<div className="teacher-dashboard">
-				{/* Sidebar */}
-				<AdminSidebar navItems={teacherNavItems} isOpen={sidebarOpen} />
+				{/* Sidebar with class dropdown (teacher only) */}
+				<TeacherSidebar
+					navItems={teacherNavItems}
+					isOpen={sidebarOpen}
+					onClassSelect={setSelectedClass}
+					selectedClass={selectedClass}
+				/>
 
 				{/* Main Content */}
-				<div 
+				<div
 					className={`teacher-content ${sidebarOpen ? 'sidebar-open' : ''}`}
 					style={{
-						marginLeft: sidebarOpen ? '250px' : '0',
+						marginLeft: sidebarOpen ? '200px' : '0',
 						transition: 'margin-left 0.3s ease-in-out',
 						padding: '20px',
 						paddingTop: '100px'
 					}}
 				>
 					<Container fluid>
+						{/* Show summary type dropdown after class is selected */}
+						{selectedClass && (
+							<div className="mb-4" style={{ maxWidth: 300 }}>
+								<label style={{ fontWeight: 500 }}>Summary Type</label>
+								<select
+									className="form-select"
+									value={summaryType}
+									onChange={e => setSummaryType(e.target.value as 'results' | 'events' | 'attendance')}
+								>
+									<option value="results">Result Summary</option>
+									<option value="events">Event Summary</option>
+									<option value="attendance">Attendance Summary</option>
+								</select>
+							</div>
+						)}
+						{/* Pass selectedClass and summaryType as props if needed */}
 						<Routes>
-							<Route path="/" element={<TeacherView />} />
+							<Route path="/" element={<TeacherView selectedClass={selectedClass} summaryType={summaryType} />} />
 							<Route path="/results" element={<ResultsView />} />
 							<Route path="/events" element={<EventsView />} />
 							<Route path="/attendance" element={<AttendanceView />} />

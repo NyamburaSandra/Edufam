@@ -11,12 +11,13 @@ const AdminView: React.FC = () => {
     systemAlerts: 3
   };
 
-  const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
-  const students = users.filter((u: any) => u.type === 'student');
-  const teachers = users.filter((u: any) => u.type === 'teacher');
-  const parents = users.filter((u: any) => u.type === 'parent');
-  const classes = [...new Set(students.map((s: any) => s.class))].length;
-  const events = 5; // Example static value
+  type User = { type: string; class?: string; subject?: string };
+  const users: User[] = JSON.parse(localStorage.getItem('edufam_users') || '[]');
+  const students = users.filter((u) => u.type === 'student');
+  const teachers = users.filter((u) => u.type === 'teacher');
+  // const parents = users.filter((u) => u.type === 'parent'); // unused
+  const classes = [...new Set(students.map((s) => s.class))].length;
+  // const events = 5; // Example static value, unused
 
   // Demo performance data
   const performance = {
@@ -45,8 +46,8 @@ const AdminView: React.FC = () => {
                     {(() => {
                       if (students.length === 0) return 'No students';
                       const classCounts: Record<string, number> = {};
-                      students.forEach((s: any) => {
-                        classCounts[s.class] = (classCounts[s.class] || 0) + 1;
+                      students.forEach((s) => {
+                        if (s.class) classCounts[s.class] = (classCounts[s.class] || 0) + 1;
                       });
                       const highestClass = Object.entries(classCounts).reduce((max, curr) => curr[1] > max[1] ? curr : max);
                       return `Largest: ${highestClass[0]} (${highestClass[1]})`;
@@ -64,7 +65,7 @@ const AdminView: React.FC = () => {
                     {(() => {
                       if (teachers.length === 0) return 'No teachers';
                       const subjectCounts: Record<string, number> = {};
-                      teachers.forEach((t: any) => {
+                      teachers.forEach((t) => {
                         if (t.subject) subjectCounts[t.subject] = (subjectCounts[t.subject] || 0) + 1;
                       });
                       if (Object.keys(subjectCounts).length === 0) return '';
