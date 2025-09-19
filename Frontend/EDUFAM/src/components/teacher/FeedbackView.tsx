@@ -18,7 +18,7 @@ const FeedbackView: React.FC = () => {
 				) : (
 								feedbacks.map((fb: Feedback, idx: number) => (
 									<div className="col-md-6 col-lg-4 d-flex" key={idx}>
-										<div className="card shadow-sm border-0 flex-fill" style={{ borderRadius: 18, background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', minWidth: 0 }}>
+										<div className="card shadow-sm border-0 flex-fill" style={{ borderRadius: 18, background: ' #d6c8d4ff ', minWidth: 0 }}>
 											<div className="card-body d-flex flex-column justify-content-between h-100">
 												<div>
 													<div className="d-flex align-items-center mb-2">
