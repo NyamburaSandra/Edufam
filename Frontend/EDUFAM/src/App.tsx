@@ -1,5 +1,20 @@
 // Seed localStorage with users_seed_data.json if not already present
 import usersSeedData from './data/users_seed_data.json';
+import seedData from './data/seed_data.json';
+function shouldSeedFeedbacks() {
+  const raw = localStorage.getItem('edufam_feedbacks');
+  if (!raw) return true;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return true;
+  } catch {
+    return true;
+  }
+  return false;
+}
+if (shouldSeedFeedbacks()) {
+  localStorage.setItem('edufam_feedbacks', JSON.stringify(seedData.feedback));
+}
 
 function shouldSeedUsers() {
   const raw = localStorage.getItem('edufam_users');

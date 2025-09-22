@@ -29,23 +29,27 @@ export const FeedbackProvider: React.FC<{ children: ReactNode }> = ({ children }
   // Helper to load feedbacks from localStorage or seed
   const loadFeedbacks = () => {
     const local = localStorage.getItem('edufam_feedbacks');
-    let loaded: Feedback[] = [];
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        if (isFeedbackArray(parsed)) {
-          loaded = parsed;
-        }
-      } catch {
-        // Ignore JSON parse errors and fallback to seed data
+    if (!local || local === '[]') {
+      // Only seed if key is missing or empty
+      const seed = (seedData as { feedback?: unknown }).feedback;
+      if (isFeedbackArray(seed)) {
+        localStorage.setItem('edufam_feedbacks', JSON.stringify(seed));
+        setFeedbacks(seed);
+        return;
       }
+      setFeedbacks([]);
+      return;
     }
-    // If nothing loaded from localStorage, use seed data
-    if (!loaded.length && isFeedbackArray((seedData as { feedback?: unknown }).feedback)) {
-      loaded = (seedData as { feedback: Feedback[] }).feedback;
-      localStorage.setItem('edufam_feedbacks', JSON.stringify(loaded));
+    try {
+      const parsed = JSON.parse(local);
+      if (isFeedbackArray(parsed)) {
+        setFeedbacks(parsed);
+        return;
+      }
+    } catch {
+      // Ignore JSON parse errors and fallback to empty
     }
-    setFeedbacks(loaded);
+    setFeedbacks([]);
   };
 
   useEffect(() => {
@@ -64,17 +68,12 @@ export const FeedbackProvider: React.FC<{ children: ReactNode }> = ({ children }
     };
   }, []);
 
-  // Poll localStorage every second to ensure feedbacks are always up to date
-  useEffect(() => {
-    const interval = setInterval(() => {
-      loadFeedbacks();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
-  // Save feedbacks to localStorage whenever they change
+  // Save feedbacks to localStorage whenever they change, but never overwrite with empty array
   useEffect(() => {
-    localStorage.setItem('edufam_feedbacks', JSON.stringify(feedbacks));
+    if (feedbacks && feedbacks.length > 0) {
+      localStorage.setItem('edufam_feedbacks', JSON.stringify(feedbacks));
+    }
   }, [feedbacks]);
 
   const addFeedback = (feedback: Feedback) => {
