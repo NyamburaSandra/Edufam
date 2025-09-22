@@ -102,14 +102,6 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 					</div>
 						{summaryType === "results" && (
 							<div className="col-md-10 mx-auto">
-								{/* DEBUG: Show all terms in results for troubleshooting */}
-								<div style={{ background: '#f8f9fa', border: '1px solid #eee', borderRadius: 6, marginBottom: 8, padding: 8, fontSize: 13 }}>
-									<b>DEBUG:</b> Terms in results: [
-									{results.map((r, i) => (
-										<span key={i} style={{ marginRight: 8 }}>{JSON.stringify(r.term)}</span>
-									))}
-									]
-								</div>
 								<h3>Results Summary{selectedClass ? ` -  Class ${selectedClass}` : ''}</h3>
 								<div style={tableStyle}>
 									<table className="table table-hover align-middle mb-0">
