@@ -2,7 +2,8 @@ import React from 'react';
 import { Navbar, Container, Nav, Button } from 'react-bootstrap';
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 import NotificationsPopup from './NotificationsPopup';
-import type { NotificationItem } from './NotificationsPopup';
+import type { NotificationItem } from '../context/NotificationsContext';
+import { useCurrentUser } from '../context/useCurrentUser';
 
 interface CustomNavbarProps {
   notifications?: NotificationItem[];
@@ -10,6 +11,12 @@ interface CustomNavbarProps {
 }
 
 const CustomNavbar: React.FC<CustomNavbarProps> = ({ notifications, toggleSidebar }) => {
+  const currentUser = useCurrentUser();
+
+  // Debug: Log current user information
+  console.log('Navbar - Current user:', currentUser);
+  console.log('Navbar - Notifications prop:', notifications);
+
   return (
     <Navbar className="bg-edufam-dark" variant="dark" expand="lg" fixed="top">
       <Container>
@@ -35,7 +42,11 @@ const CustomNavbar: React.FC<CustomNavbarProps> = ({ notifications, toggleSideba
           <Nav>
             {/* Show notifications bell only if notifications prop is provided */}
             {notifications && (
-              <NotificationsPopup notifications={notifications} />
+              <NotificationsPopup 
+                notifications={notifications} 
+                userType={currentUser?.type || 'parent'}
+                userEmail={currentUser?.email || 'default@example.com'}
+              />
             )}
             {/* User Account */}
             <SignedOut>

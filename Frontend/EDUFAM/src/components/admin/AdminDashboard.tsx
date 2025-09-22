@@ -17,6 +17,11 @@ const AdminDashboard: React.FC = () => {
   const { events } = useEvents();
   const now = new Date();
   
+  // Debug: log events and filtering
+  console.log('AdminDashboard - All events:', events);
+  console.log('AdminDashboard - Current time:', now);
+  console.log('AdminDashboard - Future events:', events.filter((e) => e.start > now));
+  
   // Transform events into notifications for the bell icon
   type Notification = {
     id: number;
@@ -43,6 +48,8 @@ const AdminDashboard: React.FC = () => {
       start: e.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       end: e.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }));
+
+  console.log('AdminDashboard - Final notifications:', notifications);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);

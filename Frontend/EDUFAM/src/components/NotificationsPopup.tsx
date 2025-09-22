@@ -1,39 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ListGroup, Button, Overlay, Popover } from 'react-bootstrap';
-
-export interface NotificationItem {
-  id: number;
-  message: string;
-  date: string;
-  event: string;
-  description: string;
-  extra: string;
-  start: string;
-  end: string;
-}
+import { useNotifications, type NotificationItem, type UserType } from '../context/NotificationsContext';
 
 interface NotificationsPopupProps {
   notifications: NotificationItem[];
+  userType?: UserType;
+  userEmail?: string;
 }
 
 
-const NotificationsPopup: React.FC<NotificationsPopupProps> = ({ notifications }) => {
+const NotificationsPopup: React.FC<NotificationsPopupProps> = ({ 
+  notifications, 
+  userType = 'parent', 
+  userEmail 
+}) => {
   const [show, setShow] = useState(false);
   const [target, setTarget] = useState<null | HTMLElement>(null);
-  const [dismissed, setDismissed] = useState<number[]>(() => {
-    const stored = localStorage.getItem('edufam_dismissed_notifications');
-    const arr = stored ? JSON.parse(stored) : [];
-    // Remove dismissed notifications for events that are now in the past
-    const now = new Date();
-    const futureIds = (notifications || [])
-      .filter(n => new Date(n.date) > now)
-      .map(n => n.id);
-    const filtered = arr.filter((id: number) => futureIds.includes(id));
-    if (filtered.length !== arr.length) {
-      localStorage.setItem('edufam_dismissed_notifications', JSON.stringify(filtered));
-    }
-    return filtered;
-  });
+  const [forceUpdate, setForceUpdate] = useState(0);
+  const { getUserSpecificNotifications, dismissNotification, clearExpiredDismissals } = useNotifications();
+
+  // Debug: Log props and user info
+  console.log('NotificationsPopup - Props:', { notifications, userType, userEmail });
+  console.log('NotificationsPopup - ForceUpdate:', forceUpdate);
+
+  // Clear expired dismissals when notifications change
+  useEffect(() => {
+    clearExpiredDismissals(notifications, userType, userEmail);
+  }, [notifications, userType, userEmail, clearExpiredDismissals]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setShow(!show);
@@ -41,12 +34,15 @@ const NotificationsPopup: React.FC<NotificationsPopupProps> = ({ notifications }
   };
 
   const handleDismiss = (id: number) => {
-    const updated = [...dismissed, id];
-    setDismissed(updated);
-    localStorage.setItem('edufam_dismissed_notifications', JSON.stringify(updated));
+    dismissNotification(id, userType, userEmail);
+    // Force component to re-render by updating state
+    setForceUpdate(prev => prev + 1);
   };
 
-  const filteredNotifications = notifications.filter(n => !dismissed.includes(n.id));
+  // Get filtered notifications for the current user
+  const filteredNotifications = React.useMemo(() => {
+    return getUserSpecificNotifications(notifications, userType, userEmail);
+  }, [notifications, userType, userEmail, getUserSpecificNotifications, forceUpdate]);
 
   return (
     <>
