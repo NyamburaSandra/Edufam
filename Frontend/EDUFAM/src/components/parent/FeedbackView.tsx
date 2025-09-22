@@ -17,13 +17,15 @@ const FeedbackView: React.FC = () => {
       alert('You must be logged in as a parent to submit feedback.');
       return;
     }
-    addFeedback({
+    const feedbackObj = {
       concernType,
       message,
       requestCallback,
       scheduleMeeting,
       parentEmail: user.email
-    });
+    };
+    console.log('[EDUFAM] Submitting feedback:', feedbackObj);
+    addFeedback(feedbackObj);
     setConcernType('');
     setMessage('');
     setRequestCallback(false);

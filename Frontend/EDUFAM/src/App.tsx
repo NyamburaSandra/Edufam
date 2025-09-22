@@ -53,20 +53,25 @@ function App() {
   return (
     <AttendanceProvider>
       <ResultsProvider>
-        <FeedbackProvider>
-          <div className="flex-grow-1">
-            <main>
-              <Routes>
-                <Route path="/" element={<Navigate to="/welcome" replace />} />
-                <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
-                <Route path="/parent/*" element={<ParentDashboard />} />
-
-                <Route path="/teacher/*" element={<><CustomNavbar /><TeacherDashboard /></>} />
-                <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
-              </Routes>
-            </main>
-          </div>
-        </FeedbackProvider>
+        <div className="flex-grow-1">
+          <main>
+            <Routes>
+              <Route path="/" element={<Navigate to="/welcome" replace />} />
+              <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
+              <Route path="/parent/*" element={
+                <FeedbackProvider>
+                  <ParentDashboard />
+                </FeedbackProvider>
+              } />
+              <Route path="/teacher/*" element={
+                <FeedbackProvider>
+                  <><CustomNavbar /><TeacherDashboard /></>
+                </FeedbackProvider>
+              } />
+              <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
+            </Routes>
+          </main>
+        </div>
       </ResultsProvider>
     </AttendanceProvider>
   );
