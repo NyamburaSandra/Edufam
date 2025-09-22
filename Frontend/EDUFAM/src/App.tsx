@@ -1,3 +1,20 @@
+// Seed localStorage with users_seed_data.json if not already present
+import usersSeedData from './data/users_seed_data.json';
+
+function shouldSeedUsers() {
+  const raw = localStorage.getItem('edufam_users');
+  if (!raw) return true;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return true;
+  } catch {
+    return true;
+  }
+  return false;
+}
+if (shouldSeedUsers()) {
+  localStorage.setItem('edufam_users', JSON.stringify(usersSeedData));
+}
 import "./App.css";
 // import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 import CustomNavbar from "./components/Navbar";

@@ -31,21 +31,59 @@ const AccountsView: React.FC = () => {
   };
 
   // Generate fee records based on users
+  interface Student {
+    id: number;
+    type: string;
+    name: string;
+    studentId?: string;
+    class?: string;
+    parentId?: number;
+    fee?: {
+      totalFee?: number;
+      paidAmount?: number;
+      balance?: number;
+      dueDate?: string;
+      status?: 'paid' | 'pending' | 'overdue';
+      paymentDate?: string | null;
+    };
+  }
+  interface Parent {
+    id: number;
+    type: string;
+    name: string;
+    children?: string[];
+  }
+
   const feeRecords = useMemo((): FeeRecord[] => {
     const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
-    const students = users.filter((u: any) => u.type === 'student');
-    
-    return students.map((student: any) => {
-      const parent = users.find((u: any) => u.childId === student.id);
-      const totalFee = 30000;
-      const paidAmount = Math.floor(Math.random() * 35000); // Random payment amount
-      const balance = Math.max(0, totalFee - paidAmount);
-      const dueDate = '2025-09-30';
-      
+    const students: Student[] = users.filter((u: Student) => u.type === 'student');
+    const parents: Parent[] = users.filter((u: Parent) => u.type === 'parent');
+
+    return students.map((student: Student) => {
+      // Find parent by parentId (student.parentId) or by matching parent's children array
+      let parent: Parent | undefined = undefined;
+      if (student.parentId) {
+        parent = parents.find((p: Parent) => p.id === student.parentId);
+      }
+      if (!parent && student.studentId) {
+        parent = parents.find((p: Parent) => Array.isArray(p.children) && p.children.includes(student.studentId!));
+      }
+
+      // Use fee object from student if available, else fallback to defaults
+      const fee = student.fee || {};
+      const totalFee = typeof fee.totalFee === 'number' ? fee.totalFee : 30000;
+      const paidAmount = typeof fee.paidAmount === 'number' ? fee.paidAmount : 0;
+      const balance = typeof fee.balance === 'number' ? fee.balance : Math.max(0, totalFee - paidAmount);
+      const dueDate = fee.dueDate || '2025-09-30';
       let status: 'paid' | 'pending' | 'overdue' = 'pending';
-      if (balance === 0) status = 'paid';
-      else if (new Date(dueDate) < new Date()) status = 'overdue';
-      
+      if (fee.status) {
+        status = fee.status;
+      } else if (balance === 0) {
+        status = 'paid';
+      } else if (new Date(dueDate) < new Date()) {
+        status = 'overdue';
+      }
+
       return {
         id: student.id,
         studentName: student.name,
@@ -56,7 +94,7 @@ const AccountsView: React.FC = () => {
         balance,
         dueDate,
         status,
-        paymentDate: status === 'paid' ? '2025-09-10' : undefined
+        paymentDate: fee.paymentDate || (status === 'paid' ? '2025-09-10' : undefined)
       };
     });
   }, []);
