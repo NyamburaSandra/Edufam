@@ -17,7 +17,14 @@ const ReportsView: React.FC = () => {
                 {(() => {
                   const feedbacks = JSON.parse(localStorage.getItem('edufam_feedbacks') || '[]');
                   if (!feedbacks.length) return <ListGroup.Item>No feedback yet.</ListGroup.Item>;
-                  return feedbacks.map((fb: any, idx: number) => (
+                  type Feedback = {
+                    from: string;
+                    class: string;
+                    concernType: string;
+                    message: string;
+                    requestCallback: boolean;
+                  };
+                  return feedbacks.map((fb: Feedback, idx: number) => (
                     <ListGroup.Item key={idx}>
                       <strong>{fb.from}</strong> ({fb.class}) - {fb.concernType}<br />
                       {fb.message}
@@ -32,7 +39,13 @@ const ReportsView: React.FC = () => {
                 {(() => {
                   const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
                   if (!users.length) return <ListGroup.Item>No users yet.</ListGroup.Item>;
-                  return users.map((u: any) => (
+                  type User = {
+                    id: string | number;
+                    name: string;
+                    type: string;
+                    class?: string;
+                  };
+                  return users.map((u: User) => (
                     <ListGroup.Item key={u.id}>
                       <strong>{u.name}</strong> <span className="text-muted">({u.type})</span> {u.class && <span>- Class: {u.class}</span>}
                     </ListGroup.Item>
