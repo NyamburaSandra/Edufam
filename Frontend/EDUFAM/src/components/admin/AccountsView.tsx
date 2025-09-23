@@ -130,10 +130,37 @@ const AccountsView: React.FC = () => {
     };
   }, [feeRecords]);
 
+
+  // Placeholder for SMS logic (replace with backend integration)
+  // Backend-ready SMS reminder function
+  const sendSmsReminder = async (opts: {
+    parentName: string;
+    parentPhone: string | undefined;
+    studentName: string;
+    amount: number;
+    dueDate: string;
+    status: string;
+  }) => {
+    // TODO: Replace this with real backend call
+    // Example: await api.sendSms({ to: opts.parentPhone, message: ... })
+    console.log(`SMS sent to ${opts.parentName} (${opts.parentPhone}): ${opts.studentName} has a fee balance of KES ${opts.amount} due on ${opts.dueDate} [${opts.status}]`);
+    showMessage(`Fee reminder sent to ${opts.parentName} for ${opts.studentName}`);
+  };
+
   const handleSendReminder = (recordId: number) => {
     const record = feeRecords.find(r => r.id === recordId);
     if (record) {
-      showMessage(`Fee reminder sent to ${record.parentName} for ${record.studentName}`);
+      const users = JSON.parse(localStorage.getItem('edufam_users') || '[]') as Parent[];
+      const parent = users.find((u) => u.name === record.parentName && u.type === 'parent');
+      const parentPhone = (parent && 'phone' in parent) ? (parent as { phone?: string }).phone : undefined;
+      sendSmsReminder({
+        parentName: record.parentName,
+        parentPhone,
+        studentName: record.studentName,
+        amount: record.balance,
+        dueDate: record.dueDate,
+        status: record.status
+      });
     }
   };
 
@@ -381,11 +408,12 @@ const AccountsView: React.FC = () => {
                             </Badge>
                           </td>
                           <td>
-                            {record.status !== 'paid' && (
+                            {record.balance > 0 && (
                               <Button 
                                 variant="outline-primary" 
                                 size="sm"
                                 onClick={() => handleSendReminder(record.id)}
+                                title="Send SMS reminder to parent"
                               >
                                 <i className="bi bi-envelope"></i>
                               </Button>
