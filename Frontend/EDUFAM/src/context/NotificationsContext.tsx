@@ -23,6 +23,7 @@ interface NotificationsContextType {
 
 const NotificationsContext = createContext<NotificationsContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useNotifications = () => {
   const context = useContext(NotificationsContext);
   if (!context) {
@@ -35,14 +36,15 @@ interface NotificationsProviderProps {
   children: ReactNode;
 }
 
+// Helper function to get storage key for specific user type and email
+const getStorageKey = (userType: UserType, userEmail?: string) => {
+  if (userEmail) {
+    return `edufam_dismissed_notifications_${userType}_${userEmail}`;
+  }
+  return `edufam_dismissed_notifications_${userType}`;
+};
+
 export const NotificationsProvider: React.FC<NotificationsProviderProps> = ({ children }) => {
-  // Helper function to get storage key for specific user type and email
-  const getStorageKey = (userType: UserType, userEmail?: string) => {
-    if (userEmail) {
-      return `edufam_dismissed_notifications_${userType}_${userEmail}`;
-    }
-    return `edufam_dismissed_notifications_${userType}`;
-  };
 
   // Get dismissed notifications for a specific user type and email
   const getDismissedNotifications = (userType: UserType, userEmail?: string): number[] => {

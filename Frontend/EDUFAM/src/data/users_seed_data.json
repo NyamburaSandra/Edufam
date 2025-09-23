@@ -1,14 +1,15 @@
-[
-  {
-    "id": 1,
-    "type": "parent",
-    "name": "Jane Doe Parent",
-    "email": "janedoe.parent@email.com",
-    "children": ["12A"],
-    "status": "approved",
-    "dateAdded": "2025-01-10",
-    "lastLogin": "2025-09-17"
-  },
+{
+  "users_seed": [
+    {
+      "id": 1,
+      "type": "parent",
+      "name": "Jane Doe Parent",
+      "email": "janedoe.parent@email.com",
+      "children": ["12A"],
+      "status": "approved",
+      "dateAdded": "2025-01-10",
+      "lastLogin": "2025-09-17"
+    },
   {
     "id": 2,
     "type": "student",
@@ -119,4 +120,35 @@
     "dateAdded": "2025-01-07",
     "lastLogin": "2025-09-18"
   }
-]
+ ],
+"pending_accounts_seed": [
+  {
+    "id": 101,
+    "type": "parent",
+    "name": "Pending Parent Example",
+    "email": "pending.parent@email.com",
+    "children": ["15D"],
+    "status": "pending",
+    "dateAdded": "2025-09-20"
+  },
+  {
+    "id": 102,
+    "type": "teacher",
+    "name": "Pending Teacher Example",
+    "email": "pending.teacher@email.com",
+    "subject": "Science",
+    "class": "Class 2",
+    "status": "pending",
+    "dateAdded": "2025-09-21"
+  },
+  {
+    "id": 103,
+    "type": "student",
+    "name": "Pending Student Example",
+    "studentId": "15D",
+    "class": "Class 1",
+    "status": "pending",
+    "dateAdded": "2025-09-22"
+  }
+  ]
+}

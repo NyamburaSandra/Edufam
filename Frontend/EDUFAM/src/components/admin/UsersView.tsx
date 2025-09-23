@@ -164,11 +164,21 @@ const UsersView: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertVariant, setAlertVariant] = useState<'success' | 'danger'>('success');
 
-  // Pending accounts state
-  const [pendingAccounts, setPendingAccounts] = useState<EdufamUser[]>([
-    { id: 1, type: 'parent', name: 'Mary Wanjiku', email: 'mary@example.com', status: 'pending', dateAdded: '2025-09-15' },
-    { id: 2, type: 'teacher', name: 'John Mwangi', email: 'john@example.com', status: 'pending', dateAdded: '2025-09-14' }
-  ]);
+  // Pending accounts state (persisted in localStorage)
+  const [pendingAccounts, setPendingAccounts] = useState<EdufamUser[]>([]);
+
+  // Load pending accounts from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('edufam_pending_accounts');
+    if (stored) {
+      setPendingAccounts(JSON.parse(stored));
+    }
+  }, []);
+
+  // Save pending accounts to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('edufam_pending_accounts', JSON.stringify(pendingAccounts));
+  }, [pendingAccounts]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -235,7 +245,6 @@ const UsersView: React.FC = () => {
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
-    
     // Validation based on user type
     if (formData.type === 'student') {
       if (!formData.name.trim() || !formData.studentId.trim()) {
@@ -252,14 +261,12 @@ const UsersView: React.FC = () => {
         return;
       }
     }
-
     if (formData.type === 'teacher' && !formData.subject) {
       showMessage('Please select a subject for the teacher', 'danger');
       return;
     }
-
-    const users = getUsers();
-    const newUser: EdufamUser = {
+    // Add to pending accounts (not users) for admin approval
+    const newPending: EdufamUser = {
       id: Date.now(),
       type: formData.type as 'teacher' | 'student' | 'parent',
       name: formData.name.trim(),
@@ -268,28 +275,34 @@ const UsersView: React.FC = () => {
       class: formData.type === 'student' ? formData.class : undefined,
       subject: formData.type === 'teacher' ? formData.subject : undefined,
       children: formData.type === 'parent' ? formData.children : undefined,
-      status: 'approved',
+      status: 'pending',
       dateAdded: new Date().toISOString().split('T')[0]
     };
-
-    const updatedUsers = [...users, newUser];
-    setUsers(updatedUsers);
-    showMessage(`${formData.type.charAt(0).toUpperCase() + formData.type.slice(1)} added successfully!`);
+    setPendingAccounts(prev => [...prev, newPending]);
+    showMessage('Account request submitted for admin approval!');
     setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [] });
   };
 
   const handleVerify = (id: number, approved: boolean) => {
-    setPendingAccounts(prev => 
-      prev.map(acc => 
-        acc.id === id 
-          ? { ...acc, status: approved ? 'approved' : 'rejected' } 
-          : acc
-      )
-    );
-    showMessage(
-      `Account ${approved ? 'approved' : 'rejected'} successfully`,
-      approved ? 'success' : 'danger'
-    );
+    setPendingAccounts(prev => {
+      const account = prev.find(acc => acc.id === id);
+      if (!account) return prev;
+      if (approved) {
+        // Add to users and remove from pending, but prevent duplicate ids
+        const users = getUsers();
+        const filteredUsers = users.filter(u => u.id !== id);
+        const newUser: EdufamUser = {
+          ...account,
+          status: 'approved',
+        };
+        setUsers([...filteredUsers, newUser]);
+        showMessage('Account approved and added to users!', 'success');
+      } else {
+        showMessage('Account rejected.', 'danger');
+      }
+      // Remove from pending accounts
+      return prev.filter(acc => acc.id !== id);
+    });
   };
 
   const handleDeleteUser = (userId: number) => {

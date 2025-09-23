@@ -1,6 +1,13 @@
 // Seed localStorage with users_seed_data.json if not already present
 import usersSeedData from './data/users_seed_data.json';
 import seedData from './data/seed_data.json';
+
+// Seed pending accounts only once using a flag
+const pendingSeedFlag = 'edufam_pending_accounts_seeded';
+if (!localStorage.getItem(pendingSeedFlag)) {
+  localStorage.setItem('edufam_pending_accounts', JSON.stringify(usersSeedData.pending_accounts_seed));
+  localStorage.setItem(pendingSeedFlag, 'true');
+}
 function shouldSeedFeedbacks() {
   const raw = localStorage.getItem('edufam_feedbacks');
   if (!raw) return true;
