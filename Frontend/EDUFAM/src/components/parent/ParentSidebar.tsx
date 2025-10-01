@@ -1,28 +1,30 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import './Sidebar.css';
+import '../Sidebar.css';
 
-// Define the shape of a navigation item
-export interface NavItem {
+export interface ParentNavItem {
   path: string;
   label: string;
-  icon?: string; // Optional icon class (e.g., 'bi bi-house')
+  icon?: string;
 }
 
-// Define the props for the AdminSidebar component
-interface AdminSidebarProps {
-  navItems: NavItem[];
+interface ParentSidebarProps {
+  navItems: ParentNavItem[];
   isOpen: boolean;
-  title?: string; // Optional title for the sidebar
+  title?: string;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen, title = "EDUFAM Admin" }) => {
+const ParentSidebar: React.FC<ParentSidebarProps> = ({ 
+  navItems, 
+  isOpen, 
+  title = "EDUFAM Parent" 
+}) => {
   return (
     <div className={`admin-sidebar ${isOpen ? 'open' : ''}`}>
       {/* Sidebar Header */}
       <div className="sidebar-header">
         <div className="logo-section">
-          <i className="bi bi-mortarboard-fill me-2"></i>
+          <i className="bi bi-people-fill me-2"></i>
           <h4 className="mb-0">{title}</h4>
         </div>
       </div>
@@ -37,7 +39,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen, title = "
                 className={({ isActive }) => 
                   `nav-link ${isActive ? 'active' : ''}`
                 }
-                end={item.path === '/admin'}
+                end={item.path === '/parent'}
               >
                 <span className="nav-icon">
                   {item.icon && <i className={item.icon}></i>}
@@ -53,8 +55,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen, title = "
       <div className="sidebar-footer">
         <div className="footer-content">
           <small className="text-white">
-            <i className="bi bi-shield-check me-1"></i>
-            Admin Panel v1.0
+            <i className="bi bi-house-heart me-1"></i>
+            Parent Portal v1.0
           </small>
         </div>
       </div>
@@ -62,4 +64,4 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen, title = "
   );
 };
 
-export default AdminSidebar;
+export default ParentSidebar;

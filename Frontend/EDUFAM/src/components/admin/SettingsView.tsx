@@ -21,6 +21,14 @@ interface BulkSMS {
   };
 }
 
+interface User {
+  id: number;
+  type: 'parent' | 'teacher' | 'student';
+  name: string;
+  class?: string;
+  children?: string[];
+}
+
 const SettingsView: React.FC = () => {
   // SMS Management State
   const [showSMSModal, setShowSMSModal] = useState(false);
@@ -30,7 +38,11 @@ const SettingsView: React.FC = () => {
   const [alertVariant, setAlertVariant] = useState<'success' | 'danger' | 'warning'>('success');
 
   // SMS Form State
-  const [smsForm, setSmsForm] = useState({
+  const [smsForm, setSmsForm] = useState<{
+    message: string;
+    recipientType: BulkSMS['recipientType'];
+    recipientFilter: string;
+  }>({
     message: '',
     recipientType: 'all-parents',
     recipientFilter: ''
@@ -89,22 +101,22 @@ const SettingsView: React.FC = () => {
   ]);
 
   // Get users for recipient count calculation
-  const users = useMemo(() => {
+  const users = useMemo((): User[] => {
     return JSON.parse(localStorage.getItem('edufam_users') || '[]');
   }, []);
 
   // Calculate recipient count based on selection
   const calculateRecipientCount = (type: string, filter?: string): number => {
-    const parents = users.filter((u: any) => u.type === 'parent');
-    const teachers = users.filter((u: any) => u.type === 'teacher');
-    const students = users.filter((u: any) => u.type === 'student');
+    const parents = users.filter((u: User) => u.type === 'parent');
+    const teachers = users.filter((u: User) => u.type === 'teacher');
+    const students = users.filter((u: User) => u.type === 'student');
 
     switch (type) {
       case 'all-parents':
         return parents.length;
       case 'class-parents':
         if (filter) {
-          const classStudents = students.filter((s: any) => s.class === filter);
+          const classStudents = students.filter((s: User) => s.class === filter);
           return classStudents.length; // Assuming 1 parent per student
         }
         return 0;
@@ -201,7 +213,7 @@ const SettingsView: React.FC = () => {
     const newSMS: BulkSMS = {
       id: Date.now(),
       message: smsForm.message,
-      recipientType: smsForm.recipientType as any,
+      recipientType: smsForm.recipientType,
       recipientFilter: smsForm.recipientFilter || undefined,
       recipientCount,
       status: 'draft',
@@ -265,14 +277,30 @@ const SettingsView: React.FC = () => {
 
       {/* Navigation Tabs */}
       <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k || 'sms-overview')}>
-        <Nav variant="tabs" className="mb-4">
+        <Nav variant="tabs" className="mb-4" style={{ borderBottom: '2px solid #dee2e6' }}>
           <Nav.Item>
-            <Nav.Link eventKey="sms-overview">
+            <Nav.Link 
+              eventKey="sms-overview"
+              style={{ 
+                color: activeTab === 'sms-overview' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'sms-overview' ? '600' : '500',
+                borderColor: activeTab === 'sms-overview' ? '#6c63ff' : 'transparent'
+              }}
+            >
               Bulk SMS {smsStats.draft > 0 && <Badge bg="warning">{smsStats.draft}</Badge>}
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="school-settings">School Settings</Nav.Link>
+            <Nav.Link 
+              eventKey="school-settings"
+              style={{ 
+                color: activeTab === 'school-settings' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'school-settings' ? '600' : '500',
+                borderColor: activeTab === 'school-settings' ? '#6c63ff' : 'transparent'
+              }}
+            >
+              School Settings
+            </Nav.Link>
           </Nav.Item>
          
         </Nav>
@@ -539,7 +567,7 @@ const SettingsView: React.FC = () => {
               <Form.Label>Send To</Form.Label>
               <Form.Select 
                 value={smsForm.recipientType}
-                onChange={(e) => setSmsForm(prev => ({ ...prev, recipientType: e.target.value, recipientFilter: '' }))}
+                onChange={(e) => setSmsForm(prev => ({ ...prev, recipientType: e.target.value as BulkSMS['recipientType'], recipientFilter: '' }))}
               >
                 <option value="all-parents">All Parents</option>
                 <option value="class-parents">Parents of Specific Class</option>

@@ -88,9 +88,11 @@ const AdminDashboard: React.FC = () => {
         className={`admin-content ${sidebarOpen ? 'sidebar-open' : ''}`}
         style={{
           marginLeft: sidebarOpen ? '250px' : '0',
-          transition: 'margin-left 0.3s ease-in-out',
+          transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           padding: '20px',
-          paddingTop: '100px'
+          paddingTop: '100px',
+          minHeight: '100vh',
+          backgroundColor: '#f8f9fa'
         }}
       >
         <Container fluid>

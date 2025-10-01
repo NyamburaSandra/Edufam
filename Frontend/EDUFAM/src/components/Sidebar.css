@@ -1,14 +1,150 @@
+/* Modern Admin Sidebar Styles */
+.admin-sidebar {
+  background: linear-gradient(180deg, #1e0a3c 0%, #2d1b69 100%);
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  z-index: 1020;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar.open {
+  transform: translateX(0);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.logo-section i {
+  font-size: 1.5rem;
+  color: #6c63ff;
+}
+
+.logo-section h4 {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* Navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+  overflow-y: auto;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin-bottom: 0.25rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.875rem 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 0 25px 25px 0;
+  margin-right: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: #6c63ff;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover {
+  color: white;
+  background: rgba(108, 99, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.nav-link:hover::before {
+  transform: scaleY(1);
+}
+
+.nav-link.active {
+  color: white;
+  background: rgba(108, 99, 255, 0.2);
+  font-weight: 600;
+}
+
+.nav-link.active::before {
+  transform: scaleY(1);
+}
+
+.nav-icon {
+  width: 20px;
+  margin-right: 0.75rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.nav-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-content small {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+/* Legacy sidebar styles for compatibility */
 .sidebar {
   background-color: #f8f9fa;
   padding: 1rem;
-  padding-top: 1rem; /* Extra space for hamburger button */
-  margin-top: 56px; /* Height of the navbar */
+  padding-top: 1rem;
+  margin-top: 56px;
   position: fixed;
   top: 0;
   left: 0;
   height: 100%;
   width: 250px;
-  z-index: 1020; /* Below navbar (1030) */
+  z-index: 1020;
   transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
 }
@@ -35,4 +171,107 @@
 .sidebar a:hover,
 .sidebar .dropdown-item:hover {
   color: #0a58ca !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 280px;
+    z-index: 1030;
+  }
+  
+  .nav-link {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .sidebar-header {
+    padding: 1.25rem 1rem;
+  }
+  
+  .sidebar-header h4 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    width: 100%;
+    max-width: 320px;
+    z-index: 1040;
+  }
+  
+  .nav-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .sidebar-header {
+    padding: 1rem;
+  }
+  
+  .sidebar-header h4 {
+    font-size: 0.95rem;
+  }
+  
+  .sidebar-header i {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-sidebar {
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .nav-link {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .sidebar-header {
+    padding: 0.75rem;
+  }
+  
+  .sidebar-header h4 {
+    font-size: 0.9rem;
+  }
+  
+  .sidebar-header i {
+    font-size: 1.1rem;
+  }
+  
+  .nav-icon {
+    margin-right: 0.5rem;
+  }
+  
+  .nav-text {
+    font-size: 0.85rem;
+  }
+}
+
+/* Touch-friendly navigation */
+@media (pointer: coarse) {
+  .nav-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .admin-sidebar {
+    width: 250px;
+    max-width: 250px;
+  }
+  
+  .sidebar-header {
+    padding: 0.75rem 0.75rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 0.75rem;
+  }
 }
