@@ -52,7 +52,6 @@ import { ResultsProvider } from './context/ResultsContext';
 import { AttendanceProvider } from './context/AttendanceContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 import { NotificationsProvider } from './context/NotificationsContext';
-import { AuthProvider } from './context/AuthContext';
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useAuth } from './context/useAuth';
