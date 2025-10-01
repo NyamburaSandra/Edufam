@@ -75,33 +75,31 @@ function App() {
   }, [isSignedIn, user]);
 
   return (
-    <AuthProvider>
-      <NotificationsProvider>
-        <AttendanceProvider>
-          <ResultsProvider>
-            <div className="flex-grow-1">
-              <main>
-                <Routes>
-                  <Route path="/" element={<Navigate to="/welcome" replace />} />
-                  <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
-                  <Route path="/parent/*" element={
-                    <FeedbackProvider>
-                      <ParentDashboard />
-                    </FeedbackProvider>
-                  } />
-                  <Route path="/teacher/*" element={
-                    <FeedbackProvider>
-                      <><CustomNavbar /><TeacherDashboard /></>
-                    </FeedbackProvider>
-                  } />
-                  <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
-                </Routes>
-              </main>
-            </div>
-          </ResultsProvider>
-        </AttendanceProvider>
-      </NotificationsProvider>
-    </AuthProvider>
+    <NotificationsProvider>
+      <AttendanceProvider>
+        <ResultsProvider>
+          <div className="flex-grow-1">
+            <main>
+              <Routes>
+                <Route path="/" element={<Navigate to="/welcome" replace />} />
+                <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
+                <Route path="/parent/*" element={
+                  <FeedbackProvider>
+                    <ParentDashboard />
+                  </FeedbackProvider>
+                } />
+                <Route path="/teacher/*" element={
+                  <FeedbackProvider>
+                    <><CustomNavbar /><TeacherDashboard /></>
+                  </FeedbackProvider>
+                } />
+                <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
+              </Routes>
+            </main>
+          </div>
+        </ResultsProvider>
+      </AttendanceProvider>
+    </NotificationsProvider>
   );
 }
 
