@@ -165,17 +165,13 @@ const UsersView: React.FC = () => {
   const [alertVariant, setAlertVariant] = useState<'success' | 'danger'>('success');
 
   // Pending accounts state (persisted in localStorage)
-  const [pendingAccounts, setPendingAccounts] = useState<EdufamUser[]>([]);
-
-  // Load pending accounts from localStorage on mount
-  useEffect(() => {
+  const [pendingAccounts, setPendingAccounts] = useState<EdufamUser[]>(() => {
+    // Always initialize from localStorage
     const stored = localStorage.getItem('edufam_pending_accounts');
-    if (stored) {
-      setPendingAccounts(JSON.parse(stored));
-    }
-  }, []);
+    return stored ? JSON.parse(stored) : [];
+  });
 
-  // Save pending accounts to localStorage whenever they change
+  // Always update localStorage when pendingAccounts changes
   useEffect(() => {
     localStorage.setItem('edufam_pending_accounts', JSON.stringify(pendingAccounts));
   }, [pendingAccounts]);
@@ -378,15 +374,40 @@ const UsersView: React.FC = () => {
 
       {/* Navigation Tabs */}
       <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k || 'overview')}>
-        <Nav variant="tabs" className="mb-4">
+        <Nav variant="tabs" className="mb-4" style={{ borderBottom: '2px solid #dee2e6' }}>
           <Nav.Item>
-            <Nav.Link eventKey="overview">Overview</Nav.Link>
+            <Nav.Link 
+              eventKey="overview"
+              style={{ 
+                color: activeTab === 'overview' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'overview' ? '600' : '500',
+                borderColor: activeTab === 'overview' ? '#6c63ff' : 'transparent'
+              }}
+            >
+              Overview
+            </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="add-user">Add User</Nav.Link>
+            <Nav.Link 
+              eventKey="add-user"
+              style={{ 
+                color: activeTab === 'add-user' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'add-user' ? '600' : '500',
+                borderColor: activeTab === 'add-user' ? '#6c63ff' : 'transparent'
+              }}
+            >
+              Add User
+            </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="pending">
+            <Nav.Link 
+              eventKey="pending"
+              style={{ 
+                color: activeTab === 'pending' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'pending' ? '600' : '500',
+                borderColor: activeTab === 'pending' ? '#6c63ff' : 'transparent'
+              }}
+            >
               Pending Approvals {userStats.pending > 0 && <Badge bg="danger">{userStats.pending}</Badge>}
             </Nav.Link>
           </Nav.Item>

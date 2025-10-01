@@ -7,6 +7,8 @@ import { enUS } from 'date-fns/locale';
 import AttendancePieChart from '../AttendancePieChart';
 import { useAttendance } from '../../context/AttendanceContextHook';
 import { useResults } from '../../context/ResultsContextHook';
+import { useAuth } from '../../context/useAuth';
+import { useFeedback } from '../../context/useFeedback';
 
 const locales = { 'en-US': enUS };
 const localizer = dateFnsLocalizer({
@@ -43,10 +45,14 @@ interface ParentMainDashboardProps {
 const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, events }) => {
   const { attendance } = useAttendance();
   const { results } = useResults();
+  const { user } = useAuth();
+  const { addFeedback } = useFeedback();
+  
   // Find latest attendance for this child by studentId
   const childAttendance = attendance.filter(a => a.studentId === childData.studentId);
   const latestAttendance = childAttendance.length > 0 ? childAttendance[childAttendance.length - 1] : null;
   const percent = latestAttendance ? latestAttendance.attendancePercent : 0;
+  
   // Find latest result for this child by studentId
   const childResults = results.filter(r => r.studentId === childData.studentId && r.fileName && r.fileDataUrl);
   const latestResult = childResults.length > 0 ? childResults[childResults.length - 1] : null;
@@ -74,6 +80,13 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
   }
   // State to force re-render after payment
   const [feeRefresh, setFeeRefresh] = useState(0);
+  
+  // Feedback form state
+  const [concernType, setConcernType] = useState('');
+  const [message, setMessage] = useState('');
+  const [requestCallback, setRequestCallback] = useState(false);
+  const [scheduleMeeting, setScheduleMeeting] = useState(false);
+  
   const { fee, dueAmount } = React.useMemo(() => {
     const users: User[] = JSON.parse(localStorage.getItem('edufam_users') || '[]');
     const student = users.find((u) => u.studentId === childData.studentId && u.fee);
@@ -143,6 +156,41 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
     }, 1200);
     // Optionally, trigger a mock SMS/notification here
     // alert('Payment successful! Admin notified.');
+  };
+
+  // Feedback form handler
+  const handleFeedbackSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    // Get user email - fallback to a test email if not authenticated
+    const userEmail = user?.email || 'test.parent@email.com';
+    
+    if (!userEmail) {
+      alert('Unable to submit feedback. Please try logging in again.');
+      return;
+    }
+    
+    const feedbackObj = {
+      concernType,
+      message,
+      requestCallback,
+      scheduleMeeting,
+      parentEmail: userEmail
+    };
+    
+    console.log('[EDUFAM] Submitting feedback:', feedbackObj);
+    
+    try {
+      addFeedback(feedbackObj);
+      setConcernType('');
+      setMessage('');
+      setRequestCallback(false);
+      setScheduleMeeting(false);
+      alert('Feedback submitted successfully!');
+    } catch (error) {
+      console.error('[EDUFAM] Error submitting feedback:', error);
+      alert('There was an error submitting your feedback. Please try again.');
+    }
   };
 
   return (
@@ -295,6 +343,77 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
               style={{ height: 400 }}
             />
           </div>
+        </Card.Body>
+      </Card>
+
+      {/* Feedback Form Section */}
+      <Card className="feedback-card-gradient" style={{ background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
+        <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0 }}>
+          <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Feedback / Request Meeting</h5>
+        </Card.Header>
+        <Card.Body>
+          <Form onSubmit={handleFeedbackSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label style={{ color: '#a83279', fontWeight: 600 }}>Concern Type</Form.Label>
+              <Form.Select
+                style={{ background: '#fff', border: '1.5px solid #a83279', borderRadius: 10, color: '#6c63ff', fontWeight: 500 }}
+                value={concernType}
+                onChange={(e) => setConcernType(e.target.value)}
+                required
+              >
+                <option value="">Select concern type...</option>
+                <option value="academic">Academic</option>
+                <option value="behavior">Behavior</option>
+                <option value="health">Health</option>
+                <option value="attendance">Attendance</option>
+                <option value="general">General Inquiry</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label style={{ color: '#a83279', fontWeight: 600 }}>Message</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                style={{ background: '#fff', border: '1.5px solid #a83279', borderRadius: 10, color: '#6c63ff', fontWeight: 500 }}
+                placeholder="Please describe your concern or feedback..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                label="Request Callback"
+                style={{ color: '#a83279', fontWeight: 500 }}
+                checked={requestCallback}
+                onChange={(e) => setRequestCallback(e.target.checked)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                label="Schedule Meeting"
+                style={{ color: '#a83279', fontWeight: 500 }}
+                checked={scheduleMeeting}
+                onChange={(e) => setScheduleMeeting(e.target.checked)}
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit" style={{
+              background: 'linear-gradient(90deg, #a83279 0%, #6c63ff 100%)',
+              border: 'none',
+              borderRadius: 20,
+              fontWeight: 700,
+              fontSize: '1.08rem',
+              letterSpacing: 0.5,
+              padding: '0.6rem 1.4rem',
+              boxShadow: '0 2px 8px rgba(171,71,188,0.10)',
+              color: '#fff',
+              transition: 'all 0.2s',
+            }}>
+              Submit Feedback
+            </Button>
+          </Form>
         </Card.Body>
       </Card>
     </div>

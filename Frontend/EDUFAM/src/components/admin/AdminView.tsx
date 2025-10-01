@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Card, ListGroup } from 'react-bootstrap';
+import { Row, Col, Card, ListGroup, Badge } from 'react-bootstrap';
 
 type EdufamUser = {
   id: number;
@@ -26,15 +26,17 @@ type EdufamUser = {
 };
 
 const AdminView: React.FC = () => {
+
   // Get real data from localStorage
   const users: EdufamUser[] = JSON.parse(localStorage.getItem('edufam_users') || '[]');
   const students: EdufamUser[] = users.filter((u) => u.type === 'student');
   const teachers: EdufamUser[] = users.filter((u) => u.type === 'teacher');
-  // const parents = users.filter((u) => u.type === 'parent'); // Removed unused variable
   const classes = [...new Set(students.map((s) => s.class))].filter(Boolean).length;
-
-  // Calculate real revenue based on student count (KES 30,000 per student)
   const totalRevenue = students.length * 30000;
+
+  // Get pending approvals from localStorage
+  const pendingAccounts: EdufamUser[] = JSON.parse(localStorage.getItem('edufam_pending_accounts') || '[]');
+  const pendingCount = pendingAccounts.filter(acc => acc.status === 'pending').length;
 
   return (
     <>
@@ -110,20 +112,29 @@ const AdminView: React.FC = () => {
 
           {/* First Row: Pending Approvals and Recent Activity */}
           <Row className="mb-4">
+
             <Col md={6}>
               <Card className="mb-4 h-100">
                 <Card.Header>
                   <div className="d-flex justify-content-between align-items-center">
                     <h5 className="mb-0" style={{ color: '#1e0a3c' }}>Pending Approvals</h5>
-                    <span className="badge bg-success">0</span>
+                    <span className={`badge ${pendingCount > 0 ? 'bg-danger' : 'bg-success'}`}>{pendingCount}</span>
                   </div>
                 </Card.Header>
                 <Card.Body>
-                  <div className="text-center py-3">
-                    <i className="bi bi-check-circle" style={{ fontSize: '3rem', color: '#28a745' }}></i>
-                    <h6 className="mt-2">All Clear!</h6>
-                    <p className="text-muted mb-0">No pending approvals at this time.</p>
-                  </div>
+                  {pendingCount === 0 ? (
+                    <div className="text-center py-3">
+                      <i className="bi bi-check-circle" style={{ fontSize: '3rem', color: '#28a745' }}></i>
+                      <h6 className="mt-2">All Clear!</h6>
+                      <p className="text-muted mb-0">No pending approvals at this time.</p>
+                    </div>
+                  ) : (
+                    <div className="text-center py-3">
+                      <i className="bi bi-hourglass-split" style={{ fontSize: '3rem', color: '#fd7e14' }}></i>
+                      <h6 className="mt-2">{pendingCount} account(s) awaiting approval</h6>
+                      <p className="text-muted mb-0">Approve or reject pending user accounts in the Users tab.</p>
+                    </div>
+                  )}
                 </Card.Body>
               </Card>
             </Col>
@@ -132,11 +143,32 @@ const AdminView: React.FC = () => {
               <Card className="mb-4 h-100">
                 <Card.Header><h5 className="mb-0" style={{ color: '#1e0a3c' }}>Recent Activity</h5></Card.Header>
                 <Card.Body>
-                  <div className="text-center py-3">
-                    <i className="bi bi-activity" style={{ fontSize: '3rem', color: '#6c63ff' }}></i>
-                    <h6 className="mt-2">No Recent Activity</h6>
-                    <p className="text-muted mb-0">System activity will appear here.</p>
-                  </div>
+                  {pendingAccounts.length === 0 ? (
+                    <div className="text-center py-3">
+                      <i className="bi bi-activity" style={{ fontSize: '3rem', color: '#6c63ff' }}></i>
+                      <h6 className="mt-2">No Recent Activity</h6>
+                      <p className="text-muted mb-0">System activity will appear here.</p>
+                    </div>
+                  ) : (
+                    <ListGroup variant="flush">
+                      {pendingAccounts
+                        .sort((a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || ''))
+                        .slice(0, 5)
+                        .map(acc => (
+                          <ListGroup.Item key={acc.id} className="d-flex justify-content-between align-items-center">
+                            <div>
+                              <strong>{acc.name}</strong> <span className="text-muted">({acc.type})</span>
+                              <div style={{ fontSize: '0.85em', color: '#888' }}>
+                                Requested on {acc.dateAdded || 'N/A'}
+                              </div>
+                            </div>
+                            <Badge bg={acc.status === 'pending' ? 'warning' : acc.status === 'approved' ? 'success' : 'danger'}>
+                              {acc.status}
+                            </Badge>
+                          </ListGroup.Item>
+                        ))}
+                    </ListGroup>
+                  )}
                 </Card.Body>
               </Card>
             </Col>

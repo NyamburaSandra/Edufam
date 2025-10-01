@@ -1,18 +1,39 @@
 import { useEvents } from '../../context/useEvents';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { Routes, Route } from 'react-router-dom';
 import CustomNavbar from '../Navbar';
-import Sidebar from '../Sidebar';
+import ParentSidebar from './ParentSidebar';
 import { useResults } from '../../context/ResultsContextHook';
 import { useAttendance } from '../../context/AttendanceContextHook';
-import { ParentMainDashboard, ChildInformationView, EventCalendarView, FeedbackView } from '.';
+import { ParentMainDashboard, ChildInformationView, EventCalendarView } from '.';
+import './ParentResponsive.css';
 
 const ParentDashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { results } = useResults();
   const { attendance } = useAttendance();
   
+  // Handle window resize for responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      // Auto-close sidebar on mobile/tablet
+      if (window.innerWidth <= 1024) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    // Set initial state based on screen size
+    handleResize();
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -48,7 +69,6 @@ const ParentDashboard: React.FC = () => {
     { path: '/parent', label: 'Dashboard', icon: 'bi bi-house' },
     { path: '/parent/child-info', label: 'Child Information', icon: 'bi bi-person-circle' },
     { path: '/parent/event-calendar', label: 'Event Calendar', icon: 'bi bi-calendar-event' },
-    { path: '/parent/feedback', label: 'Feedback', icon: 'bi bi-chat-left-text' },
   ];
 
   // Use events from context
@@ -117,7 +137,7 @@ const ParentDashboard: React.FC = () => {
         </Button> */}
 
         {/* Sidebar */}
-        <Sidebar 
+        <ParentSidebar 
           navItems={parentNavItems} 
           isOpen={sidebarOpen} 
         />
@@ -126,10 +146,10 @@ const ParentDashboard: React.FC = () => {
         <div 
           className={`parent-content ${sidebarOpen ? 'sidebar-open' : ''}`}
           style={{
-            marginLeft: sidebarOpen ? '250px' : '0',
+            marginLeft: windowWidth > 1024 ? (sidebarOpen ? '250px' : '0') : '0',
             transition: 'margin-left 0.3s ease-in-out',
-            padding: '20px',
-            paddingTop: '100px'
+            padding: windowWidth <= 480 ? '8px' : windowWidth <= 768 ? '10px' : windowWidth <= 1024 ? '15px' : '20px',
+            paddingTop: windowWidth <= 480 ? '70px' : windowWidth <= 768 ? '80px' : windowWidth <= 1024 ? '90px' : '100px'
           }}
         >
           <Container fluid>
@@ -137,7 +157,6 @@ const ParentDashboard: React.FC = () => {
               <Route path="/" element={<ParentMainDashboard childData={childData} events={events} />} />
               <Route path="/child-info" element={<ChildInformationView />} />
               <Route path="/event-calendar" element={<EventCalendarView events={events} />} />
-              <Route path="/feedback" element={<FeedbackView />} />
             </Routes>
           </Container>
         </div>
@@ -155,7 +174,7 @@ const ParentDashboard: React.FC = () => {
               height: '100%',
               backgroundColor: 'rgba(0,0,0,0.5)',
               zIndex: 1010,
-              display: window.innerWidth <= 768 ? 'block' : 'none'
+              display: windowWidth <= 1024 ? 'block' : 'none'
             }}
           />
         )}

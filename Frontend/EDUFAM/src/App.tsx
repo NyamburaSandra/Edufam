@@ -52,6 +52,7 @@ import { ResultsProvider } from './context/ResultsContext';
 import { AttendanceProvider } from './context/AttendanceContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 import { NotificationsProvider } from './context/NotificationsContext';
+import { AuthProvider } from './context/AuthContext';
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useAuth } from './context/useAuth';
@@ -74,31 +75,33 @@ function App() {
   }, [isSignedIn, user]);
 
   return (
-    <NotificationsProvider>
-      <AttendanceProvider>
-        <ResultsProvider>
-          <div className="flex-grow-1">
-            <main>
-              <Routes>
-                <Route path="/" element={<Navigate to="/welcome" replace />} />
-                <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
-                <Route path="/parent/*" element={
-                  <FeedbackProvider>
-                    <ParentDashboard />
-                  </FeedbackProvider>
-                } />
-                <Route path="/teacher/*" element={
-                  <FeedbackProvider>
-                    <><CustomNavbar /><TeacherDashboard /></>
-                  </FeedbackProvider>
-                } />
-                <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
-              </Routes>
-            </main>
-          </div>
-        </ResultsProvider>
-      </AttendanceProvider>
-    </NotificationsProvider>
+    <AuthProvider>
+      <NotificationsProvider>
+        <AttendanceProvider>
+          <ResultsProvider>
+            <div className="flex-grow-1">
+              <main>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/welcome" replace />} />
+                  <Route path="/welcome" element={<><CustomNavbar /><Welcome /><Footer /></>} />
+                  <Route path="/parent/*" element={
+                    <FeedbackProvider>
+                      <ParentDashboard />
+                    </FeedbackProvider>
+                  } />
+                  <Route path="/teacher/*" element={
+                    <FeedbackProvider>
+                      <><CustomNavbar /><TeacherDashboard /></>
+                    </FeedbackProvider>
+                  } />
+                  <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
+                </Routes>
+              </main>
+            </div>
+          </ResultsProvider>
+        </AttendanceProvider>
+      </NotificationsProvider>
+    </AuthProvider>
   );
 }
 

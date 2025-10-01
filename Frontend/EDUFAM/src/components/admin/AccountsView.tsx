@@ -253,20 +253,54 @@ const AccountsView: React.FC = () => {
 
       {/* Navigation Tabs */}
       <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k || 'overview')}>
-        <Nav variant="tabs" className="mb-4">
+        <Nav variant="tabs" className="mb-4" style={{ borderBottom: '2px solid #dee2e6' }}>
           <Nav.Item>
-            <Nav.Link eventKey="overview">Fee Overview</Nav.Link>
+            <Nav.Link 
+              eventKey="overview"
+              style={{ 
+                color: activeTab === 'overview' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'overview' ? '600' : '500',
+                borderColor: activeTab === 'overview' ? '#6c63ff' : 'transparent'
+              }}
+            >
+              Fee Overview
+            </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="records">Fee Records</Nav.Link>
+            <Nav.Link 
+              eventKey="records"
+              style={{ 
+                color: activeTab === 'records' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'records' ? '600' : '500',
+                borderColor: activeTab === 'records' ? '#6c63ff' : 'transparent'
+              }}
+            >
+              Fee Records
+            </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="overdue">
+            <Nav.Link 
+              eventKey="overdue"
+              style={{ 
+                color: activeTab === 'overdue' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'overdue' ? '600' : '500',
+                borderColor: activeTab === 'overdue' ? '#6c63ff' : 'transparent'
+              }}
+            >
               Overdue {stats.overdueCount > 0 && <Badge bg="danger">{stats.overdueCount}</Badge>}
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="reports">Reports</Nav.Link>
+            <Nav.Link 
+              eventKey="reports"
+              style={{ 
+                color: activeTab === 'reports' ? '#1e0a3c' : '#6c757d',
+                fontWeight: activeTab === 'reports' ? '600' : '500',
+                borderColor: activeTab === 'reports' ? '#6c63ff' : 'transparent'
+              }}
+            >
+              Reports
+            </Nav.Link>
           </Nav.Item>
         </Nav>
 
