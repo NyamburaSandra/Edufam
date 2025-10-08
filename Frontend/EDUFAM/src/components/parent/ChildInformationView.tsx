@@ -31,12 +31,21 @@ const ChildInformationView: React.FC = () => {
   const normalizeId = (id: string | undefined) => (id || '').trim().toLowerCase();
 
   // Get children based on parent's children array (robust matching)
-  const children: EdufamUser[] = currentParent?.children && currentParent.children.length > 0
-    ? users.filter((u: EdufamUser) =>
-        u.type === 'student' &&
-        currentParent.children!.map(normalizeId).includes(normalizeId(u.studentId))
-      )
-    : [];
+  const children: EdufamUser[] = React.useMemo(() => (
+    currentParent?.children && currentParent.children.length > 0
+      ? users.filter((u: EdufamUser) =>
+          u.type === 'student' &&
+          currentParent.children!.map(normalizeId).includes(normalizeId(u.studentId))
+        )
+      : []
+  ), [users, currentParent]);
+
+  // Debug output for troubleshooting (after all variable declarations)
+  React.useEffect(() => {
+    console.log('Logged-in parent email:', user?.email);
+    console.log('Current parent:', currentParent);
+    console.log('Matched children:', children);
+  }, [user, currentParent, children]);
 
   const [selectedChild, setSelectedChild] = useState(children[0] || null);
 
@@ -49,6 +58,14 @@ const ChildInformationView: React.FC = () => {
             <i className="bi bi-person-plus" style={{ fontSize: '3rem', color: '#6c63ff' }}></i>
             <h6 className="mt-3">No Children Found</h6>
             <p>No children are linked to your account. Please contact the school administration.</p>
+            <hr />
+            <div style={{ textAlign: 'left', fontSize: '0.95em', color: '#444', marginTop: '2rem' }}>
+              <strong>Debug Info:</strong><br />
+              Logged-in email: {user?.email}<br />
+              Parent found: {currentParent ? 'Yes' : 'No'}<br />
+              Children array: {currentParent?.children ? JSON.stringify(currentParent.children) : 'None'}<br />
+              Matched children: {children.length}
+            </div>
           </div>
         </Card.Body>
       </Card>

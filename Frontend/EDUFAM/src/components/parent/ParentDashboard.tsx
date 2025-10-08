@@ -1,4 +1,5 @@
 import { useEvents } from '../../context/useEvents';
+import { useAuth } from '../../context/useAuth';
 import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { Routes, Route } from 'react-router-dom';
@@ -38,8 +39,9 @@ const ParentDashboard: React.FC = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Replace this with real auth context or prop in production
-  const loggedInParentEmail = "janedoe.parent@email.com";
+  // Use logged-in parent's email from AuthContext
+  const { user } = useAuth();
+  const loggedInParentEmail = user?.email || '';
   // Filter results and attendance for this parent
   const parentResults = results.filter(r => r.parentEmail === loggedInParentEmail);
   const parentAttendance = attendance.filter(a => a.parentEmail === loggedInParentEmail);
