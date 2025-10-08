@@ -1,19 +1,35 @@
-
+    
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import { useEvents } from '../../context/useEvents';
+import type { EdufamEvent } from '../../context/EventsContext';
 import { useResults } from '../../context/ResultsContextHook';
 import { useAttendance } from '../../context/AttendanceContextHook';
 // Try to import EdufamEvent type from EventsContext, fallback to inline type if not found
 // import { EdufamEvent } from '../../context/EventsContext';
-type EdufamEvent = {
-	title: string;
-	start?: Date;
-	end?: Date;
-	description?: string;
+
+type ResultRow = {
+	studentId?: string;
+	studentName?: string;
+	grade?: string;
 	term?: string;
-	// ...other event fields
+	fileDataUrl?: string;
+	fileName?: string;
+	studentClass?: string;
+	[key: string]: unknown;
 };
+
+type EventRow = EdufamEvent;
+
+type AttendanceRow = {
+	studentId?: string;
+	studentName?: string;
+	term?: string;
+	attendancePercent?: number;
+	[key: string]: unknown;
+};
+
+type EditRowType = ResultRow | EventRow | AttendanceRow | Record<string, unknown>;
 
 interface TeacherViewProps {
 	selectedClass?: string;
@@ -22,9 +38,17 @@ interface TeacherViewProps {
 
 
 const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryType = 'results' }) => {
-	const { events } = useEvents();
-	const { results } = useResults();
-	const { attendance } = useAttendance();
+	const { events: contextEvents } = useEvents();
+	const { results: contextResults } = useResults();
+	const { attendance: contextAttendance } = useAttendance();
+
+	const [results, setResults] = React.useState(contextResults);
+	const [events, setEvents] = React.useState(contextEvents);
+	const [attendance, setAttendance] = React.useState(contextAttendance);
+
+	React.useEffect(() => { setResults(contextResults); }, [contextResults]);
+	React.useEffect(() => { setEvents(contextEvents); }, [contextEvents]);
+	React.useEffect(() => { setAttendance(contextAttendance); }, [contextAttendance]);
 
 	// Term filter state
 	const [selectedTerm, setSelectedTerm] = React.useState<string>('');
@@ -32,14 +56,79 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 	// Helper to normalize class names for comparison
 	const normalizeClass = (cls: string) => cls.replace(/class\s*/i, '').trim();
 
-	// Action handlers (implement logic as needed)
+
+	// Modal state for edit/delete
+	const [showEditModal, setShowEditModal] = React.useState(false);
+	const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+	const [selectedType, setSelectedType] = React.useState<'results' | 'events' | 'attendance' | null>(null);
+	const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
+
 	const handleEdit = (type: 'results' | 'events' | 'attendance', idx: number) => {
-		alert(`Edit ${type} row #${idx + 1}`);
+		setSelectedType(type);
+		setSelectedIndex(idx);
+		setShowEditModal(true);
 	};
 	const handleDelete = (type: 'results' | 'events' | 'attendance', idx: number) => {
-		if (window.confirm('Are you sure you want to delete this entry?')) {
-			alert(`Delete ${type} row #${idx + 1}`);
+		setSelectedType(type);
+		setSelectedIndex(idx);
+		setShowDeleteModal(true);
+	};
+
+	const handleConfirmDelete = () => {
+		if (selectedType && selectedIndex !== null) {
+			if (selectedType === 'results') {
+				setResults(prev => prev.filter((_, i) => i !== selectedIndex));
+			} else if (selectedType === 'events') {
+				setEvents(prev => prev.filter((_, i) => i !== selectedIndex));
+			} else if (selectedType === 'attendance') {
+				setAttendance(prev => prev.filter((_, i) => i !== selectedIndex));
+			}
 		}
+		setShowDeleteModal(false);
+	};
+
+	const [editRow, setEditRow] = React.useState<EditRowType>({});
+
+	React.useEffect(() => {
+		if (showEditModal && selectedType !== null && selectedIndex !== null) {
+			let row = null;
+			if (selectedType === 'results' && results[selectedIndex]) {
+				row = results[selectedIndex];
+			} else if (selectedType === 'events' && events[selectedIndex]) {
+				row = events[selectedIndex];
+			} else if (selectedType === 'attendance' && attendance[selectedIndex]) {
+				row = attendance[selectedIndex];
+			}
+			setEditRow(row ? { ...row } : {});
+		}
+	}, [showEditModal, selectedType, selectedIndex, results, events, attendance]);
+
+	const handleEditFieldChange = (field: string, value: string | number) => {
+		setEditRow((prev) => ({ ...prev, [field]: value }));
+	};
+
+	const handleConfirmEdit = () => {
+		if (selectedType && selectedIndex !== null) {
+			if (selectedType === 'results') {
+				setResults(prev => prev.map((item, i) => i === selectedIndex ? { ...item, ...editRow } : item));
+			} else if (selectedType === 'events') {
+				setEvents(prev => prev.map((item, i) => {
+					if (i !== selectedIndex) return item;
+					// Build updated event with correct types
+					const updated: EdufamEvent = {
+						...item,
+						...editRow,
+						start: (typeof editRow.start === 'string') ? new Date(editRow.start) : (editRow.start instanceof Date ? editRow.start : item.start),
+						end: (typeof editRow.end === 'string') ? new Date(editRow.end) : (editRow.end instanceof Date ? editRow.end : item.end),
+						id: typeof editRow.id === 'number' ? editRow.id : (typeof item.id === 'number' ? item.id : 0)
+					};
+					return updated;
+				}));
+			} else if (selectedType === 'attendance') {
+				setAttendance(prev => prev.map((item, i) => i === selectedIndex ? { ...item, ...editRow } : item));
+			}
+		}
+		setShowEditModal(false);
 	};
 
 	const tableStyle = {
@@ -76,43 +165,174 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 							: arr;
 
 						// For events, filter by term if event has a 'term' property (optional)
-								const filterEventsByTerm = (arr: EdufamEvent[]) => {
-									if (!selectedTerm) return arr;
-									return arr.filter(ev => normalizeTerm(ev.term) === normalizeTerm(selectedTerm));
-								};
 
-		return (
+	return (
+		<>
+			{/* Edit Modal */}
+			<Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
+				<Modal.Header closeButton>
+					<Modal.Title>Edit {selectedType ? selectedType.charAt(0).toUpperCase() + selectedType.slice(1) : ''}</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<div style={{ textAlign: 'center', padding: '1rem' }}>
+						{editRow && Object.keys(editRow).length > 0 && (
+							<form>
+								{Object.entries(editRow).map(([key, value]) => (
+									(typeof value === 'string' || typeof value === 'number') ? (
+										<div key={key} style={{ marginBottom: '0.8em', textAlign: 'left' }}>
+											<label style={{ fontWeight: 500, marginBottom: 4, display: 'block' }}>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</label>
+											<input
+												type={typeof value === 'number' ? 'number' : 'text'}
+												value={value ?? ''}
+												onChange={e => handleEditFieldChange(key, typeof value === 'number' ? Number(e.target.value) : e.target.value)}
+												style={{ width: '100%', padding: '0.5em', borderRadius: 6, border: '1px solid #ccc' }}
+											/>
+										</div>
+									) : null
+								))}
+							</form>
+						)}
+						{selectedIndex !== null && (
+							<p style={{ fontSize: '0.95em', color: '#888' }}>Editing row #{selectedIndex + 1}</p>
+						)}
+					</div>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancel</Button>
+					<Button variant="primary" onClick={handleConfirmEdit}>Save Changes</Button>
+				</Modal.Footer>
+			</Modal>
+			{/* Delete Modal */}
+			<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+				<Modal.Header closeButton>
+					<Modal.Title>Delete Confirmation</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<div style={{ textAlign: 'center', padding: '1rem' }}>
+						<i className="bi bi-exclamation-triangle" style={{ fontSize: '2.5em', color: '#dc3545', marginBottom: '1rem' }}></i>
+						<p>Are you sure you want to delete this entry?</p>
+						{selectedIndex !== null && (
+							<p style={{ fontSize: '0.95em', color: '#888' }}>Deleting row #{selectedIndex + 1}</p>
+						)}
+					</div>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
+					<Button variant="danger" onClick={handleConfirmDelete}>Delete</Button>
+				</Modal.Footer>
+			</Modal>
 			<div className="row dashboard-tab-section" style={{ minHeight: '68vh', minWidth: '', marginTop: '8px', background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', paddingTop: 12 }}>
 				<div className="row">
 					{/* Term Filter Dropdown */}
-					<div className="col-12 mb-3 d-flex align-items-center" style={{ gap: 12 }}>
-						<label htmlFor="termFilter" style={{ fontWeight: 600, color: '#6c63ff', marginRight: 8 }}>Filter by Term:</label>
-						<select
-							id="termFilter"
-							className="form-select"
-							style={{ width: 160, display: 'inline-block' }}
-							value={selectedTerm}
-							onChange={e => setSelectedTerm(e.target.value)}
-						>
-							<option value="">All Terms</option>
-							<option value="Term 1">Term 1</option>
-							<option value="Term 2">Term 2</option>
-							<option value="Term 3">Term 3</option>
-						</select>
+					<div className="col-12 mb-4 d-flex align-items-center justify-content-center" style={{ gap: 12 }}>
+						<div style={{
+							background: '#6c63ff',
+							borderRadius: '12px',
+							padding: '1rem 1.5rem',
+							display: 'flex',
+							alignItems: 'center',
+							gap: '1rem',
+							boxShadow: '0 4px 16px rgba(108, 99, 255, 0.2)',
+							border: '1px solid rgba(255,255,255,0.1)'
+						}}>
+							<div style={{
+								background: 'rgba(255,255,255,0.2)',
+								borderRadius: '8px',
+								padding: '0.5rem',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center'
+							}}>
+								<i className="bi bi-funnel" style={{ fontSize: '1.2rem', color: '#fff' }}></i>
+							</div>
+							<label htmlFor="termFilter" style={{ 
+								fontWeight: 600, 
+								color: '#fff', 
+								margin: 0,
+								fontSize: '1rem',
+								textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+							}}>
+								Filter by Term:
+							</label>
+							<select
+								id="termFilter"
+								className="form-select"
+								style={{ 
+									width: 160, 
+									display: 'inline-block',
+									border: '2px solid rgba(255,255,255,0.2)',
+									borderRadius: '8px',
+									background: 'rgba(255,255,255,0.95)',
+									color: '#333',
+									fontWeight: 500,
+									padding: '0.5rem 0.75rem',
+									transition: 'all 0.3s ease'
+								}}
+								value={selectedTerm}
+								onChange={e => setSelectedTerm(e.target.value)}
+								onFocus={e => {
+									e.target.style.border = '2px solid #fff';
+									e.target.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.2)';
+								}}
+								onBlur={e => {
+									e.target.style.border = '2px solid rgba(255,255,255,0.2)';
+									e.target.style.boxShadow = 'none';
+								}}
+							>
+								<option value="">All Terms</option>
+								<option value="Term 1">Term 1</option>
+								<option value="Term 2">Term 2</option>
+								<option value="Term 3">Term 3</option>
+							</select>
+						</div>
 					</div>
-						{summaryType === "results" && (
-							<div className="col-md-10 mx-auto">
-								<h3>Results Summary{selectedClass ? ` -  Class ${selectedClass}` : ''}</h3>
-								<div style={tableStyle}>
-									<table className="table table-hover align-middle mb-0">
-									<thead>
-										<tr>
-											<th style={thStyle}>Student ID</th>
-											<th style={thStyle}>Student Name</th>
-											<th style={thStyle}>Grade</th>
-											<th style={thStyle}>Term</th>
-											<th style={thStyle}>File</th>
-											<th style={thStyle}>Actions</th>
+					{summaryType === "results" && (
+						<div className="col-12">
+							<div style={{ 
+								background: '#6c63ff',
+								borderRadius: '15px',
+								padding: '1.5rem',
+								marginBottom: '1.5rem',
+								boxShadow: '0 8px 32px rgba(108, 99, 255, 0.15)'
+							}}>
+								<div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+									<div style={{
+										background: 'rgba(255,255,255,0.2)',
+										borderRadius: '12px',
+										padding: '0.8rem',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center'
+									}}>
+										<i className="bi bi-clipboard-data" style={{ fontSize: '1.8rem', color: '#fff' }}></i>
+									</div>
+									<div>
+										<h3 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
+											Results Summary
+										</h3>
+										{selectedClass && (
+											<p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '1rem' }}>
+												Class {selectedClass}
+											</p>
+										)}
+									</div>
+								</div>
+							</div>
+							<div style={{
+								...tableStyle,
+								background: '#fff',
+								border: '1px solid rgba(108, 99, 255, 0.1)',
+								boxShadow: '0 4px 20px rgba(108, 99, 255, 0.08)'
+							}}>
+								<table className="table table-hover align-middle mb-0">
+								<thead>
+									<tr>
+											<th style={{...thStyle, background: '#6c63ff'}}>Student ID</th>
+											<th style={{...thStyle, background: '#6c63ff'}}>Student Name</th>
+											<th style={{...thStyle, background: '#6c63ff'}}>Grade</th>
+											<th style={{...thStyle, background: '#6c63ff'}}>Term</th>
+											<th style={{...thStyle, background: '#6c63ff'}}>File</th>
+											<th style={{...thStyle, background: '#6c63ff'}}>Actions</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -120,66 +340,144 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 											? filterByTerm(results.filter(r => normalizeClass(r.studentClass || '') === normalizeClass(selectedClass)))
 											: filterByTerm(results)
 										).length === 0 ? (
-											<tr><td colSpan={6} className="text-center">No results uploaded</td></tr>
+											<tr>
+												<td colSpan={6} className="text-center" style={{
+													padding: '2rem',
+													fontSize: '1.1rem',
+													color: '#666',
+													fontStyle: 'italic'
+												}}>
+													<i className="bi bi-inbox" style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem', color: '#ddd' }}></i>
+													No results uploaded
+												</td>
+											</tr>
 										) : (
 											(selectedClass
 												? filterByTerm(results.filter(r => normalizeClass(r.studentClass || '') === normalizeClass(selectedClass)))
 												: filterByTerm(results)
 											).map((r, idx) => (
-												<tr key={idx}>
-													<td>{r.studentId}</td>
-													<td>{r.studentName}</td>
-													<td>{r.grade}</td>
-													<td>{r.term}</td>
-													<td>{r.fileName ? <a href={r.fileDataUrl} target="_blank" rel="noopener noreferrer">{r.fileName}</a> : '—'}</td>
+												<tr key={idx} style={{
+													transition: 'all 0.3s ease',
+													borderLeft: '4px solid #6c63ff'
+												}}
+													onMouseEnter={e => {
+														e.currentTarget.style.background = 'rgba(108, 99, 255, 0.05)';
+														e.currentTarget.style.transform = 'translateX(2px)';
+													}}
+													onMouseLeave={e => {
+														e.currentTarget.style.background = '';
+														e.currentTarget.style.transform = 'translateX(0)';
+													}}
+												>
+													<td style={{ fontWeight: 500, color: '#333' }}>{r.studentId}</td>
+													<td style={{ fontWeight: 600, color: '#2c3e50' }}>{r.studentName}</td>
 													<td>
-														<div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+														<span style={{
+															background: '#6c63ff',
+															color: '#fff',
+															padding: '0.3rem 0.8rem',
+															borderRadius: '20px',
+															fontSize: '0.85rem',
+															fontWeight: 600,
+															textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+														}}>
+															{r.grade}
+														</span>
+													</td>
+													<td style={{ fontWeight: 500 }}>{r.term}</td>
+													<td>
+														{r.fileName ? (
+															<a 
+																href={r.fileDataUrl} 
+																target="_blank" 
+																rel="noopener noreferrer"
+																style={{
+																	color: '#667eea',
+																	textDecoration: 'none',
+																	fontWeight: 500,
+																	display: 'flex',
+																	alignItems: 'center',
+																	gap: '0.5rem'
+																}}
+																onMouseEnter={e => e.currentTarget.style.color = '#764ba2'}
+																onMouseLeave={e => e.currentTarget.style.color = '#667eea'}
+															>
+																<i className="bi bi-file-earmark-arrow-down"></i>
+																{r.fileName}
+															</a>
+														) : (
+															<span style={{ color: '#999', fontStyle: 'italic' }}>No file</span>
+														)}
+													</td>
+													<td>
+														<div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'center' }}>
 															<Button
 																variant="outline-warning"
 																size="sm"
 																style={{
-																	padding: '0.4em 0.5em',
+																	padding: '0.6em 0.8em',
 																	display: 'flex',
 																	alignItems: 'center',
 																	justifyContent: 'center',
-																	boxShadow: '0 1px 4px #ffc10733',
-																	background: 'transparent',
+																	boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+																	background: '#fff3cd',
 																	borderColor: '#ffc107',
-																	transition: 'background 0.2s'
+																	borderWidth: '2px',
+																	borderRadius: '10px',
+																	transition: 'all 0.3s ease',
+																	transform: 'scale(1)'
 																}}
-																onMouseOver={e => (e.currentTarget.style.background = '#fffbe6')}
-																onMouseOut={e => (e.currentTarget.style.background = 'transparent')}
+																onMouseOver={e => {
+																	e.currentTarget.style.background = '#ffc107';
+																	e.currentTarget.style.color = '#fff';
+																	e.currentTarget.style.transform = 'scale(1.05)';
+																	e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
+																}}
+																onMouseOut={e => {
+																	e.currentTarget.style.background = '#fff3cd';
+																	e.currentTarget.style.color = '#856404';
+																	e.currentTarget.style.transform = 'scale(1)';
+																	e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.25)';
+																}}
 																onClick={() => handleEdit('results', idx)}
-																title="Edit"
+																title="Edit Result"
 															>
-																<i className="bi bi-pencil-square" style={{ fontSize: '1.2em', color: '#ffc107', fontWeight: 800, textShadow: '0 1px 2px #fffbe6' }}></i>
+																<i className="bi bi-pencil-square" style={{ fontSize: '1.1em', marginRight: '0.3rem' }}></i>
+																Edit
 															</Button>
 															<Button
 																variant="outline-danger"
 																size="sm"
 																style={{
-																	padding: '0.4em 0.5em',
+																	padding: '0.6em 0.8em',
 																	display: 'flex',
 																	alignItems: 'center',
 																	justifyContent: 'center',
-																	boxShadow: '0 1px 4px #dc354522',
-																	background: 'transparent',
-																	transition: 'background 0.2s'
+																	boxShadow: '0 2px 8px rgba(220, 53, 69, 0.25)',
+																	background: '#f8d7da',
+																	borderColor: '#dc3545',
+																	borderWidth: '2px',
+																	borderRadius: '10px',
+																	transition: 'all 0.3s ease',
+																	transform: 'scale(1)'
 																}}
 																onMouseOver={e => {
-																	e.currentTarget.style.background = '#ffeaea';
-																	const icon = e.currentTarget.querySelector('i');
-																	if (icon) icon.style.color = '#b71c1c';
+																	e.currentTarget.style.background = '#dc3545';
+																	e.currentTarget.style.color = '#fff';
+																	e.currentTarget.style.transform = 'scale(1.05)';
+																	e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
 																}}
 																onMouseOut={e => {
-																	e.currentTarget.style.background = 'transparent';
-																	const icon = e.currentTarget.querySelector('i');
-																	if (icon) icon.style.color = '#dc3545';
+																	e.currentTarget.style.background = '#f8d7da';
+																	e.currentTarget.style.color = '#721c24';
+																	e.currentTarget.style.transform = 'scale(1)';
+																	e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.25)';
 																}}
 																onClick={() => handleDelete('results', idx)}
-																title="Delete"
+																title="Delete Result"
 															>
-																<i className="bi bi-trash" style={{ fontSize: '1.2em', color: '#dc3545', fontWeight: 800, textShadow: '0 1px 2px #ffeaea', transition: 'color 0.2s' }}></i>
+																<i className="bi bi-trash" style={{ fontSize: '1.1em', marginRight: '0.3rem' }}></i>
+																Delete
 															</Button>
 														</div>
 													</td>
@@ -192,56 +490,156 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 							</div>
 						)}
 							{summaryType === "events" && (
-								<div className="col-md-10 mx-auto">
-									<h3>Events Summary - Class {selectedClass}</h3>
-									<div style={tableStyle}>
+								<div className="col-12">
+									<div style={{ 
+										background: '#e91e63',
+										borderRadius: '15px',
+										padding: '1.5rem',
+										marginBottom: '1.5rem',
+										boxShadow: '0 8px 32px rgba(233, 30, 99, 0.15)'
+									}}>
+										<div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+											<div style={{
+												background: 'rgba(255,255,255,0.2)',
+												borderRadius: '12px',
+												padding: '0.8rem',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center'
+											}}>
+												<i className="bi bi-calendar-event" style={{ fontSize: '1.8rem', color: '#fff' }}></i>
+											</div>
+											<div>
+												<h3 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
+													Events Summary
+												</h3>
+												{selectedClass && (
+													<p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '1rem' }}>
+														Class {selectedClass}
+													</p>
+												)}
+											</div>
+										</div>
+									</div>
+									<div style={{
+										...tableStyle,
+										background: '#fff',
+										border: '1px solid rgba(233, 30, 99, 0.1)',
+										boxShadow: '0 4px 20px rgba(233, 30, 99, 0.08)'
+									}}>
 									<table className="table table-hover align-middle mb-0">
 										<thead>
 											<tr>
-												<th style={thStyle}>Event Name</th>
-												<th style={thStyle}>Date</th>
-												<th style={thStyle}>Start Time</th>
-												<th style={thStyle}>End Time</th>
-												<th style={thStyle}>Description</th>
-												<th style={thStyle}>Actions</th>
+												<th style={{...thStyle, background: '#e91e63'}}>Event Name</th>
+												<th style={{...thStyle, background: '#e91e63'}}>Date</th>
+												<th style={{...thStyle, background: '#e91e63'}}>Start Time</th>
+												<th style={{...thStyle, background: '#e91e63'}}>End Time</th>
+												<th style={{...thStyle, background: '#e91e63'}}>Description</th>
+												<th style={{...thStyle, background: '#e91e63'}}>Actions</th>
 											</tr>
 										</thead>
 										<tbody>
-											{filterEventsByTerm(events).length === 0 ? (
-												<tr><td colSpan={6} className="text-center">No events uploaded</td></tr>
+											{events.length === 0 ? (
+												<tr>
+													<td colSpan={6} className="text-center" style={{
+														padding: '2rem',
+														fontSize: '1.1rem',
+														color: '#666',
+														fontStyle: 'italic'
+													}}>
+														<i className="bi bi-calendar-x" style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem', color: '#ddd' }}></i>
+														No events uploaded
+													</td>
+												</tr>
 											) : (
-												filterEventsByTerm(events).map((ev, idx) => (
-													<tr key={idx}>
-														<td>{ev.title}</td>
-														<td>{ev.start ? new Date(ev.start).toLocaleDateString() : ''}</td>
-														<td>{ev.start ? new Date(ev.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
-														<td>{ev.end ? new Date(ev.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
-														<td>{ev.description}</td>
+												events.map((ev, idx) => (
+													<tr key={idx} style={{
+														transition: 'all 0.3s ease',
+														borderLeft: '4px solid #e91e63'
+													}}
+														onMouseEnter={e => {
+															e.currentTarget.style.background = 'rgba(233, 30, 99, 0.05)';
+															e.currentTarget.style.transform = 'translateX(2px)';
+														}}
+														onMouseLeave={e => {
+															e.currentTarget.style.background = '';
+															e.currentTarget.style.transform = 'translateX(0)';
+														}}
+													>
+														<td style={{ fontWeight: 600, color: '#2c3e50' }}>{ev.title}</td>
+														<td style={{ fontWeight: 500 }}>{ev.start ? new Date(ev.start).toLocaleDateString() : ''}</td>
+														<td style={{ fontWeight: 500 }}>{ev.start ? new Date(ev.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
+														<td style={{ fontWeight: 500 }}>{ev.end ? new Date(ev.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
+														<td style={{ color: '#555', maxWidth: '200px', wordBreak: 'break-word' }}>{ev.description}</td>
 														<td>
-															<div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+															<div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'center' }}>
 																<Button
 																	variant="outline-warning"
 																	size="sm"
 																	style={{
-																		borderRadius: '50%',
-																		padding: '0.4em 0.5em',
+																		padding: '0.6em 0.8em',
 																		display: 'flex',
 																		alignItems: 'center',
 																		justifyContent: 'center',
-																		boxShadow: '0 1px 4px #ffc10733',
-																		background: 'transparent',
+																		boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+																		background: '#fff3cd',
 																		borderColor: '#ffc107',
-																		transition: 'background 0.2s'
+																		borderWidth: '2px',
+																		borderRadius: '10px',
+																		transition: 'all 0.3s ease',
+																		transform: 'scale(1)'
 																	}}
-																	onMouseOver={e => (e.currentTarget.style.background = '#fffbe6')}
-																	onMouseOut={e => (e.currentTarget.style.background = 'transparent')}
+																	onMouseOver={e => {
+																		e.currentTarget.style.background = '#ffc107';
+																		e.currentTarget.style.color = '#fff';
+																		e.currentTarget.style.transform = 'scale(1.05)';
+																		e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
+																	}}
+																	onMouseOut={e => {
+																		e.currentTarget.style.background = '#fff3cd';
+																		e.currentTarget.style.color = '#856404';
+																		e.currentTarget.style.transform = 'scale(1)';
+																		e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.25)';
+																	}}
 																	onClick={() => handleEdit('events', idx)}
-																	title="Edit"
+																	title="Edit Event"
 																>
-																	<i className="bi bi-pencil-square" style={{ fontSize: '1.1em', color: '#ffc107' }}></i>
+																	<i className="bi bi-pencil-square" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
+																	Edit
 																</Button>
-																<Button variant="outline-danger" size="sm" style={{ borderRadius: '50%', padding: '0.4em 0.5em', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #dc354522' }} onClick={() => handleDelete('events', idx)} title="Delete">
-																	<i className="bi bi-trash" style={{ fontSize: '1.1em', color: '#dc3545' }}></i>
+																<Button
+																	variant="outline-danger"
+																	size="sm"
+																	style={{
+																		padding: '0.6em 0.8em',
+																		display: 'flex',
+																		alignItems: 'center',
+																		justifyContent: 'center',
+																		boxShadow: '0 2px 8px rgba(220, 53, 69, 0.25)',
+																		background: '#f8d7da',
+																		borderColor: '#dc3545',
+																		borderWidth: '2px',
+																		borderRadius: '10px',
+																		transition: 'all 0.3s ease',
+																		transform: 'scale(1)'
+																	}}
+																	onMouseOver={e => {
+																		e.currentTarget.style.background = '#dc3545';
+																		e.currentTarget.style.color = '#fff';
+																		e.currentTarget.style.transform = 'scale(1.05)';
+																		e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
+																	}}
+																	onMouseOut={e => {
+																		e.currentTarget.style.background = '#f8d7da';
+																		e.currentTarget.style.color = '#721c24';
+																		e.currentTarget.style.transform = 'scale(1)';
+																		e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.25)';
+																	}}
+																	onClick={() => handleDelete('events', idx)}
+																	title="Delete Event"
+																>
+																	<i className="bi bi-trash" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
+																	Delete
 																</Button>
 															</div>
 														</td>
@@ -254,17 +652,51 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 								</div>
 							)}
 					{summaryType === "attendance" && (
-						<div className="col-md-10 mx-auto">
-							<h3>Attendance Summary - Class {selectedClass}</h3>
-							<div style={tableStyle}>
+						<div className="col-12">
+							<div style={{ 
+								background: '#00bcd4',
+								borderRadius: '15px',
+								padding: '1.5rem',
+								marginBottom: '1.5rem',
+								boxShadow: '0 8px 32px rgba(0, 188, 212, 0.15)'
+							}}>
+								<div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+									<div style={{
+										background: 'rgba(255,255,255,0.2)',
+										borderRadius: '12px',
+										padding: '0.8rem',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center'
+									}}>
+										<i className="bi bi-person-check" style={{ fontSize: '1.8rem', color: '#fff' }}></i>
+									</div>
+									<div>
+										<h3 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
+											Attendance Summary
+										</h3>
+										{selectedClass && (
+											<p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '1rem' }}>
+												Class {selectedClass}
+											</p>
+										)}
+									</div>
+								</div>
+							</div>
+							<div style={{
+								...tableStyle,
+								background: '#fff',
+								border: '1px solid rgba(0, 188, 212, 0.1)',
+								boxShadow: '0 4px 20px rgba(0, 188, 212, 0.08)'
+							}}>
 							<table className="table table-hover align-middle mb-0">
 								<thead>
 									<tr>
-										<th style={thStyle}>Student ID</th>
-										<th style={thStyle}>Student Name</th>
-										<th style={thStyle}>Term</th>
-										<th style={thStyle}>Attendance (%)</th>
-										<th style={thStyle}>Actions</th>
+										<th style={{...thStyle, background: '#00bcd4'}}>Student ID</th>
+										<th style={{...thStyle, background: '#00bcd4'}}>Student Name</th>
+										<th style={{...thStyle, background: '#00bcd4'}}>Term</th>
+										<th style={{...thStyle, background: '#00bcd4'}}>Attendance (%)</th>
+										<th style={{...thStyle, background: '#00bcd4'}}>Actions</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -274,39 +706,127 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 											: attendance;
 										const filteredByTerm = filterByTerm(filteredAttendance);
 										if (filteredByTerm.length === 0) {
-											return <tr><td colSpan={5} className="text-center">No attendance uploaded</td></tr>;
+											return (
+												<tr>
+													<td colSpan={5} className="text-center" style={{
+														padding: '2rem',
+														fontSize: '1.1rem',
+														color: '#666',
+														fontStyle: 'italic'
+													}}>
+														<i className="bi bi-person-x" style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem', color: '#ddd' }}></i>
+														No attendance uploaded
+													</td>
+												</tr>
+											);
 										}
 										return filteredByTerm.map((a, idx) => (
-											<tr key={idx}>
-												<td>{a.studentId}</td>
-												<td>{a.studentName}</td>
-												<td>{a.term}</td>
-												<td>{a.attendancePercent}%</td>
+											<tr key={idx} style={{
+												transition: 'all 0.3s ease',
+												borderLeft: '4px solid #00bcd4'
+											}}
+												onMouseEnter={e => {
+													e.currentTarget.style.background = 'rgba(0, 188, 212, 0.05)';
+													e.currentTarget.style.transform = 'translateX(2px)';
+												}}
+												onMouseLeave={e => {
+													e.currentTarget.style.background = '';
+													e.currentTarget.style.transform = 'translateX(0)';
+												}}
+											>
+												<td style={{ fontWeight: 500, color: '#333' }}>{a.studentId}</td>
+												<td style={{ fontWeight: 600, color: '#2c3e50' }}>{a.studentName}</td>
+												<td style={{ fontWeight: 500 }}>{a.term}</td>
 												<td>
-													<div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'center' }}>
+													<span style={{
+														background: a.attendancePercent >= 80 
+															? '#28a745' 
+															: a.attendancePercent >= 60 
+															? '#ffc107' 
+															: '#dc3545',
+														color: '#fff',
+														padding: '0.4rem 0.8rem',
+														borderRadius: '20px',
+														fontSize: '0.9rem',
+														fontWeight: 600,
+														textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+														display: 'inline-flex',
+														alignItems: 'center',
+														gap: '0.3rem'
+													}}>
+														<i className={`bi ${a.attendancePercent >= 80 ? 'bi-check-circle' : a.attendancePercent >= 60 ? 'bi-exclamation-circle' : 'bi-x-circle'}`}></i>
+														{a.attendancePercent}%
+													</span>
+												</td>
+												<td>
+													<div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'center' }}>
 														<Button
 															variant="outline-warning"
 															size="sm"
 															style={{
-																borderRadius: '50%',
-																padding: '0.4em 0.5em',
+																padding: '0.6em 0.8em',
 																display: 'flex',
 																alignItems: 'center',
 																justifyContent: 'center',
-																boxShadow: '0 1px 4px #ffc10733',
-																background: 'transparent',
+																boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+																background: '#fff3cd',
 																borderColor: '#ffc107',
-																transition: 'background 0.2s'
+																borderWidth: '2px',
+																borderRadius: '10px',
+																transition: 'all 0.3s ease',
+																transform: 'scale(1)'
 															}}
-															onMouseOver={e => (e.currentTarget.style.background = '#fffbe6')}
-															onMouseOut={e => (e.currentTarget.style.background = 'transparent')}
+															onMouseOver={e => {
+																e.currentTarget.style.background = '#ffc107';
+																e.currentTarget.style.color = '#fff';
+																e.currentTarget.style.transform = 'scale(1.05)';
+																e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
+															}}
+															onMouseOut={e => {
+																e.currentTarget.style.background = '#fff3cd';
+																e.currentTarget.style.color = '#856404';
+																e.currentTarget.style.transform = 'scale(1)';
+																e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.25)';
+															}}
 															onClick={() => handleEdit('attendance', idx)}
-															title="Edit"
+															title="Edit Attendance"
 														>
-															<i className="bi bi-pencil-square" style={{ fontSize: '1.1em', color: '#ffc107' }}></i>
+															<i className="bi bi-pencil-square" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
+															Edit
 														</Button>
-														<Button variant="outline-danger" size="sm" style={{ borderRadius: '50%', padding: '0.4em 0.5em', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px #dc354522' }} onClick={() => handleDelete('attendance', idx)} title="Delete">
-															<i className="bi bi-trash" style={{ fontSize: '1.1em', color: '#dc3545' }}></i>
+														<Button
+															variant="outline-danger"
+															size="sm"
+															style={{
+																padding: '0.6em 0.8em',
+																display: 'flex',
+																alignItems: 'center',
+																justifyContent: 'center',
+																boxShadow: '0 2px 8px rgba(220, 53, 69, 0.25)',
+																background: '#f8d7da',
+																borderColor: '#dc3545',
+																borderWidth: '2px',
+																borderRadius: '10px',
+																transition: 'all 0.3s ease',
+																transform: 'scale(1)'
+															}}
+															onMouseOver={e => {
+																e.currentTarget.style.background = '#dc3545';
+																e.currentTarget.style.color = '#fff';
+																e.currentTarget.style.transform = 'scale(1.05)';
+																e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
+															}}
+															onMouseOut={e => {
+																e.currentTarget.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+																e.currentTarget.style.color = '#721c24';
+																e.currentTarget.style.transform = 'scale(1)';
+																e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.25)';
+															}}
+															onClick={() => handleDelete('attendance', idx)}
+															title="Delete Attendance"
+														>
+															<i className="bi bi-trash" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
+															Delete
 														</Button>
 													</div>
 												</td>
@@ -319,9 +839,10 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 						</div>
 					)}
 
-				</div>
-			</div>
-		);
-};
+				   </div>
+			   </div>
+		   </>
+	   );
+}
 
 export default TeacherView;
