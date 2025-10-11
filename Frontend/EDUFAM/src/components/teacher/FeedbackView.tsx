@@ -1,6 +1,3 @@
-
-
-
 import type { Feedback } from '../../context/FeedbackContextObject';
 
 const FeedbackView: React.FC = () => {

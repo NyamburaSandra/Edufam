@@ -8,7 +8,7 @@ import ParentSidebar from './ParentSidebar';
 import { useResults } from '../../context/ResultsContextHook';
 import { useAttendance } from '../../context/AttendanceContextHook';
 import { ParentMainDashboard, ChildInformationView, EventCalendarView } from '.';
-import './ParentResponsive.css';
+import '../../assets/style/ParentResponsive.css';
 
 const ParentDashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
