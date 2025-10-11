@@ -1,0 +1,72 @@
+
+/* Card styles for summary sections */
+.teacher-summary-card {
+  background: #00bcd4;
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 188, 212, 0.15);
+}
+
+.teacher-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.teacher-summary-icon {
+  background: rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teacher-summary-title {
+  color: #fff;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.teacher-summary-class {
+  color: rgba(255,255,255,0.8);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.teacher-download-row {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.teacher-download-label {
+  font-weight: 500;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.teacher-table-container {
+  background: #fff;
+  border: 1px solid rgba(0, 188, 212, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 188, 212, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Example for table header cell */
+.teacher-table-th {
+  background: #00bcd4;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  letter-spacing: 0.03em;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 1.05em;
+}

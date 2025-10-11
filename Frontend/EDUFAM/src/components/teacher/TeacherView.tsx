@@ -1,10 +1,98 @@
+// Download handler for attendance summary
+	const handleDownloadAttendance = (attendance: AttendanceEntry[], type: 'excel' | 'pdf') => {
+		const rows = attendance.map((a: AttendanceEntry) => [
+			a.studentId || '',
+			a.studentName || '',
+			a.term || '',
+			typeof a.attendancePercent === 'number' ? a.attendancePercent : ''
+		]);
+		const header = ['Student ID', 'Student Name', 'Term', 'Attendance %'];
+		if (type === 'excel') {
+			let csv = header.join(',') + '\n';
+			csv += rows.map((row: (string | number)[]) => row.map((cell: string | number) => '"' + String(cell).replace(/"/g, '""') + '"').join(',')).join('\n');
+			const blob = new Blob([csv], { type: 'text/csv' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'attendance_summary.csv';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		} else {
+			const win = window.open('', '_blank');
+			if (win) {
+				win.document.write('<html><head><title>Attendance Summary PDF</title></head><body>');
+				win.document.write('<h2>Attendance Summary</h2>');
+				win.document.write('<table border="1" cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:1rem;">');
+				win.document.write('<tr>' + header.map((h: string) => `<th>${h}</th>`).join('') + '</tr>');
+				rows.forEach((row: (string | number)[]) => {
+					win.document.write('<tr>' + row.map((cell: string | number) => `<td>${cell}</td>`).join('') + '</tr>');
+				});
+				win.document.write('</table>');
+				win.document.write('</body></html>');
+				win.document.close();
+				win.print();
+			} else {
+				alert('Unable to open PDF window. Please check your browser settings.');
+			}
+		}
+	};
+
+	// Download handler for event summary
+	const handleDownload = (events: EventRow[], type: 'excel' | 'pdf') => {
+		// Prepare event data
+		const eventRows = events.map(ev => [
+			ev.title,
+			ev.start ? new Date(ev.start).toLocaleDateString() : '',
+			ev.start ? new Date(ev.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+			ev.end ? new Date(ev.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+			ev.description
+		]);
+		const header = ['Event Name', 'Date', 'Start Time', 'End Time', 'Description'];
+		if (type === 'excel') {
+			// Simple CSV export
+			let csv = header.join(',') + '\n';
+			csv += eventRows.map(row => row.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(',')).join('\n');
+			const blob = new Blob([csv], { type: 'text/csv' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'event_summary.csv';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		} else {
+			// Simple PDF export using window.print (for demo)
+			const win = window.open('', '_blank');
+			if (win) {
+				win.document.write('<html><head><title>Event Summary PDF</title></head><body>');
+				win.document.write('<h2>Event Summary</h2>');
+				win.document.write('<table border="1" cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:1rem;">');
+				win.document.write('<tr>' + header.map(h => `<th>${h}</th>`).join('') + '</tr>');
+				eventRows.forEach(row => {
+					win.document.write('<tr>' + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>');
+				});
+				win.document.write('</table>');
+				win.document.write('</body></html>');
+				win.document.close();
+				win.print();
+			} else {
+				alert('Unable to open PDF window. Please check your browser settings.');
+			}
+		}
+	};
     
 import React from 'react';
+import '../../assets/style/Teacher.css';
 import { Modal, Button } from 'react-bootstrap';
 import { useEvents } from '../../context/useEvents';
 import type { EdufamEvent } from '../../context/EventsContext';
 import { useResults } from '../../context/ResultsContextHook';
 import { useAttendance } from '../../context/AttendanceContextHook';
+import type { AttendanceEntry } from '../../context/AttendanceContext';
+
 // Try to import EdufamEvent type from EventsContext, fallback to inline type if not found
 // import { EdufamEvent } from '../../context/EventsContext';
 
@@ -520,6 +608,16 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 												)}
 											</div>
 										</div>
+										{/* Download Event Summary Button */}
+										<div style={{ marginTop: '1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+											<span style={{ fontWeight: 500, color: '#fff', fontSize: '1rem' }}>Download Event Summary:</span>
+											<Button variant="outline-light" size="sm" onClick={() => handleDownload(events, 'excel')} style={{ fontWeight: 600 }}>
+												<i className="bi bi-file-earmark-excel" style={{ marginRight: 6 }}></i> Excel (Recommended)
+											</Button>
+											<Button variant="outline-light" size="sm" onClick={() => handleDownload(events, 'pdf')} style={{ fontWeight: 600 }}>
+												<i className="bi bi-file-earmark-pdf" style={{ marginRight: 6 }}></i> PDF
+											</Button>
+										</div>
 									</div>
 									<div style={{
 										...tableStyle,
@@ -651,193 +749,181 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 									</div>
 								</div>
 							)}
-					{summaryType === "attendance" && (
-						<div className="col-12">
-							<div style={{ 
-								background: '#00bcd4',
-								borderRadius: '15px',
-								padding: '1.5rem',
-								marginBottom: '1.5rem',
-								boxShadow: '0 8px 32px rgba(0, 188, 212, 0.15)'
-							}}>
-								<div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-									<div style={{
-										background: 'rgba(255,255,255,0.2)',
-										borderRadius: '12px',
-										padding: '0.8rem',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center'
-									}}>
-										<i className="bi bi-person-check" style={{ fontSize: '1.2rem', color: '#fff' }}></i>
-									</div>
-									<div>
-										<h3 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
-											Attendance Summary
-										</h3>
-										{selectedClass && (
-											<p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '1rem' }}>
-												Class {selectedClass}
-											</p>
-										)}
-									</div>
-								</div>
-							</div>
-							<div style={{
-								...tableStyle,
-								background: '#fff',
-								border: '1px solid rgba(0, 188, 212, 0.1)',
-								boxShadow: '0 4px 20px rgba(0, 188, 212, 0.08)'
-							}}>
-							<table className="table table-hover align-middle mb-0">
-								<thead>
-									<tr>
-										<th style={{...thStyle, background: '#00bcd4'}}>Student ID</th>
-										<th style={{...thStyle, background: '#00bcd4'}}>Student Name</th>
-										<th style={{...thStyle, background: '#00bcd4'}}>Term</th>
-										<th style={{...thStyle, background: '#00bcd4'}}>Attendance (%)</th>
-										<th style={{...thStyle, background: '#00bcd4'}}>Actions</th>
-									</tr>
-								</thead>
-								<tbody>
-									{(() => {
-										const filteredAttendance = selectedClass
-											? attendance.filter(a => normalizeClass(a.studentClass || '') === normalizeClass(selectedClass))
-											: attendance;
-										const filteredByTerm = filterByTerm(filteredAttendance);
-										if (filteredByTerm.length === 0) {
-											return (
-												<tr>
-													<td colSpan={5} className="text-center" style={{
-														padding: '2rem',
-														fontSize: '1.1rem',
-														color: '#666',
-														fontStyle: 'italic'
-													}}>
-														<i className="bi bi-person-x" style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem', color: '#ddd' }}></i>
-														No attendance uploaded
-													</td>
-												</tr>
-											);
-										}
-										return filteredByTerm.map((a, idx) => (
-											<tr key={idx} style={{
-												transition: 'all 0.3s ease',
-												borderLeft: '4px solid #00bcd4'
-											}}
-												onMouseEnter={e => {
-													e.currentTarget.style.background = 'rgba(0, 188, 212, 0.05)';
-													e.currentTarget.style.transform = 'translateX(2px)';
-												}}
-												onMouseLeave={e => {
-													e.currentTarget.style.background = '';
-													e.currentTarget.style.transform = 'translateX(0)';
-												}}
-											>
-												<td style={{ fontWeight: 500, color: '#333' }}>{a.studentId}</td>
-												<td style={{ fontWeight: 600, color: '#2c3e50' }}>{a.studentName}</td>
-												<td style={{ fontWeight: 500 }}>{a.term}</td>
-												<td>
-													<span style={{
-														background: a.attendancePercent >= 80 
-															? '#28a745' 
-															: a.attendancePercent >= 60 
-															? '#ffc107' 
-															: '#dc3545',
-														color: '#fff',
-														padding: '0.4rem 0.8rem',
-														borderRadius: '20px',
-														fontSize: '0.9rem',
-														fontWeight: 600,
-														textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-														display: 'inline-flex',
-														alignItems: 'center',
-														gap: '0.3rem'
-													}}>
-														<i className={`bi ${a.attendancePercent >= 80 ? 'bi-check-circle' : a.attendancePercent >= 60 ? 'bi-exclamation-circle' : 'bi-x-circle'}`}></i>
-														{a.attendancePercent}%
-													</span>
-												</td>
-												<td>
-													<div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'center' }}>
-														<Button
-															variant="outline-warning"
-															size="sm"
-															style={{
-																padding: '0.6em 0.8em',
-																display: 'flex',
-																alignItems: 'center',
-																justifyContent: 'center',
-																boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
-																background: '#fff3cd',
-																borderColor: '#ffc107',
-																borderWidth: '2px',
-																borderRadius: '10px',
-																transition: 'all 0.3s ease',
-																transform: 'scale(1)'
-															}}
-															onMouseOver={e => {
-																e.currentTarget.style.background = '#ffc107';
-																e.currentTarget.style.color = '#fff';
-																e.currentTarget.style.transform = 'scale(1.05)';
-																e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
-															}}
-															onMouseOut={e => {
-																e.currentTarget.style.background = '#fff3cd';
-																e.currentTarget.style.color = '#856404';
-																e.currentTarget.style.transform = 'scale(1)';
-																e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.25)';
-															}}
-															onClick={() => handleEdit('attendance', idx)}
-															title="Edit Attendance"
-														>
-															<i className="bi bi-pencil-square" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
-															Edit
-														</Button>
-														<Button
-															variant="outline-danger"
-															size="sm"
-															style={{
-																padding: '0.6em 0.8em',
-																display: 'flex',
-																alignItems: 'center',
-																justifyContent: 'center',
-																boxShadow: '0 2px 8px rgba(220, 53, 69, 0.25)',
-																background: '#f8d7da',
-																borderColor: '#dc3545',
-																borderWidth: '2px',
-																borderRadius: '10px',
-																transition: 'all 0.3s ease',
-																transform: 'scale(1)'
-															}}
-															onMouseOver={e => {
-																e.currentTarget.style.background = '#dc3545';
-																e.currentTarget.style.color = '#fff';
-																e.currentTarget.style.transform = 'scale(1.05)';
-																e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
-															}}
-															onMouseOut={e => {
-																e.currentTarget.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
-																e.currentTarget.style.color = '#721c24';
-																e.currentTarget.style.transform = 'scale(1)';
-																e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.25)';
-															}}
-															onClick={() => handleDelete('attendance', idx)}
-															title="Delete Attendance"
-														>
-															<i className="bi bi-trash" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
-															Delete
-														</Button>
-													</div>
-												</td>
-											</tr>
-										));
-									})()}
-								</tbody>
-							</table>
-							</div>
-						</div>
-					)}
+					   {summaryType === "attendance" && (
+						   <div className="col-12">
+							   <div className="teacher-summary-card">
+								   <div className="teacher-summary-header">
+									   <div className="teacher-summary-icon">
+										   <i className="bi bi-person-check" style={{ fontSize: '1.2rem', color: '#fff' }}></i>
+									   </div>
+									   <div>
+										   <h3 className="teacher-summary-title" style={{ color: '#fff' }}>Attendance Summary</h3>
+										   {selectedClass && (
+											   <p className="teacher-summary-class">Class {selectedClass}</p>
+										   )}
+									   </div>
+								   </div>
+								   {/* Download Attendance Summary Button */}
+								   <div className="teacher-download-row">
+									   <span className="teacher-download-label">Download Attendance Summary:</span>
+									   <Button variant="outline-light" size="sm" onClick={() => handleDownloadAttendance(attendance, 'excel')} style={{ fontWeight: 600 }}>
+										   <i className="bi bi-file-earmark-excel" style={{ marginRight: 6 }}></i> Excel (Recommended)
+									   </Button>
+									   <Button variant="outline-light" size="sm" onClick={() => handleDownloadAttendance(attendance, 'pdf')} style={{ fontWeight: 600 }}>
+										   <i className="bi bi-file-earmark-pdf" style={{ marginRight: 6 }}></i> PDF
+									   </Button>
+								   </div>
+							   </div>
+							   <div className="teacher-table-container">
+							   <table className="table table-hover align-middle mb-0">
+								   <thead>
+									   <tr>
+										   <th className="teacher-table-th">Student ID</th>
+										   <th className="teacher-table-th">Student Name</th>
+										   <th className="teacher-table-th">Term</th>
+										   <th className="teacher-table-th">Attendance (%)</th>
+										   <th className="teacher-table-th">Actions</th>
+									   </tr>
+								   </thead>
+								   <tbody>
+									   {(() => {
+										   const filteredAttendance = selectedClass
+											   ? attendance.filter(a => normalizeClass(a.studentClass || '') === normalizeClass(selectedClass))
+											   : attendance;
+										   const filteredByTerm = filterByTerm(filteredAttendance);
+										   if (filteredByTerm.length === 0) {
+											   return (
+												   <tr>
+													   <td colSpan={5} className="text-center" style={{
+														   padding: '2rem',
+														   fontSize: '1.1rem',
+														   color: '#666',
+														   fontStyle: 'italic'
+													   }}>
+														   <i className="bi bi-person-x" style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem', color: '#ddd' }}></i>
+														   No attendance uploaded
+													   </td>
+												   </tr>
+											   );
+										   }
+										   return filteredByTerm.map((a, idx) => (
+											   <tr key={idx} style={{
+												   transition: 'all 0.3s ease',
+												   borderLeft: '4px solid #00bcd4'
+											   }}
+												   onMouseEnter={e => {
+													   e.currentTarget.style.background = 'rgba(0, 188, 212, 0.05)';
+													   e.currentTarget.style.transform = 'translateX(2px)';
+												   }}
+												   onMouseLeave={e => {
+													   e.currentTarget.style.background = '';
+													   e.currentTarget.style.transform = 'translateX(0)';
+												   }}
+											   >
+												   <td style={{ fontWeight: 500, color: '#333' }}>{a.studentId}</td>
+												   <td style={{ fontWeight: 600, color: '#2c3e50' }}>{a.studentName}</td>
+												   <td style={{ fontWeight: 500 }}>{a.term}</td>
+												   <td>
+													   <span style={{
+														   background: a.attendancePercent >= 80 
+															   ? '#28a745' 
+															   : a.attendancePercent >= 60 
+															   ? '#ffc107' 
+															   : '#dc3545',
+														   color: '#fff',
+														   padding: '0.4rem 0.8rem',
+														   borderRadius: '20px',
+														   fontSize: '0.9rem',
+														   fontWeight: 600,
+														   textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+														   display: 'inline-flex',
+														   alignItems: 'center',
+														   gap: '0.3rem'
+													   }}>
+														   <i className={`bi ${a.attendancePercent >= 80 ? 'bi-check-circle' : a.attendancePercent >= 60 ? 'bi-exclamation-circle' : 'bi-x-circle'}`}></i>
+														   {a.attendancePercent}%
+													   </span>
+												   </td>
+												   <td>
+													   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'center' }}>
+														   <Button
+															   variant="outline-warning"
+															   size="sm"
+															   style={{
+																   padding: '0.6em 0.8em',
+																   display: 'flex',
+																   alignItems: 'center',
+																   justifyContent: 'center',
+																   boxShadow: '0 2px 8px rgba(255, 193, 7, 0.25)',
+																   background: '#fff3cd',
+																   borderColor: '#ffc107',
+																   borderWidth: '2px',
+																   borderRadius: '10px',
+																   transition: 'all 0.3s ease',
+																   transform: 'scale(1)'
+															   }}
+															   onMouseOver={e => {
+																   e.currentTarget.style.background = '#ffc107';
+																   e.currentTarget.style.color = '#fff';
+																   e.currentTarget.style.transform = 'scale(1.05)';
+																   e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
+															   }}
+															   onMouseOut={e => {
+																   e.currentTarget.style.background = '#fff3cd';
+																   e.currentTarget.style.color = '#856404';
+																   e.currentTarget.style.transform = 'scale(1)';
+																   e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.25)';
+															   }}
+															   onClick={() => handleEdit('attendance', idx)}
+															   title="Edit Attendance"
+														   >
+															   <i className="bi bi-pencil-square" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
+															   Edit
+														   </Button>
+														   <Button
+															   variant="outline-danger"
+															   size="sm"
+															   style={{
+																   padding: '0.6em 0.8em',
+																   display: 'flex',
+																   alignItems: 'center',
+																   justifyContent: 'center',
+																   boxShadow: '0 2px 8px rgba(220, 53, 69, 0.25)',
+																   background: '#f8d7da',
+																   borderColor: '#dc3545',
+																   borderWidth: '2px',
+																   borderRadius: '10px',
+																   transition: 'all 0.3s ease',
+																   transform: 'scale(1)'
+															   }}
+															   onMouseOver={e => {
+																   e.currentTarget.style.background = '#dc3545';
+																   e.currentTarget.style.color = '#fff';
+																   e.currentTarget.style.transform = 'scale(1.05)';
+																   e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.4)';
+															   }}
+															   onMouseOut={e => {
+																   e.currentTarget.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+																   e.currentTarget.style.color = '#721c24';
+																   e.currentTarget.style.transform = 'scale(1)';
+																   e.currentTarget.style.boxShadow = '0 2px 8px rgba(220, 53, 69, 0.25)';
+															   }}
+															   onClick={() => handleDelete('attendance', idx)}
+															   title="Delete Attendance"
+														   >
+															   <i className="bi bi-trash" style={{ fontSize: '1em', marginRight: '0.3rem' }}></i>
+															   Delete
+														   </Button>
+													   </div>
+												   </td>
+											   </tr>
+										   ));
+									   })()}
+								   </tbody>
+							   </table>
+							   </div>
+						   </div>
+					   )}
 
 				   </div>
 			   </div>
