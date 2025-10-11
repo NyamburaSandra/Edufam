@@ -138,7 +138,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 	};
 
 	const thStyle: React.CSSProperties = {
-		background: '#6c63ff',
+		background: '#00bcd4',
 		color: '#fff',
 		fontWeight: 600,
 		border: 'none',
@@ -226,7 +226,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 					{/* Term Filter Dropdown */}
 					<div className="col-12 mb-4 d-flex align-items-center justify-content-center" style={{ gap: 12 }}>
 						<div style={{
-							background: '#6c63ff',
+							background: '#00bcd4',
 							borderRadius: '12px',
 							padding: '1rem 1.5rem',
 							display: 'flex',
@@ -289,7 +289,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 					{summaryType === "results" && (
 						<div className="col-12">
 							<div style={{ 
-								background: '#6c63ff',
+								background: '#00bcd4',
 								borderRadius: '15px',
 								padding: '1.5rem',
 								marginBottom: '1.5rem',
@@ -304,7 +304,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 										alignItems: 'center',
 										justifyContent: 'center'
 									}}>
-										<i className="bi bi-clipboard-data" style={{ fontSize: '1.8rem', color: '#fff' }}></i>
+										<i className="bi bi-clipboard-data" style={{ fontSize: '1.2rem', color: '#fff' }}></i>
 									</div>
 									<div>
 										<h3 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
@@ -327,12 +327,12 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 								<table className="table table-hover align-middle mb-0">
 								<thead>
 									<tr>
-											<th style={{...thStyle, background: '#6c63ff'}}>Student ID</th>
-											<th style={{...thStyle, background: '#6c63ff'}}>Student Name</th>
-											<th style={{...thStyle, background: '#6c63ff'}}>Grade</th>
-											<th style={{...thStyle, background: '#6c63ff'}}>Term</th>
-											<th style={{...thStyle, background: '#6c63ff'}}>File</th>
-											<th style={{...thStyle, background: '#6c63ff'}}>Actions</th>
+											<th style={{...thStyle, background: '#00bcd4'}}>Student ID</th>
+											<th style={{...thStyle, background: '#00bcd4'}}>Student Name</th>
+											<th style={{...thStyle, background: '#00bcd4'}}>Grade</th>
+											<th style={{...thStyle, background: '#00bcd4'}}>Term</th>
+											<th style={{...thStyle, background: '#00bcd4'}}>File</th>
+											<th style={{...thStyle, background: '#00bcd4'}}>Actions</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -358,7 +358,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 											).map((r, idx) => (
 												<tr key={idx} style={{
 													transition: 'all 0.3s ease',
-													borderLeft: '4px solid #6c63ff'
+													borderLeft: '4px solid #00bcd4 '
 												}}
 													onMouseEnter={e => {
 														e.currentTarget.style.background = 'rgba(108, 99, 255, 0.05)';
@@ -373,7 +373,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 													<td style={{ fontWeight: 600, color: '#2c3e50' }}>{r.studentName}</td>
 													<td>
 														<span style={{
-															background: '#6c63ff',
+															background: '#00bcd4',
 															color: '#fff',
 															padding: '0.3rem 0.8rem',
 															borderRadius: '20px',
@@ -492,7 +492,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 							{summaryType === "events" && (
 								<div className="col-12">
 									<div style={{ 
-										background: '#e91e63',
+										background: '#00bcd4',
 										borderRadius: '15px',
 										padding: '1.5rem',
 										marginBottom: '1.5rem',
@@ -507,7 +507,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 												alignItems: 'center',
 												justifyContent: 'center'
 											}}>
-												<i className="bi bi-calendar-event" style={{ fontSize: '1.8rem', color: '#fff' }}></i>
+												<i className="bi bi-calendar-event" style={{ fontSize: '1.2rem', color: '#fff' }}></i>
 											</div>
 											<div>
 												<h3 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
@@ -530,12 +530,12 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 									<table className="table table-hover align-middle mb-0">
 										<thead>
 											<tr>
-												<th style={{...thStyle, background: '#e91e63'}}>Event Name</th>
-												<th style={{...thStyle, background: '#e91e63'}}>Date</th>
-												<th style={{...thStyle, background: '#e91e63'}}>Start Time</th>
-												<th style={{...thStyle, background: '#e91e63'}}>End Time</th>
-												<th style={{...thStyle, background: '#e91e63'}}>Description</th>
-												<th style={{...thStyle, background: '#e91e63'}}>Actions</th>
+												<th style={{...thStyle, background: '#00bcd4'}}>Event Name</th>
+												<th style={{...thStyle, background: '#00bcd4'}}>Date</th>
+												<th style={{...thStyle, background: '#00bcd4'}}>Start Time</th>
+												<th style={{...thStyle, background: '#00bcd4'}}>End Time</th>
+												<th style={{...thStyle, background: '#00bcd4'}}>Description</th>
+												<th style={{...thStyle, background: '#00bcd4'}}>Actions</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -555,7 +555,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 												events.map((ev, idx) => (
 													<tr key={idx} style={{
 														transition: 'all 0.3s ease',
-														borderLeft: '4px solid #e91e63'
+														borderLeft: '4px solid #00bcd4'
 													}}
 														onMouseEnter={e => {
 															e.currentTarget.style.background = 'rgba(233, 30, 99, 0.05)';
@@ -669,7 +669,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 										alignItems: 'center',
 										justifyContent: 'center'
 									}}>
-										<i className="bi bi-person-check" style={{ fontSize: '1.8rem', color: '#fff' }}></i>
+										<i className="bi bi-person-check" style={{ fontSize: '1.2rem', color: '#fff' }}></i>
 									</div>
 									<div>
 										<h3 style={{ color: '#fff', margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>

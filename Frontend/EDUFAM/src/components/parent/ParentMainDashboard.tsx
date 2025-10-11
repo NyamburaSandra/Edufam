@@ -329,7 +329,7 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
         </Modal.Footer>
       </Modal>
       {/* Events Calendar section */}
-      <Card className="mb-4" style={{ background: '#cf84c7', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
+      <Card className="mb-4" style={{ background: '#d0dad6ff', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
         <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Events Calendar</h5>
         </Card.Header>
