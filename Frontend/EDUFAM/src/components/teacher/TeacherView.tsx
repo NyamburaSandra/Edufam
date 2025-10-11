@@ -1,3 +1,54 @@
+// Download handler for results summary
+import type { ResultEntry } from '../../context/ResultsContext';
+const handleDownloadResults = (results: ResultEntry[], type: 'excel' | 'pdf') => {
+	const rows = results.map((r: ResultEntry) => [
+		r.studentId || '',
+		r.studentName || '',
+		r.grade || '',
+		r.term || '',
+		r.fileName || ''
+	]);
+	const header = ['Student ID', 'Student Name', 'Grade', 'Term', 'File'];
+	if (type === 'excel') {
+		let csv = header.join(',') + '\n';
+		csv += rows.map((row: (string | number)[]) => row.map((cell: string | number) => '"' + String(cell).replace(/"/g, '""') + '"').join(',')).join('\n');
+		const blob = new Blob([csv], { type: 'text/csv' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'results_summary.csv';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	} else {
+		const win = window.open('', '_blank');
+		if (win) {
+			win.document.write('<html><head><title>Results Summary PDF</title></head><body>');
+			win.document.write('<h2>Results Summary</h2>');
+			win.document.write('<table border="1" cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:1rem;">');
+			win.document.write('<tr>' + header.map((h: string) => `<th>${h}</th>`).join('') + '</tr>');
+			rows.forEach((row: (string | number)[]) => {
+				win.document.write('<tr>' + row.map((cell: string | number) => `<td>${cell}</td>`).join('') + '</tr>');
+			});
+			win.document.write('</table>');
+			win.document.write('</body></html>');
+			win.document.close();
+			win.print();
+		} else {
+			alert('Unable to open PDF window. Please check your browser settings.');
+		}
+	}
+};
+import React from 'react';
+import '../../assets/style/Teacher.css';
+import { Modal, Button } from 'react-bootstrap';
+import { useEvents } from '../../context/useEvents';
+import type { EdufamEvent } from '../../context/EventsContext';
+import { useResults } from '../../context/ResultsContextHook';
+import { useAttendance } from '../../context/AttendanceContextHook';
+import type { AttendanceEntry } from '../../context/AttendanceContext';
+
 // Download handler for attendance summary
 	const handleDownloadAttendance = (attendance: AttendanceEntry[], type: 'excel' | 'pdf') => {
 		const rows = attendance.map((a: AttendanceEntry) => [
@@ -84,17 +135,6 @@
 		}
 	};
     
-import React from 'react';
-import '../../assets/style/Teacher.css';
-import { Modal, Button } from 'react-bootstrap';
-import { useEvents } from '../../context/useEvents';
-import type { EdufamEvent } from '../../context/EventsContext';
-import { useResults } from '../../context/ResultsContextHook';
-import { useAttendance } from '../../context/AttendanceContextHook';
-import type { AttendanceEntry } from '../../context/AttendanceContext';
-
-// Try to import EdufamEvent type from EventsContext, fallback to inline type if not found
-// import { EdufamEvent } from '../../context/EventsContext';
 
 type ResultRow = {
 	studentId?: string;
@@ -405,6 +445,38 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 										)}
 									</div>
 								</div>
+								{/* Download Results Summary Button */}
+								<div className="teacher-download-row">
+									<span className="teacher-download-label">Download Results Summary:</span>
+									<Button
+										variant="outline-success"
+										size="sm"
+										onClick={() => {
+											const filtered = filterByTerm(selectedClass
+												? results.filter(r => normalizeClass(r.studentClass || '') === normalizeClass(selectedClass))
+												: results);
+											handleDownloadResults(selectedTerm ? filtered : results, 'excel');
+										}}
+										style={{ fontWeight: 600, marginRight: 8 }}
+									>
+										<i className="bi bi-file-earmark-excel" style={{ marginRight: 6 }}></i>
+										Excel {selectedTerm ? `(Term ${selectedTerm})` : '(All Terms)'}
+									</Button>
+									<Button
+										variant="outline-danger"
+										size="sm"
+										onClick={() => {
+											const filtered = filterByTerm(selectedClass
+												? results.filter(r => normalizeClass(r.studentClass || '') === normalizeClass(selectedClass))
+												: results);
+											handleDownloadResults(selectedTerm ? filtered : results, 'pdf');
+										}}
+										style={{ fontWeight: 600 }}
+									>
+										<i className="bi bi-file-earmark-pdf" style={{ marginRight: 6 }}></i>
+										PDF {selectedTerm ? `(Term ${selectedTerm})` : '(All Terms)'}
+									</Button>
+								</div>
 							</div>
 							<div style={{
 								...tableStyle,
@@ -612,7 +684,7 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 										<div style={{ marginTop: '1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
 											<span style={{ fontWeight: 500, color: '#fff', fontSize: '1rem' }}>Download Event Summary:</span>
 											<Button variant="outline-light" size="sm" onClick={() => handleDownload(events, 'excel')} style={{ fontWeight: 600 }}>
-												<i className="bi bi-file-earmark-excel" style={{ marginRight: 6 }}></i> Excel (Recommended)
+												<i className="bi bi-file-earmark-excel" style={{ marginRight: 6 }}></i> Excel
 											</Button>
 											<Button variant="outline-light" size="sm" onClick={() => handleDownload(events, 'pdf')} style={{ fontWeight: 600 }}>
 												<i className="bi bi-file-earmark-pdf" style={{ marginRight: 6 }}></i> PDF
@@ -764,15 +836,37 @@ const TeacherView: React.FC<TeacherViewProps> = ({ selectedClass = '', summaryTy
 									   </div>
 								   </div>
 								   {/* Download Attendance Summary Button */}
-								   <div className="teacher-download-row">
-									   <span className="teacher-download-label">Download Attendance Summary:</span>
-									   <Button variant="outline-light" size="sm" onClick={() => handleDownloadAttendance(attendance, 'excel')} style={{ fontWeight: 600 }}>
-										   <i className="bi bi-file-earmark-excel" style={{ marginRight: 6 }}></i> Excel (Recommended)
-									   </Button>
-									   <Button variant="outline-light" size="sm" onClick={() => handleDownloadAttendance(attendance, 'pdf')} style={{ fontWeight: 600 }}>
-										   <i className="bi bi-file-earmark-pdf" style={{ marginRight: 6 }}></i> PDF
-									   </Button>
-								   </div>
+								<div className="teacher-download-row">
+									<span className="teacher-download-label">Download Attendance Summary:</span>
+									<Button
+										variant="outline-success"
+										size="sm"
+										onClick={() => {
+											const filtered = filterByTerm(selectedClass
+												? attendance.filter(a => normalizeClass(a.studentClass || '') === normalizeClass(selectedClass))
+												: attendance);
+											handleDownloadAttendance(selectedTerm ? filtered : attendance, 'excel');
+										}}
+										style={{ fontWeight: 600, marginRight: 8 }}
+									>
+										<i className="bi bi-file-earmark-excel" style={{ marginRight: 6 }}></i>
+										Excel {selectedTerm ? `(Term ${selectedTerm})` : '(All Terms)'}
+									</Button>
+									<Button
+										variant="outline-danger"
+										size="sm"
+										onClick={() => {
+											const filtered = filterByTerm(selectedClass
+												? attendance.filter(a => normalizeClass(a.studentClass || '') === normalizeClass(selectedClass))
+												: attendance);
+											handleDownloadAttendance(selectedTerm ? filtered : attendance, 'pdf');
+										}}
+										style={{ fontWeight: 600 }}
+									>
+										<i className="bi bi-file-earmark-pdf" style={{ marginRight: 6 }}></i>
+										PDF {selectedTerm ? `(Term ${selectedTerm})` : '(All Terms)'}
+									</Button>
+								</div>
 							   </div>
 							   <div className="teacher-table-container">
 							   <table className="table table-hover align-middle mb-0">
