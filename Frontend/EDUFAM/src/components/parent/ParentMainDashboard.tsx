@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCurrentUser } from '../../context/useCurrentUser';
 import { Card, Row, Col, Button, Modal, Form } from 'react-bootstrap';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -43,6 +44,8 @@ interface ParentMainDashboardProps {
 }
 
 const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, events }) => {
+  const currentUser = useCurrentUser();
+  const firstName = currentUser?.name?.split(' ')[0] || 'User';
   const { attendance } = useAttendance();
   const { results } = useResults();
   const { user } = useAuth();
@@ -195,6 +198,11 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
 
   return (
     <div>
+      {/* Personalized Welcome Message */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 600 }}>
+        <span>Welcome {firstName}</span>
+  <span role="img" aria-label="wave">👋🏼</span>
+      </div>
       {/* Child Profile Section */}
       <Card className="mb-4">
         <Card.Header>
