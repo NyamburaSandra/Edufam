@@ -66,22 +66,7 @@ const ReportsView: React.FC = () => {
   };
 
   // Events PDF
-  const handleDownloadEventsPDF = () => {
-    const events = JSON.parse(localStorage.getItem('edufam_events') || '[]');
-    const doc = new jsPDF();
-    doc.text('Events Reports', 14, 16);
-    autoTable(doc, {
-      head: [['Title', 'Start Date', 'End Date', 'Description']],
-      body: events.map((ev: { title: string; start?: string; end?: string; description?: string }) => [
-        ev.title,
-        ev.start ? new Date(ev.start).toLocaleDateString() : '',
-        ev.end ? new Date(ev.end).toLocaleDateString() : '',
-        ev.description || '',
-      ]),
-      startY: 20,
-    });
-    doc.save('events_report.pdf');
-  };
+  // Removed unused handleDownloadEventsPDF function.
 
   // Class Performance Excel (placeholder)
   const handleDownloadClassPerfExcel = () => {
