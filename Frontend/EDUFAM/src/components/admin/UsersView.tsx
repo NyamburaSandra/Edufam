@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Table, Badge, Alert, Nav, Tab, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Table, Badge, Alert, Nav, Tab, ListGroup, Modal } from 'react-bootstrap';
 
 type EdufamUser = {
   id: number;
@@ -13,6 +13,7 @@ type EdufamUser = {
   childId?: number;
   children?: string[]; // Array of student IDs for parent-child linking
   dateAdded?: string;
+  phoneNumber?: string; // Phone number for parents
 };
 
 type ChildSelectorProps = {
@@ -184,7 +185,8 @@ const UsersView: React.FC = () => {
     studentId: '',
     class: '',
     subject: '',
-    children: [] as string[] // Array of student IDs for parent-child linking
+    children: [] as string[], // Array of student IDs for parent-child linking
+    phoneNumber: ''
   });
 
   // Reset specific fields when user type changes
@@ -241,7 +243,8 @@ const UsersView: React.FC = () => {
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
-    // Validation based on user type
+    
+    // Common validation
     if (formData.type === 'student') {
       if (!formData.name.trim() || !formData.studentId.trim()) {
         showMessage('Please fill in all required fields (name and student ID)', 'danger');
@@ -261,22 +264,56 @@ const UsersView: React.FC = () => {
       showMessage('Please select a subject for the teacher', 'danger');
       return;
     }
-    // Add to pending accounts (not users) for admin approval
-    const newPending: EdufamUser = {
-      id: Date.now(),
-      type: formData.type as 'teacher' | 'student' | 'parent',
-      name: formData.name.trim(),
-      email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
-      studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
-      class: formData.type === 'student' ? formData.class : undefined,
-      subject: formData.type === 'teacher' ? formData.subject : undefined,
-      children: formData.type === 'parent' ? formData.children : undefined,
-      status: 'pending',
-      dateAdded: new Date().toISOString().split('T')[0]
-    };
-    setPendingAccounts(prev => [...prev, newPending]);
-    showMessage('Account request submitted for admin approval!');
-    setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [] });
+
+    const currentUsers = getUsers();
+
+    // If we have an ID, we're editing an existing user
+    if (formData.id) {
+      const updatedUsers = currentUsers.map(user => 
+        user.id === formData.id ? {
+          ...formData,
+          email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
+          studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
+          class: formData.type === 'student' ? formData.class : undefined,
+          subject: formData.type === 'teacher' ? formData.subject : undefined,
+          children: formData.type === 'parent' ? formData.children : undefined,
+        } : user
+      );
+      setUsers(updatedUsers);
+      localStorage.setItem('edufam_users', JSON.stringify(updatedUsers));
+      showMessage('User updated successfully!', 'success');
+    } else {
+      // Adding a new user
+      const newUser: EdufamUser = {
+        id: Date.now(),
+        type: formData.type as 'teacher' | 'student' | 'parent',
+        name: formData.name.trim(),
+        email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
+        studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
+        class: formData.type === 'student' ? formData.class : undefined,
+        subject: formData.type === 'teacher' ? formData.subject : undefined,
+        children: formData.type === 'parent' ? formData.children : undefined,
+        status: 'approved',
+        dateAdded: new Date().toISOString().split('T')[0]
+      };
+      const updatedUsers = [...currentUsers, newUser];
+      setUsers(updatedUsers);
+      localStorage.setItem('edufam_users', JSON.stringify(updatedUsers));
+      showMessage('New user added successfully!', 'success');
+    }
+
+    // Reset form after successful submission
+    setFormData({ 
+      id: 0,
+      type: 'student', 
+      name: '', 
+      email: '', 
+      studentId: '', 
+      class: '', 
+      subject: '', 
+      children: [] 
+    });
+    setActiveTab('overview'); // Return to users list after saving
   };
 
   const handleVerify = (id: number, approved: boolean) => {
@@ -299,6 +336,64 @@ const UsersView: React.FC = () => {
       // Remove from pending accounts
       return prev.filter(acc => acc.id !== id);
     });
+  };
+
+  const [editingUser, setEditingUser] = useState<EdufamUser | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const handleEditUser = (userId: number) => {
+    console.log('Edit button clicked for user ID:', userId);
+    const currentUsers = getUsers();
+    console.log('Current users:', currentUsers);
+    
+    const userToEdit = currentUsers.find(u => u.id === userId);
+    console.log('Found user:', userToEdit);
+    
+    if (userToEdit) {
+      setEditingUser(userToEdit);
+      setFormData({
+        type: userToEdit.type,
+        name: userToEdit.name,
+        email: userToEdit.email || '',
+        studentId: userToEdit.studentId || '',
+        class: userToEdit.class || '',
+        subject: userToEdit.subject || '',
+        children: userToEdit.children || [],
+        phoneNumber: userToEdit.phoneNumber || ''
+      });
+      setShowEditModal(true);
+    } else {
+      console.error('User not found with ID:', userId);
+    }
+  };
+
+  const handleUpdateUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    console.log('Updating user:', editingUser.id);
+    console.log('Form data:', formData);
+    
+    const currentUsers = getUsers();
+    const updatedUsers = currentUsers.map((user: EdufamUser) => 
+      user.id === editingUser.id ? {
+        ...user, // Keep other fields like id and dateAdded
+        type: formData.type as 'student' | 'teacher' | 'parent',
+        name: formData.name,
+        email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
+        studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
+        class: formData.type === 'student' ? formData.class : undefined,
+        subject: formData.type === 'teacher' ? formData.subject : undefined,
+        children: formData.type === 'parent' ? formData.children : undefined,
+        phoneNumber: formData.type === 'parent' ? formData.phoneNumber : undefined,
+      } : user
+    ) as EdufamUser[];
+    
+    console.log('Updated users:', updatedUsers);
+    setUsers(updatedUsers);
+    showMessage('User updated successfully!', 'success');
+    setShowEditModal(false);
+    setEditingUser(null);
   };
 
   const handleDeleteUser = (userId: number) => {
@@ -371,6 +466,131 @@ const UsersView: React.FC = () => {
           </Row>
         </Card.Body>
       </Card>
+
+      {/* Edit User Modal */}
+      <Modal 
+        show={showEditModal} 
+        onHide={() => {
+          setShowEditModal(false);
+          setEditingUser(null);
+        }} 
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Edit User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleUpdateUser}>
+            <Form.Group className="mb-3">
+              <Form.Label>User Type</Form.Label>
+              <Form.Select 
+                value={formData.type} 
+                onChange={e => handleFormChange('type', e.target.value)}
+                disabled // Type cannot be changed
+              >
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+                <option value="parent">Parent</option>
+              </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Full Name</Form.Label>
+              <Form.Control 
+                type="text"
+                value={formData.name} 
+                onChange={e => handleFormChange('name', e.target.value)}
+                placeholder="Enter full name"
+                required
+              />
+            </Form.Group>
+
+            {formData.type === 'student' ? (
+              <>
+                <Form.Group className="mb-3">
+                  <Form.Label>Student ID</Form.Label>
+                  <Form.Control 
+                    type="text"
+                    value={formData.studentId} 
+                    onChange={e => handleFormChange('studentId', e.target.value)}
+                    placeholder="Enter student ID"
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Class</Form.Label>
+                  <Form.Select 
+                    value={formData.class} 
+                    onChange={e => handleFormChange('class', e.target.value)}
+                    required
+                  >
+                    <option value="">Select class...</option>
+                    {CLASS_OPTIONS.map(cls => (
+                      <option key={cls} value={cls}>{cls}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </>
+            ) : (
+              <Form.Group className="mb-3">
+                <Form.Label>Email Address</Form.Label>
+                <Form.Control 
+                  type="email"
+                  value={formData.email} 
+                  onChange={e => handleFormChange('email', e.target.value)}
+                  placeholder="Enter email address"
+                  required
+                />
+              </Form.Group>
+            )}
+
+            {formData.type === 'teacher' && (
+              <Form.Group className="mb-3">
+                <Form.Label>Subject</Form.Label>
+                <Form.Select 
+                  value={formData.subject} 
+                  onChange={e => handleFormChange('subject', e.target.value)}
+                  required
+                >
+                  <option value="">Select subject...</option>
+                  {SUBJECT_OPTIONS.map(subject => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            )}
+
+            {formData.type === 'parent' && (
+              <>
+                <Form.Group className="mb-3">
+                  <Form.Label>Phone Number</Form.Label>
+                  <Form.Control 
+                    type="tel"
+                    value={formData.phoneNumber || ''} 
+                    onChange={e => handleFormChange('phoneNumber', e.target.value)}
+                    placeholder="Enter phone number"
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Children</Form.Label>
+                  <ChildSelector
+                    selectedChildren={formData.children || []}
+                    onChildrenChange={(children) => handleFormChange('children', children)}
+                  />
+                </Form.Group>
+              </>
+            )}
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleUpdateUser}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Navigation Tabs */}
       <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k || 'overview')}>
@@ -456,6 +676,7 @@ const UsersView: React.FC = () => {
                         <th>Name</th>
                         <th>Email/Student ID</th>
                         <th>Type</th>
+                        <th>Phone Number</th>
                         <th>Details</th>
                         <th>Date Added</th>
                         <th>Actions</th>
@@ -483,6 +704,13 @@ const UsersView: React.FC = () => {
                             </Badge>
                           </td>
                           <td>
+                            {user.type === 'parent' && user.phoneNumber ? (
+                              user.phoneNumber
+                            ) : (
+                              <span className="text-muted">-</span>
+                            )}
+                          </td>
+                          <td>
                             {user.type === 'student' && user.class && <span>Class: {user.class}</span>}
                             {user.type === 'teacher' && user.subject && <span>Subject: {user.subject}</span>}
                             {user.type === 'parent' && user.children && user.children.length > 0 && (
@@ -497,13 +725,22 @@ const UsersView: React.FC = () => {
                           </td>
                           <td>{user.dateAdded || 'N/A'}</td>
                           <td>
-                            <Button 
-                              variant="outline-danger" 
-                              size="sm"
-                              onClick={() => handleDeleteUser(user.id)}
-                            >
-                              <i className="bi bi-trash"></i>
-                            </Button>
+                            <div className="d-flex gap-2">
+                              <Button 
+                                variant="outline-primary" 
+                                size="sm"
+                                onClick={() => handleEditUser(user.id)}
+                              >
+                                <i className="bi bi-pencil"></i>
+                              </Button>
+                              <Button 
+                                variant="outline-danger" 
+                                size="sm"
+                                onClick={() => handleDeleteUser(user.id)}
+                              >
+                                <i className="bi bi-trash"></i>
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -517,7 +754,7 @@ const UsersView: React.FC = () => {
           <Tab.Pane eventKey="add-user">
             <Card>
               <Card.Header>
-                <h5 className="mb-0">Add New User</h5>
+                <h5 className="mb-0">{editingUser ? 'Edit User' : 'Add New User'}</h5>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleAddUser}>
@@ -571,6 +808,19 @@ const UsersView: React.FC = () => {
                           </>
                         )}
                       </Form.Group>
+
+                      {formData.type === 'parent' && (
+                        <Form.Group className="mb-3">
+                          <Form.Label>Phone Number</Form.Label>
+                          <Form.Control 
+                            type="tel"
+                            value={formData.phoneNumber || ''} 
+                            onChange={e => handleFormChange('phoneNumber', e.target.value)}
+                            placeholder="Enter phone number"
+                            required
+                          />
+                        </Form.Group>
+                      )}
                     </Col>
 
                     <Col md={6}>
@@ -644,7 +894,7 @@ const UsersView: React.FC = () => {
                     <Button 
                       variant="secondary" 
                       className="me-2"
-                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [] })}
+                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [], phoneNumber: '' })}
                     >
                       Reset
                     </Button>
@@ -738,6 +988,6 @@ const UsersView: React.FC = () => {
       </Tab.Container>
     </Container>
   );
-};
+}
 
 export default UsersView;

@@ -355,7 +355,7 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
       </Card>
 
       {/* Feedback Form Section */}
-      <Card className="feedback-card-gradient" style={{ background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
+      <Card className="feedback-card-gradient" style={{ background: '#d0dad6ff', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
         <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0 }}>
           <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Feedback / Request Meeting</h5>
         </Card.Header>
