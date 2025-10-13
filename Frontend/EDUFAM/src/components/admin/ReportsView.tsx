@@ -15,7 +15,13 @@ const ReportsView: React.FC = () => {
     doc.text('Parent Feedback Reports', 14, 16);
     autoTable(doc, {
       head: [['From', 'Class', 'Concern Type', 'Message', 'Requested Callback']],
-      body: feedbacks.map((fb: any) => [
+      body: feedbacks.map((fb: {
+        from: string;
+        class: string;
+        concernType: string;
+        message: string;
+        requestCallback: boolean;
+      }) => [
         fb.from,
         fb.class,
         fb.concernType,
@@ -30,7 +36,19 @@ const ReportsView: React.FC = () => {
   // Users Excel
   const handleDownloadUsersExcel = () => {
     const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
-    const ws = XLSX.utils.json_to_sheet(users.map((u: any) => ({
+    type User = {
+      id: string | number;
+      name: string;
+      type: string;
+      class?: string;
+      email?: string;
+      studentId?: string;
+      subject?: string;
+      children?: string[];
+      phoneNumber?: string;
+      dateAdded?: string;
+    };
+    const ws = XLSX.utils.json_to_sheet(users.map((u: User) => ({
       ID: u.id,
       Name: u.name,
       Type: u.type,
@@ -54,7 +72,7 @@ const ReportsView: React.FC = () => {
     doc.text('Events Reports', 14, 16);
     autoTable(doc, {
       head: [['Title', 'Start Date', 'End Date', 'Description']],
-      body: events.map((ev: any) => [
+      body: events.map((ev: { title: string; start?: string; end?: string; description?: string }) => [
         ev.title,
         ev.start ? new Date(ev.start).toLocaleDateString() : '',
         ev.end ? new Date(ev.end).toLocaleDateString() : '',
