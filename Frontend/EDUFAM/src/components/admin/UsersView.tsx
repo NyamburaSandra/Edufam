@@ -676,6 +676,7 @@ const UsersView: React.FC = () => {
                         <th>Name</th>
                         <th>Email/Student ID</th>
                         <th>Type</th>
+                        <th>Phone Number</th>
                         <th>Details</th>
                         <th>Date Added</th>
                         <th>Actions</th>
@@ -703,6 +704,13 @@ const UsersView: React.FC = () => {
                             </Badge>
                           </td>
                           <td>
+                            {user.type === 'parent' && user.phoneNumber ? (
+                              user.phoneNumber
+                            ) : (
+                              <span className="text-muted">-</span>
+                            )}
+                          </td>
+                          <td>
                             {user.type === 'student' && user.class && <span>Class: {user.class}</span>}
                             {user.type === 'teacher' && user.subject && <span>Subject: {user.subject}</span>}
                             {user.type === 'parent' && user.children && user.children.length > 0 && (
@@ -721,9 +729,7 @@ const UsersView: React.FC = () => {
                               <Button 
                                 variant="outline-primary" 
                                 size="sm"
-                                onClick={() => {
-                                  handleEditUser(user.id);
-                                }}
+                                onClick={() => handleEditUser(user.id)}
                               >
                                 <i className="bi bi-pencil"></i>
                               </Button>
@@ -982,6 +988,6 @@ const UsersView: React.FC = () => {
       </Tab.Container>
     </Container>
   );
-};
+}
 
 export default UsersView;
