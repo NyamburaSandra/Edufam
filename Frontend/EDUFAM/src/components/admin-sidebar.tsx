@@ -18,15 +18,12 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen, title = "EDUFAM Admin" }) => {
   return (
-    <div className={`admin-sidebar ${isOpen ? 'open' : ''}`}>
-      {/* Sidebar Header */}
-      <div className="sidebar-header">
-        <div className="logo-section">
-          <i className="bi bi-mortarboard-fill me-2"></i>
-          <h4 className="mb-0">{title}</h4>
+    <div className={`sidebar admin-sidebar ${isOpen ? 'open' : ''}`}>
+      {title && (
+        <div className="sidebar-title p-3 border-bottom bg-primary text-white">
+          <h5 className="mb-0">{title}</h5>
         </div>
-      </div>
-
+      )}
       {/* Navigation Menu */}
       <nav className="sidebar-nav">
         <ul className="nav-list">

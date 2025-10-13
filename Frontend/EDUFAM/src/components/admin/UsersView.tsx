@@ -13,6 +13,7 @@ type EdufamUser = {
   childId?: number;
   children?: string[]; // Array of student IDs for parent-child linking
   dateAdded?: string;
+  phoneNumber?: string; // Phone number for parents
 };
 
 type ChildSelectorProps = {
@@ -184,7 +185,8 @@ const UsersView: React.FC = () => {
     studentId: '',
     class: '',
     subject: '',
-    children: [] as string[] // Array of student IDs for parent-child linking
+    children: [] as string[], // Array of student IDs for parent-child linking
+    phoneNumber: ''
   });
 
   // Reset specific fields when user type changes
@@ -299,6 +301,18 @@ const UsersView: React.FC = () => {
       // Remove from pending accounts
       return prev.filter(acc => acc.id !== id);
     });
+  };
+
+  const handleEditUser = (userId: number) => {
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setFormData({
+        ...user,
+        type: user.type as 'student' | 'teacher' | 'parent'
+      });
+      setActiveTab('add-user'); // Switch to the add user tab which we'll use for editing
+      showMessage('Edit user details and submit to update', 'info');
+    }
   };
 
   const handleDeleteUser = (userId: number) => {
@@ -497,13 +511,22 @@ const UsersView: React.FC = () => {
                           </td>
                           <td>{user.dateAdded || 'N/A'}</td>
                           <td>
-                            <Button 
-                              variant="outline-danger" 
-                              size="sm"
-                              onClick={() => handleDeleteUser(user.id)}
-                            >
-                              <i className="bi bi-trash"></i>
-                            </Button>
+                            <div className="d-flex gap-2">
+                              <Button 
+                                variant="outline-primary" 
+                                size="sm"
+                                onClick={() => handleEditUser(user.id)}
+                              >
+                                <i className="bi bi-pencil"></i>
+                              </Button>
+                              <Button 
+                                variant="outline-danger" 
+                                size="sm"
+                                onClick={() => handleDeleteUser(user.id)}
+                              >
+                                <i className="bi bi-trash"></i>
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -571,6 +594,19 @@ const UsersView: React.FC = () => {
                           </>
                         )}
                       </Form.Group>
+
+                      {formData.type === 'parent' && (
+                        <Form.Group className="mb-3">
+                          <Form.Label>Phone Number</Form.Label>
+                          <Form.Control 
+                            type="tel"
+                            value={formData.phoneNumber || ''} 
+                            onChange={e => handleFormChange('phoneNumber', e.target.value)}
+                            placeholder="Enter phone number"
+                            required
+                          />
+                        </Form.Group>
+                      )}
                     </Col>
 
                     <Col md={6}>
@@ -644,7 +680,7 @@ const UsersView: React.FC = () => {
                     <Button 
                       variant="secondary" 
                       className="me-2"
-                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [] })}
+                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [], phoneNumber: '' })}
                     >
                       Reset
                     </Button>

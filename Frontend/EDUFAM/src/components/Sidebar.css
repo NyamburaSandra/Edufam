@@ -153,6 +153,15 @@
   transform: translateX(0);
 }
 
+/* Admin sidebar specific styles */
+.admin-sidebar {
+  border-right: 2px solid #838486 !important; /* Right border for admin sidebar */
+}
+
+.admin-sidebar.open {
+  border-right: 2px solid #838483; /* Ensure border shows when open */
+}
+
 .sidebar ul {
   list-style-type: none;
   padding: 0;
