@@ -307,6 +307,18 @@ const UsersView: React.FC = () => {
     });
   };
 
+  const handleEditUser = (userId: number) => {
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setFormData({
+        ...user,
+        type: user.type as 'student' | 'teacher' | 'parent'
+      });
+      setActiveTab('add-user'); // Switch to the add user tab which we'll use for editing
+      showMessage('Edit user details and submit to update', 'info');
+    }
+  };
+
   const handleDeleteUser = (userId: number) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       const users = getUsers();
@@ -478,13 +490,22 @@ const UsersView: React.FC = () => {
                           </td>
                           <td>{user.dateAdded || 'N/A'}</td>
                           <td>
-                            <Button 
-                              variant="outline-danger" 
-                              size="sm"
-                              onClick={() => handleDeleteUser(user.id)}
-                            >
-                              <i className="bi bi-trash"></i>
-                            </Button>
+                            <div className="d-flex gap-2">
+                              <Button 
+                                variant="outline-primary" 
+                                size="sm"
+                                onClick={() => handleEditUser(user.id)}
+                              >
+                                <i className="bi bi-pencil"></i>
+                              </Button>
+                              <Button 
+                                variant="outline-danger" 
+                                size="sm"
+                                onClick={() => handleDeleteUser(user.id)}
+                              >
+                                <i className="bi bi-trash"></i>
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))}
