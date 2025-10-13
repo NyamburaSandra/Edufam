@@ -18,7 +18,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ navItems, isOpen, title }) => {
   return (
-    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+    <div className={`sidebar admin-sidebar ${isOpen ? 'open' : ''}`}>
       {title && (
         <div className="sidebar-title p-3 border-bottom bg-primary text-white">
           <h5 className="mb-0">{title}</h5>

@@ -13,6 +13,7 @@ type EdufamUser = {
   childId?: number;
   children?: string[]; // Array of student IDs for parent-child linking
   dateAdded?: string;
+  phoneNumber?: string; // Phone number for parents
 };
 
 type ChildSelectorProps = {
@@ -188,7 +189,8 @@ const UsersView: React.FC = () => {
     studentId: '',
     class: '',
     subject: '',
-    children: [] as string[] // Array of student IDs for parent-child linking
+    children: [] as string[], // Array of student IDs for parent-child linking
+    phoneNumber: ''
   });
 
   // Reset specific fields when user type changes
@@ -550,6 +552,19 @@ const UsersView: React.FC = () => {
                           </>
                         )}
                       </Form.Group>
+
+                      {formData.type === 'parent' && (
+                        <Form.Group className="mb-3">
+                          <Form.Label>Phone Number</Form.Label>
+                          <Form.Control 
+                            type="tel"
+                            value={formData.phoneNumber || ''} 
+                            onChange={e => handleFormChange('phoneNumber', e.target.value)}
+                            placeholder="Enter phone number"
+                            required
+                          />
+                        </Form.Group>
+                      )}
                     </Col>
 
                     <Col md={6}>
@@ -623,7 +638,7 @@ const UsersView: React.FC = () => {
                     <Button 
                       variant="secondary" 
                       className="me-2"
-                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [] })}
+                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [], phoneNumber: '' })}
                     >
                       Reset
                     </Button>
