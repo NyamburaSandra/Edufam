@@ -290,7 +290,7 @@ const UsersView: React.FC = () => {
         type: formData.type as 'teacher' | 'student' | 'parent',
         name: formData.name.trim(),
         email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
-      studentId: formData.type === 'student' && formData.studentId ? formData.studentId.trim() : '',
+        studentId: formData.type === 'student' ? (formData.studentId ?? '').trim() : undefined,
         class: formData.type === 'student' ? formData.class : undefined,
         subject: formData.type === 'teacher' ? formData.subject : undefined,
       children: formData.type === 'parent' && Array.isArray(formData.children) ? formData.children : [],
@@ -306,13 +306,14 @@ const UsersView: React.FC = () => {
     // Reset form after successful submission
     setFormData({ 
       id: 0,
-      type: 'student', 
-      name: '', 
-      email: '', 
-      studentId: '', 
-      class: '', 
-      subject: '', 
-      children: [] 
+      type: 'student',
+      name: '',
+      email: '',
+      studentId: '',
+      class: '',
+      subject: '',
+      children: [],
+      phoneNumber: ''
     });
     setActiveTab('overview'); // Return to users list after saving
   };
@@ -383,7 +384,7 @@ const UsersView: React.FC = () => {
         type: formData.type as 'student' | 'teacher' | 'parent',
         name: formData.name,
         email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
-      studentId: formData.type === 'student' && formData.studentId ? formData.studentId.trim() : '',
+        studentId: formData.type === 'student' ? (formData.studentId ?? '').trim() : undefined,
         class: formData.type === 'student' ? formData.class : undefined,
         subject: formData.type === 'teacher' ? formData.subject : undefined,
         children: formData.type === 'parent' ? formData.children : undefined,

@@ -65,7 +65,8 @@ const ReportsView: React.FC = () => {
     XLSX.writeFile(wb, 'all_users.xlsx');
   };
 
-  // Removed unused handleDownloadEventsPDF function
+  // Events PDF
+  // Removed unused handleDownloadEventsPDF function.
 
   // Class Performance Excel (placeholder)
   const handleDownloadClassPerfExcel = () => {

@@ -1,12 +1,11 @@
 {
   "version": 2,
   "buildCommand": "cd Frontend/EDUFAM && npm install && npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
+  "outputDirectory": "Frontend/EDUFAM/dist",
   "rewrites": [
     {
       "source": "/(.*)",
-  "destination": "/dist/index.html"
+      "destination": "/index.html"
     }
   ]
 }
