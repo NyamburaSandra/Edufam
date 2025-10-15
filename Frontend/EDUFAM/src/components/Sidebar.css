@@ -1,6 +1,6 @@
 /* Modern Admin Sidebar Styles */
 .admin-sidebar {
-  background: linear-gradient(180deg, #1e0a3c 0%, #2d1b69 100%);
+  background: #00bcd4;
   color: white;
   position: fixed;
   top: 0;
@@ -151,6 +151,15 @@
 
 .sidebar.open {
   transform: translateX(0);
+}
+
+/* Admin sidebar specific styles */
+.admin-sidebar {
+  border-right: 2px solid #838486 !important; /* Right border for admin sidebar */
+}
+
+.admin-sidebar.open {
+  border-right: 2px solid #838483; /* Ensure border shows when open */
 }
 
 .sidebar ul {

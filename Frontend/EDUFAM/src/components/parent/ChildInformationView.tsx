@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCurrentUser } from '../../context/useCurrentUser';
 import ChildAttendancePie from './ChildAttendancePie';
 import { Card, Row, Col, Badge, Button } from 'react-bootstrap';
 import { useAuth } from '../../context/useAuth';
@@ -19,6 +20,8 @@ type EdufamUser = {
 };
 
 const ChildInformationView: React.FC = () => {
+  const currentUser = useCurrentUser();
+  const firstName = currentUser?.name?.split(' ')[0] || 'User';
   // Get all users and filter for current parent's children
   const users: EdufamUser[] = JSON.parse(localStorage.getItem('edufam_users') || '[]');
   const { user } = useAuth();
@@ -31,14 +34,31 @@ const ChildInformationView: React.FC = () => {
   const normalizeId = (id: string | undefined) => (id || '').trim().toLowerCase();
 
   // Get children based on parent's children array (robust matching)
-  const children: EdufamUser[] = currentParent?.children && currentParent.children.length > 0
-    ? users.filter((u: EdufamUser) =>
-        u.type === 'student' &&
-        currentParent.children!.map(normalizeId).includes(normalizeId(u.studentId))
-      )
-    : [];
+  const children: EdufamUser[] = React.useMemo(() => (
+    currentParent?.children && currentParent.children.length > 0
+      ? users.filter((u: EdufamUser) =>
+          u.type === 'student' &&
+          currentParent.children!.map(normalizeId).includes(normalizeId(u.studentId))
+        )
+      : []
+  ), [users, currentParent]);
+
+  // Debug output for troubleshooting (after all variable declarations)
+  React.useEffect(() => {
+    console.log('Logged-in parent email:', user?.email);
+    console.log('Current parent:', currentParent);
+    console.log('Matched children:', children);
+  }, [user, currentParent, children]);
 
   const [selectedChild, setSelectedChild] = useState(children[0] || null);
+
+
+  // When user clicks a child, set selection and persist to localStorage
+  const handleSelectChild = (child: EdufamUser) => {
+    setSelectedChild(child);
+    const sid = child.studentId || child.id?.toString();
+    if (sid) localStorage.setItem('selected_child_id', sid);
+  };
 
   if (children.length === 0) {
     return (
@@ -49,6 +69,14 @@ const ChildInformationView: React.FC = () => {
             <i className="bi bi-person-plus" style={{ fontSize: '3rem', color: '#6c63ff' }}></i>
             <h6 className="mt-3">No Children Found</h6>
             <p>No children are linked to your account. Please contact the school administration.</p>
+            <hr />
+            <div style={{ textAlign: 'left', fontSize: '0.95em', color: '#444', marginTop: '2rem' }}>
+              <strong>Debug Info:</strong><br />
+              Logged-in email: {user?.email}<br />
+              Parent found: {currentParent ? 'Yes' : 'No'}<br />
+              Children array: {currentParent?.children ? JSON.stringify(currentParent.children) : 'None'}<br />
+              Matched children: {children.length}
+            </div>
           </div>
         </Card.Body>
       </Card>
@@ -57,6 +85,11 @@ const ChildInformationView: React.FC = () => {
 
   return (
     <>
+      {/* Personalized Welcome Message */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 600 }}>
+        <span>Welcome {firstName}</span>
+        <span role="img" aria-label="wave">👋🏼</span>
+      </div>
       {/* Children Selector */}
       {children.length > 1 && (
         <Card className="mb-4">
@@ -75,7 +108,7 @@ const ChildInformationView: React.FC = () => {
                       transform: selectedChild?.id === child.id ? 'scale(1.02)' : 'scale(1)',
                       transition: 'all 0.3s ease'
                     }}
-                    onClick={() => setSelectedChild(child)}
+                    onClick={() => handleSelectChild(child)}
                   >
                     <Card.Body className="text-center">
                       <h6 className="mb-1">{child.name || 'Student Name'}</h6>

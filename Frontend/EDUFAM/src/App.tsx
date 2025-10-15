@@ -52,12 +52,13 @@ import { ResultsProvider } from './context/ResultsContext';
 import { AttendanceProvider } from './context/AttendanceContext';
 import { FeedbackProvider } from './context/FeedbackContext';
 import { NotificationsProvider } from './context/NotificationsContext';
+
+import { AuthProvider } from './context/AuthContext';
 import { useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useAuth } from './context/useAuth';
 
-
-function App() {
+function AppContent() {
   const { isSignedIn, user } = useUser();
   const { login, logout } = useAuth();
 
@@ -99,6 +100,14 @@ function App() {
         </ResultsProvider>
       </AttendanceProvider>
     </NotificationsProvider>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

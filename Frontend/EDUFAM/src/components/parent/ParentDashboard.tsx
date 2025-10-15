@@ -1,4 +1,5 @@
 import { useEvents } from '../../context/useEvents';
+import { useAuth } from '../../context/useAuth';
 import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { Routes, Route } from 'react-router-dom';
@@ -7,7 +8,7 @@ import ParentSidebar from './ParentSidebar';
 import { useResults } from '../../context/ResultsContextHook';
 import { useAttendance } from '../../context/AttendanceContextHook';
 import { ParentMainDashboard, ChildInformationView, EventCalendarView } from '.';
-import './ParentResponsive.css';
+import '../../assets/style/ParentResponsive.css';
 
 const ParentDashboard: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -38,31 +39,62 @@ const ParentDashboard: React.FC = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Replace this with real auth context or prop in production
-  const loggedInParentEmail = "janedoe.parent@email.com";
-  // Filter results and attendance for this parent
-  const parentResults = results.filter(r => r.parentEmail === loggedInParentEmail);
-  const parentAttendance = attendance.filter(a => a.parentEmail === loggedInParentEmail);
-  // Show the latest uploaded result if available
-  const latestResult = parentResults.length > 0 ? parentResults[parentResults.length - 1] : null;
-  const latestAttendance = parentAttendance.length > 0 ? parentAttendance[parentAttendance.length - 1] : null;
-  const childData = latestResult ? {
-    studentName: latestResult.studentName,
-    studentId: latestResult.studentId,
-    studentClass: latestResult.studentClass,
-    term: latestResult.term,
-    fileName: latestResult.fileName,
-    fileDataUrl: latestResult.fileDataUrl,
-    attendance: latestAttendance ? latestAttendance.attendancePercent : 0,
-  } : {
-    studentName: 'Jane Doe',
-    studentId: '12A',
-    studentClass: 'Class 1',
-    term: '',
-    fileName: '',
-    fileDataUrl: '',
-    attendance: latestAttendance ? latestAttendance.attendancePercent : 0,
-  };
+  // Use logged-in parent's email from AuthContext
+  const { user } = useAuth();
+  const loggedInParentEmail = user?.email || '';
+
+    // Track selected child and force re-render when it changes
+    const [selectedChildId, setSelectedChildId] = useState(localStorage.getItem('selected_child_id') || '');
+
+    useEffect(() => {
+      const handler = () => {
+        setSelectedChildId(localStorage.getItem('selected_child_id') || '');
+      };
+      window.addEventListener('storage', handler);
+      return () => window.removeEventListener('storage', handler);
+    }, []);
+
+    // Also update on click in same tab (localStorage set but no storage event)
+    useEffect(() => {
+      const interval = setInterval(() => {
+        const current = localStorage.getItem('selected_child_id') || '';
+        setSelectedChildId(prev => (prev !== current ? current : prev));
+      }, 300);
+      return () => clearInterval(interval);
+    }, []);
+
+    // Filter results and attendance for this parent and selected child
+    const parentResults = results.filter(r => r.parentEmail === loggedInParentEmail && (!selectedChildId || r.studentId === selectedChildId));
+    const parentAttendance = attendance.filter(a => a.parentEmail === loggedInParentEmail && (!selectedChildId || a.studentId === selectedChildId));
+
+    // Show the latest uploaded result and attendance for selected child
+    const latestResult = parentResults.length > 0 ? parentResults[parentResults.length - 1] : null;
+    const latestAttendance = parentAttendance.length > 0 ? parentAttendance[parentAttendance.length - 1] : null;
+    const childData = latestResult ? {
+      studentName: latestResult.studentName,
+      studentId: latestResult.studentId,
+      studentClass: latestResult.studentClass,
+      term: latestResult.term,
+      fileName: latestResult.fileName,
+      fileDataUrl: latestResult.fileDataUrl,
+      attendance: latestAttendance ? latestAttendance.attendancePercent : 0,
+    } : latestAttendance ? {
+      studentName: latestAttendance.studentName,
+      studentId: latestAttendance.studentId,
+      studentClass: latestAttendance.studentClass,
+      term: latestAttendance.term,
+      fileName: '',
+      fileDataUrl: '',
+      attendance: latestAttendance.attendancePercent,
+    } : {
+      studentName: 'Jane Doe',
+      studentId: '12A',
+      studentClass: 'Class 1',
+      term: '',
+      fileName: '',
+      fileDataUrl: '',
+      attendance: 0,
+    };
 
   // Parent navigation items
   const parentNavItems = [

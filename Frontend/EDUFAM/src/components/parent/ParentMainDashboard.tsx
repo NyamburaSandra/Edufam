@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCurrentUser } from '../../context/useCurrentUser';
 import { Card, Row, Col, Button, Modal, Form } from 'react-bootstrap';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -43,6 +44,8 @@ interface ParentMainDashboardProps {
 }
 
 const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, events }) => {
+  const currentUser = useCurrentUser();
+  const firstName = currentUser?.name?.split(' ')[0] || 'User';
   const { attendance } = useAttendance();
   const { results } = useResults();
   const { user } = useAuth();
@@ -195,6 +198,11 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
 
   return (
     <div>
+      {/* Personalized Welcome Message */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 600 }}>
+        <span>Welcome {firstName}</span>
+  <span role="img" aria-label="wave">👋🏼</span>
+      </div>
       {/* Child Profile Section */}
       <Card className="mb-4">
         <Card.Header>
@@ -329,7 +337,7 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
         </Modal.Footer>
       </Modal>
       {/* Events Calendar section */}
-      <Card className="mb-4" style={{ background: '#cf84c7', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
+      <Card className="mb-4" style={{ background: '#d0dad6ff', border: 'none', boxShadow: '0px 1px 4px rgba(30,10,60,0.1)' }}>
         <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Events Calendar</h5>
         </Card.Header>
@@ -347,7 +355,7 @@ const ParentMainDashboard: React.FC<ParentMainDashboardProps> = ({ childData, ev
       </Card>
 
       {/* Feedback Form Section */}
-      <Card className="feedback-card-gradient" style={{ background: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
+      <Card className="feedback-card-gradient" style={{ background: '#d0dad6ff', border: 'none', boxShadow: '0 4px 24px rgba(171,71,188,0.10)' }}>
         <Card.Header style={{ background: 'transparent', border: 'none', paddingBottom: 0 }}>
           <h5 className="mb-0" style={{ color: '#1e0a3c', fontWeight: 700, letterSpacing: 0.5 }}>Feedback / Request Meeting</h5>
         </Card.Header>
