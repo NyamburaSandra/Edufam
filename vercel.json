@@ -3,10 +3,8 @@
   "buildCommand": "cd Frontend/EDUFAM && npm install && npm run build",
   "outputDirectory": "Frontend/EDUFAM/dist",
   "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
   ]
 }
