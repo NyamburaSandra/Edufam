@@ -4,6 +4,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-reac
 import NotificationsPopup from './NotificationsPopup';
 import type { NotificationItem } from '../context/NotificationsContext';
 import { useCurrentUser } from '../context/useCurrentUser';
+import { useLocation } from 'react-router-dom';
 
 interface CustomNavbarProps {
   notifications?: NotificationItem[];
@@ -35,7 +36,11 @@ const CustomNavbar: React.FC<CustomNavbarProps> = ({ notifications, toggleSideba
           {/* Logo Text */}
           <span className="ml-2 text-xl font-bold">EDUFAM</span>
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        {/* Custom toggle icon so we can control its color on different pages (welcome page needs a dark icon) */}
+        <Navbar.Toggle aria-controls="basic-navbar-nav">
+          {/* children override default icon; color switches to black on the welcome page */}
+          <i className="bi bi-list" style={{ fontSize: '1.25rem', color: (useLocation().pathname === '/welcome') ? '#000' : '#fff' }} />
+        </Navbar.Toggle>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
           </Nav>

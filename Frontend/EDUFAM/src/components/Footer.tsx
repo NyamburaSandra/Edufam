@@ -37,10 +37,10 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
           <div className="col-md-3 mb-4 mb-md-0">
             <h5 className="mb-3">Connect With Us</h5>
             <div className="d-flex mb-3">
-              <Button variant="outline-light" className="rounded-circle me-2 social-icon facebook"><i className="bi bi-facebook"></i></Button>
-              <Button variant="outline-light" className="rounded-circle me-2 social-icon twitter"><i className="bi bi-twitter-x"></i></Button>
-              <Button variant="outline-light" className="rounded-circle me-2 social-icon instagram"><i className="bi bi-instagram"></i></Button>
-              <Button variant="outline-light" className="rounded-circle social-icon linkedin"><i className="bi bi-linkedin"></i></Button>
+              <Button aria-label="Visit our Facebook" variant="outline-light" className="me-2 social-icon facebook"><i className="bi bi-facebook"></i></Button>
+              <Button aria-label="Visit our Twitter" variant="outline-light" className="me-2 social-icon twitter"><i className="bi bi-twitter-x"></i></Button>
+              <Button aria-label="Visit our Instagram" variant="outline-light" className="me-2 social-icon instagram"><i className="bi bi-instagram"></i></Button>
+              <Button aria-label="Visit our LinkedIn" variant="outline-light" className="social-icon linkedin"><i className="bi bi-linkedin"></i></Button>
             </div>
             <div className="mt-4">
               <p className="text-white">Subscribe to our newsletter</p>
