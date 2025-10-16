@@ -17,28 +17,44 @@ export const useCurrentUser = (): CurrentUser | null => {
     // Debug: Log Clerk user info
     console.log('useCurrentUser - Clerk user:', user);
     
-    // First try to get from Clerk
-    if (user?.primaryEmailAddress?.emailAddress) {
-      const userEmail = user.primaryEmailAddress.emailAddress;
-      const userName = user.fullName || user.firstName || 'User';
+    // First try to get data from Clerk
+    const clerkEmail = user?.primaryEmailAddress?.emailAddress;
+    const clerkName = (user?.fullName || user?.firstName || '').trim();
 
-      // Get users from localStorage
-      const users = JSON.parse(localStorage.getItem('edufam_users') || '[]');
-      
-      // Find user by email
-      const foundUser = users.find((u: any) => 
-        u.email && u.email.toLowerCase() === userEmail.toLowerCase()
-      );
+    // Get users from localStorage
+    type StoredUser = {
+      email?: string;
+      type?: UserType;
+      name?: string;
+      id?: number;
+    };
+    const users = JSON.parse(localStorage.getItem('edufam_users') || '[]') as StoredUser[];
 
-      if (foundUser) {
-        setCurrentUser({
-          type: foundUser.type as UserType,
-          email: foundUser.email,
-          name: foundUser.name || userName,
-          id: foundUser.id
-        });
-        return;
-      }
+    // If Clerk provides an email, try to find a matching local user
+    const foundUser = clerkEmail
+      ? users.find((u: StoredUser) => u.email && u.email.toLowerCase() === clerkEmail.toLowerCase())
+      : null;
+
+    // If we found a local user record, prefer that (preserves type/id)
+    if (foundUser) {
+      setCurrentUser({
+        type: (foundUser.type || 'parent') as UserType,
+        email: foundUser.email || clerkEmail || 'unknown@example.com',
+        name: foundUser.name || clerkName || foundUser.email || 'User',
+        id: typeof foundUser.id === 'number' ? foundUser.id : -1
+      });
+      return;
+    }
+
+    // If Clerk gave us a name (even without a local match), prefer it so deployed users see their real name
+    if (clerkName) {
+      setCurrentUser({
+        type: 'parent', // default type when we can't infer a stored type
+        email: clerkEmail || 'unknown@example.com',
+        name: clerkName,
+        id: -1
+      });
+      return;
     }
     
     // Fallback: Determine user type from current URL path
