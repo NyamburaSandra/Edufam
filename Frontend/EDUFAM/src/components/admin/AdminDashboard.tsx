@@ -7,6 +7,7 @@ import AccountsView from './AccountsView';
 import SettingsView from './SettingsView';
 import UsersView from './UsersView';
 import ReportsView from './ReportsView';
+import BulkSmsModal from './BulkSmsModal';
 import CustomNavbar from '../Navbar';
 import { useEvents } from '../../context/useEvents';
 
@@ -70,6 +71,7 @@ const AdminDashboard: React.FC = () => {
       <CustomNavbar notifications={notifications} toggleSidebar={toggleSidebar} />
 
       <div className="admin-dashboard">
+        <BulkSmsModal />
         {/* Sidebar Toggle Button */}
         {/* <Button
           variant="outline-primary"

@@ -70,6 +70,7 @@ import CustomNavbar from "./components/Navbar";
 import { ParentDashboard } from "./components/parent";
 import { AdminDashboard } from "./components/admin";
 import { TeacherDashboard } from "./components/teacher";
+import { SmsModalProvider } from './context/SmsModalContext';
 
 import Footer from "./components/Footer";
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -120,7 +121,7 @@ function AppContent() {
                     <><CustomNavbar /><TeacherDashboard /></>
                   </FeedbackProvider>
                 } />
-                <Route path="/admin/*" element={<><CustomNavbar /><AdminDashboard /></>} />
+                <Route path="/admin/*" element={<><CustomNavbar /><SmsModalProvider><AdminDashboard /></SmsModalProvider></>} />
               </Routes>
             </main>
           </div>

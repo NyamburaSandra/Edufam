@@ -268,6 +268,7 @@ const UsersView: React.FC = () => {
 
     const currentUsers = getUsers();
 
+
     // If we have an ID, we're editing an existing user
     if (formData.id) {
       const updatedUsers = currentUsers.map(user => 
@@ -278,6 +279,7 @@ const UsersView: React.FC = () => {
           class: formData.type === 'student' ? formData.class : undefined,
           subject: formData.type === 'teacher' ? formData.subject : undefined,
           children: formData.type === 'parent' ? formData.children : undefined,
+          phoneNumber: formData.type === 'parent' ? formData.phoneNumber : undefined,
         } : user
       );
       setUsers(updatedUsers);
@@ -293,7 +295,7 @@ const UsersView: React.FC = () => {
         studentId: formData.type === 'student' ? (formData.studentId ?? '').trim() : undefined,
         class: formData.type === 'student' ? formData.class : undefined,
         subject: formData.type === 'teacher' ? formData.subject : undefined,
-      children: formData.type === 'parent' && Array.isArray(formData.children) ? formData.children : [],
+        phoneNumber: formData.type === 'parent' ? formData.phoneNumber : undefined,
         status: 'approved',
         dateAdded: new Date().toISOString().split('T')[0]
       };
@@ -306,12 +308,12 @@ const UsersView: React.FC = () => {
     // Reset form after successful submission
     setFormData({ 
       id: 0,
-      type: 'student',
-      name: '',
-      email: '',
-      studentId: '',
-      class: '',
-      subject: '',
+      type: 'student', 
+      name: '', 
+      email: '', 
+      studentId: '', 
+      class: '', 
+      subject: '', 
       children: [],
       phoneNumber: ''
     });

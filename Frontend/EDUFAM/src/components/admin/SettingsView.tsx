@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useSmsModal } from '../../context/SmsModalContext';
 import { Container, Row, Col, Card, Form, Button, Modal, Table, Badge, Alert, Nav, Tab } from 'react-bootstrap';
 
 interface BulkSMS {
@@ -30,8 +31,23 @@ interface User {
 }
 
 const SettingsView: React.FC = () => {
+  const smsModal = useSmsModal();
   // SMS Management State
-  const [showSMSModal, setShowSMSModal] = useState(false);
+  // Use context for SMS modal
+  const showSMSModal = smsModal.show;
+  const closeSMSModal = smsModal.close;
+  const openSMSModal = smsModal.open;
+  // Pre-fill parent info if provided by context
+  useEffect(() => {
+    if (smsModal.parentName && smsModal.parentPhone) {
+      setSmsForm(prev => ({
+        ...prev,
+        recipientType: 'custom',
+        recipientFilter: `${smsModal.parentName} (${smsModal.parentPhone})`
+      }));
+    }
+    // eslint-disable-next-line
+  }, [smsModal.parentName, smsModal.parentPhone]);
   const [activeTab, setActiveTab] = useState('sms-overview');
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -197,6 +213,26 @@ const SettingsView: React.FC = () => {
     showMessage(`SMS ${action}d successfully!`);
   };
 
+
+  // Helper: Get parent phone numbers for bulk SMS
+  const getParentPhoneNumbers = (type: string, filter?: string): string[] => {
+    const parents = users.filter((u: any) => u.type === 'parent' && u.phoneNumber);
+    if (type === 'all-parents') {
+      return parents.map((p: any) => p.phoneNumber);
+    }
+    if (type === 'class-parents' && filter) {
+      // Find parents whose children are in the selected class
+      // This assumes you have a way to link children to classes
+      // For now, return all parent numbers (customize as needed)
+      return parents.map((p: any) => p.phoneNumber);
+    }
+    if (type === 'overdue-parents') {
+      // Implement logic for overdue parents if you have fee data
+      return parents.map((p: any) => p.phoneNumber);
+    }
+    return [];
+  };
+
   const handleCreateSMS = () => {
     if (!smsForm.message.trim()) {
       showMessage('Please enter a message', 'danger');
@@ -204,11 +240,17 @@ const SettingsView: React.FC = () => {
     }
 
     const recipientCount = calculateRecipientCount(smsForm.recipientType, smsForm.recipientFilter);
-    
-    if (recipientCount === 0) {
+    const recipientNumbers = getParentPhoneNumbers(smsForm.recipientType, smsForm.recipientFilter);
+
+    if (recipientCount === 0 || recipientNumbers.length === 0) {
       showMessage('No recipients found for selected criteria', 'warning');
       return;
     }
+
+    // Here you would send recipientNumbers to your SMS API
+    // Example: sendBulkSMS(recipientNumbers, smsForm.message)
+    // For now, just log them
+    console.log('Sending SMS to:', recipientNumbers);
 
     const newSMS: BulkSMS = {
       id: Date.now(),
@@ -223,7 +265,7 @@ const SettingsView: React.FC = () => {
 
     setBulkSMSList(prev => [newSMS, ...prev]);
     setSmsForm({ message: '', recipientType: 'all-parents', recipientFilter: '' });
-    setShowSMSModal(false);
+  closeSMSModal();
     showMessage('SMS created successfully!');
   };
 
@@ -362,7 +404,7 @@ const SettingsView: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="mb-4">
-              <Button variant="primary" onClick={() => setShowSMSModal(true)}>
+              <Button variant="primary" onClick={() => openSMSModal()}>
                 <i className="bi bi-plus-circle me-2"></i>Create New SMS
               </Button>
             </div>
@@ -541,85 +583,7 @@ const SettingsView: React.FC = () => {
         </Tab.Content>
       </Tab.Container>
 
-      {/* Create SMS Modal */}
-      <Modal show={showSMSModal} onHide={() => setShowSMSModal(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Create Bulk SMS</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Message</Form.Label>
-              <Form.Control 
-                as="textarea" 
-                rows={4}
-                value={smsForm.message}
-                onChange={(e) => setSmsForm(prev => ({ ...prev, message: e.target.value }))}
-                placeholder="Enter your SMS message..."
-                maxLength={160}
-              />
-              <Form.Text className="text-muted">
-                {smsForm.message.length}/160 characters
-              </Form.Text>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Send To</Form.Label>
-              <Form.Select 
-                value={smsForm.recipientType}
-                onChange={(e) => setSmsForm(prev => ({ ...prev, recipientType: e.target.value as BulkSMS['recipientType'], recipientFilter: '' }))}
-              >
-                <option value="all-parents">All Parents</option>
-                <option value="class-parents">Parents of Specific Class</option>
-                <option value="overdue-parents">Parents with Overdue Fees</option>
-                <option value="teachers">All Teachers</option>
-                <option value="custom">Custom Recipients</option>
-              </Form.Select>
-            </Form.Group>
-
-            {smsForm.recipientType === 'class-parents' && (
-              <Form.Group className="mb-3">
-                <Form.Label>Select Class</Form.Label>
-                <Form.Select 
-                  value={smsForm.recipientFilter}
-                  onChange={(e) => setSmsForm(prev => ({ ...prev, recipientFilter: e.target.value }))}
-                >
-                  <option value="">Select a class...</option>
-                  <option value="1 Ivory">Class 1 Ivory</option>
-                  <option value="1 Pearl">Class 1 Pearl</option>
-                  <option value="2 Ivory">Class 2 Ivory</option>
-                  <option value="2 Pearl">Class 2 Pearl</option>
-                  <option value="3 Ivory">Class 3 Ivory</option>
-                  <option value="3 Pearl">Class 3 Pearl</option>
-                  <option value="4 Ivory">Class 4 Ivory</option>
-                  <option value="4 Pearl">Class 4 Pearl</option>
-                  <option value="5 Ivory">Class 5 Ivory</option>
-                  <option value="5 Pearl">Class 5 Pearl</option>
-                  <option value="6 Ivory">Class 6 Ivory</option>
-                  <option value="6 Pearl">Class 6 Pearl</option>
-                  <option value="7 Ivory">Class 7 Ivory</option>
-                  <option value="7 Pearl">Class 7 Pearl</option>
-                  <option value="8 Ivory">Class 8 Ivory</option>
-                  <option value="8 Pearl">Class 8 Pearl</option>
-                </Form.Select>
-              </Form.Group>
-            )}
-
-            <Alert variant="info">
-              <strong>Recipients: </strong>
-              {calculateRecipientCount(smsForm.recipientType, smsForm.recipientFilter)} people will receive this message
-            </Alert>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowSMSModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleCreateSMS}>
-            Create SMS (Draft)
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Bulk SMS Modal is now rendered globally in AdminDashboard */}
     </Container>
   );
 };
