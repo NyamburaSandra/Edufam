@@ -48,18 +48,30 @@ const ReportsView: React.FC = () => {
       phoneNumber?: string;
       dateAdded?: string;
     };
-    const ws = XLSX.utils.json_to_sheet(users.map((u: User) => ({
-      ID: u.id,
-      Name: u.name,
-      Type: u.type,
-      Class: u.class || '',
-      Email: u.email || '',
-      StudentID: u.studentId || '',
-      Subject: u.subject || '',
-      Children: u.children ? u.children.join(', ') : '',
-      Phone: u.phoneNumber || '',
-      DateAdded: u.dateAdded || '',
-    })));
+    // Add headers as first row, then data rows
+    const data = [
+      [
+        'ID', 'Name', 'Type', 'Class', 'Email', 'StudentID', 'Subject', 'Children', 'Phone', 'DateAdded'
+      ],
+      ...users.map((u: User) => [
+        u.id,
+        u.name,
+        u.type,
+        u.class || '',
+        u.email || '',
+        u.studentId || '',
+        u.subject || '',
+        u.children ? u.children.join(', ') : '',
+        u.phoneNumber || '',
+        u.dateAdded || '',
+      ])
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    // Auto-size columns
+  const wscols = data[0].map((_: any, i: number) => ({ wch: Math.max(12, ...data.map(row => (row[i] ? String(row[i]).length : 0))) }));
+    ws['!cols'] = wscols;
+    // Freeze header row
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Users');
     XLSX.writeFile(wb, 'all_users.xlsx');
@@ -85,11 +97,17 @@ const ReportsView: React.FC = () => {
 
   // Class Performance Excel (placeholder)
   const handleDownloadClassPerfExcel = () => {
-    // Placeholder: Replace with real data when available
-    const ws = XLSX.utils.aoa_to_sheet([
+    // Example data for better formatting
+    const data = [
       ['Class', 'Subject', 'Average Score'],
-      ['Class 1', 'Mathematics', 'N/A'],
-    ]);
+      ['Class 1', 'Mathematics', 78],
+      ['Class 1', 'English', 82],
+      ['Class 2', 'Mathematics', 74],
+      ['Class 2', 'English', 80],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = data[0].map((_: any, i: number) => ({ wch: Math.max(12, ...data.map(row => (row[i] ? String(row[i]).length : 0))) }));
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Class Performance');
     XLSX.writeFile(wb, 'class_performance.xlsx');
@@ -97,11 +115,15 @@ const ReportsView: React.FC = () => {
 
   // Attendance Excel (placeholder)
   const handleDownloadAttendanceExcel = () => {
-    // Placeholder: Replace with real data when available
-    const ws = XLSX.utils.aoa_to_sheet([
+    // Example data for better formatting
+    const data = [
       ['Student', 'Class', 'Days Present', 'Days Absent'],
-      ['John Doe', 'Class 1', 'N/A', 'N/A'],
-    ]);
+      ['John Doe', 'Class 1', 180, 5],
+      ['Jane Doe', 'Class 2', 175, 10],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = data[0].map((_: any, i: number) => ({ wch: Math.max(12, ...data.map(row => (row[i] ? String(row[i]).length : 0))) }));
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
     XLSX.writeFile(wb, 'attendance_report.xlsx');
@@ -109,11 +131,15 @@ const ReportsView: React.FC = () => {
 
   // Fees Excel (placeholder)
   const handleDownloadFeesExcel = () => {
-    // Placeholder: Replace with real data when available
-    const ws = XLSX.utils.aoa_to_sheet([
-      ['Student', 'Class', 'Fee Balance'],
-      ['Jane Doe', 'Class 2', 'N/A'],
-    ]);
+    // Example data for better formatting
+    const data = [
+      ['Student', 'Class', 'Total Fee', 'Paid', 'Balance', 'Due Date', 'Status'],
+      ['Jane Doe', 'Class 2', 30000, 20000, 10000, '2025-09-30', 'Pending'],
+      ['John Doe', 'Class 1', 30000, 30000, 0, '2025-09-30', 'Paid'],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = data[0].map((_: any, i: number) => ({ wch: Math.max(12, ...data.map(row => (row[i] ? String(row[i]).length : 0))) }));
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Fees');
     XLSX.writeFile(wb, 'fees_report.xlsx');
