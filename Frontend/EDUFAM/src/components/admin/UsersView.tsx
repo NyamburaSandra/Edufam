@@ -267,6 +267,7 @@ const UsersView: React.FC = () => {
 
     const currentUsers = getUsers();
 
+
     // If we have an ID, we're editing an existing user
     if (formData.id) {
       const updatedUsers = currentUsers.map(user => 
@@ -277,6 +278,7 @@ const UsersView: React.FC = () => {
           class: formData.type === 'student' ? formData.class : undefined,
           subject: formData.type === 'teacher' ? formData.subject : undefined,
           children: formData.type === 'parent' ? formData.children : undefined,
+          phoneNumber: formData.type === 'parent' ? formData.phoneNumber : undefined,
         } : user
       );
       setUsers(updatedUsers);
@@ -293,6 +295,7 @@ const UsersView: React.FC = () => {
         class: formData.type === 'student' ? formData.class : undefined,
         subject: formData.type === 'teacher' ? formData.subject : undefined,
         children: formData.type === 'parent' ? formData.children : undefined,
+        phoneNumber: formData.type === 'parent' ? formData.phoneNumber : undefined,
         status: 'approved',
         dateAdded: new Date().toISOString().split('T')[0]
       };
@@ -311,7 +314,8 @@ const UsersView: React.FC = () => {
       studentId: '', 
       class: '', 
       subject: '', 
-      children: [] 
+      children: [],
+      phoneNumber: ''
     });
     setActiveTab('overview'); // Return to users list after saving
   };

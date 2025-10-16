@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useSmsModal } from '../../context/SmsModalContext';
 import { Container, Row, Col, Card, Form, Button, Table, Badge, Alert, Nav, Tab, InputGroup } from 'react-bootstrap';
 
 interface FeeRecord {
@@ -6,6 +7,7 @@ interface FeeRecord {
   studentName: string;
   studentClass: string;
   parentName: string;
+  parentPhone?: string;
   totalFee: number;
   paidAmount: number;
   balance: number;
@@ -15,6 +17,7 @@ interface FeeRecord {
 }
 
 const AccountsView: React.FC = () => {
+  const smsModal = useSmsModal();
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -51,6 +54,7 @@ const AccountsView: React.FC = () => {
     id: number;
     type: string;
     name: string;
+    phone?: string;
     children?: string[];
   }
 
@@ -89,6 +93,7 @@ const AccountsView: React.FC = () => {
         studentName: student.name,
         studentClass: student.class || 'Not Assigned',
         parentName: parent?.name || 'Not Linked',
+        parentPhone: parent?.phone || '',
         totalFee,
         paidAmount,
         balance,
@@ -131,36 +136,11 @@ const AccountsView: React.FC = () => {
   }, [feeRecords]);
 
 
-  // Placeholder for SMS logic (replace with backend integration)
-  // Backend-ready SMS reminder function
-  const sendSmsReminder = async (opts: {
-    parentName: string;
-    parentPhone: string | undefined;
-    studentName: string;
-    amount: number;
-    dueDate: string;
-    status: string;
-  }) => {
-    // TODO: Replace this with real backend call
-    // Example: await api.sendSms({ to: opts.parentPhone, message: ... })
-    console.log(`SMS sent to ${opts.parentName} (${opts.parentPhone}): ${opts.studentName} has a fee balance of KES ${opts.amount} due on ${opts.dueDate} [${opts.status}]`);
-    showMessage(`Fee reminder sent to ${opts.parentName} for ${opts.studentName}`);
-  };
 
   const handleSendReminder = (recordId: number) => {
     const record = feeRecords.find(r => r.id === recordId);
     if (record) {
-      const users = JSON.parse(localStorage.getItem('edufam_users') || '[]') as Parent[];
-      const parent = users.find((u) => u.name === record.parentName && u.type === 'parent');
-      const parentPhone = (parent && 'phone' in parent) ? (parent as { phone?: string }).phone : undefined;
-      sendSmsReminder({
-        parentName: record.parentName,
-        parentPhone,
-        studentName: record.studentName,
-        amount: record.balance,
-        dueDate: record.dueDate,
-        status: record.status
-      });
+      smsModal.open({ parentName: record.parentName, parentPhone: record.parentPhone });
     }
   };
 
@@ -411,6 +391,7 @@ const AccountsView: React.FC = () => {
                         <th>Student</th>
                         <th>Class</th>
                         <th>Parent</th>
+                        <th>Parent Phone</th>
                         <th>Total Fee</th>
                         <th>Paid</th>
                         <th>Balance</th>
@@ -425,6 +406,7 @@ const AccountsView: React.FC = () => {
                           <td><strong>{record.studentName}</strong></td>
                           <td>{record.studentClass}</td>
                           <td>{record.parentName}</td>
+                          <td>{record.parentPhone || <span className="text-muted">N/A</span>}</td>
                           <td>KES {record.totalFee.toLocaleString()}</td>
                           <td>KES {record.paidAmount.toLocaleString()}</td>
                           <td>

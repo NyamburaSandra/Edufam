@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useSmsModal } from '../../context/SmsModalContext';
 import { Container, Row, Col, Card, Form, Button, Modal, Table, Badge, Alert, Nav, Tab } from 'react-bootstrap';
 
 interface BulkSMS {
@@ -30,8 +31,23 @@ interface User {
 }
 
 const SettingsView: React.FC = () => {
+  const smsModal = useSmsModal();
   // SMS Management State
-  const [showSMSModal, setShowSMSModal] = useState(false);
+  // Use context for SMS modal
+  const showSMSModal = smsModal.show;
+  const closeSMSModal = smsModal.close;
+  const openSMSModal = smsModal.open;
+  // Pre-fill parent info if provided by context
+  useEffect(() => {
+    if (smsModal.parentName && smsModal.parentPhone) {
+      setSmsForm(prev => ({
+        ...prev,
+        recipientType: 'custom',
+        recipientFilter: `${smsModal.parentName} (${smsModal.parentPhone})`
+      }));
+    }
+    // eslint-disable-next-line
+  }, [smsModal.parentName, smsModal.parentPhone]);
   const [activeTab, setActiveTab] = useState('sms-overview');
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -197,6 +213,26 @@ const SettingsView: React.FC = () => {
     showMessage(`SMS ${action}d successfully!`);
   };
 
+
+  // Helper: Get parent phone numbers for bulk SMS
+  const getParentPhoneNumbers = (type: string, filter?: string): string[] => {
+    const parents = users.filter((u: any) => u.type === 'parent' && u.phoneNumber);
+    if (type === 'all-parents') {
+      return parents.map((p: any) => p.phoneNumber);
+    }
+    if (type === 'class-parents' && filter) {
+      // Find parents whose children are in the selected class
+      // This assumes you have a way to link children to classes
+      // For now, return all parent numbers (customize as needed)
+      return parents.map((p: any) => p.phoneNumber);
+    }
+    if (type === 'overdue-parents') {
+      // Implement logic for overdue parents if you have fee data
+      return parents.map((p: any) => p.phoneNumber);
+    }
+    return [];
+  };
+
   const handleCreateSMS = () => {
     if (!smsForm.message.trim()) {
       showMessage('Please enter a message', 'danger');
@@ -204,11 +240,17 @@ const SettingsView: React.FC = () => {
     }
 
     const recipientCount = calculateRecipientCount(smsForm.recipientType, smsForm.recipientFilter);
-    
-    if (recipientCount === 0) {
+    const recipientNumbers = getParentPhoneNumbers(smsForm.recipientType, smsForm.recipientFilter);
+
+    if (recipientCount === 0 || recipientNumbers.length === 0) {
       showMessage('No recipients found for selected criteria', 'warning');
       return;
     }
+
+    // Here you would send recipientNumbers to your SMS API
+    // Example: sendBulkSMS(recipientNumbers, smsForm.message)
+    // For now, just log them
+    console.log('Sending SMS to:', recipientNumbers);
 
     const newSMS: BulkSMS = {
       id: Date.now(),
@@ -223,7 +265,7 @@ const SettingsView: React.FC = () => {
 
     setBulkSMSList(prev => [newSMS, ...prev]);
     setSmsForm({ message: '', recipientType: 'all-parents', recipientFilter: '' });
-    setShowSMSModal(false);
+  closeSMSModal();
     showMessage('SMS created successfully!');
   };
 
@@ -362,7 +404,7 @@ const SettingsView: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="mb-4">
-              <Button variant="primary" onClick={() => setShowSMSModal(true)}>
+              <Button variant="primary" onClick={() => openSMSModal()}>
                 <i className="bi bi-plus-circle me-2"></i>Create New SMS
               </Button>
             </div>
@@ -542,7 +584,7 @@ const SettingsView: React.FC = () => {
       </Tab.Container>
 
       {/* Create SMS Modal */}
-      <Modal show={showSMSModal} onHide={() => setShowSMSModal(false)} size="lg">
+  <Modal show={showSMSModal} onHide={closeSMSModal} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Create Bulk SMS</Modal.Title>
         </Modal.Header>
@@ -608,11 +650,19 @@ const SettingsView: React.FC = () => {
             <Alert variant="info">
               <strong>Recipients: </strong>
               {calculateRecipientCount(smsForm.recipientType, smsForm.recipientFilter)} people will receive this message
+              <br />
+              <span style={{ fontSize: '0.95em' }}>
+                <strong>Numbers:</strong> {
+                  getParentPhoneNumbers(smsForm.recipientType, smsForm.recipientFilter).length > 0
+                    ? getParentPhoneNumbers(smsForm.recipientType, smsForm.recipientFilter).join(', ')
+                    : <span className="text-muted">No numbers found</span>
+                }
+              </span>
             </Alert>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowSMSModal(false)}>
+          <Button variant="secondary" onClick={closeSMSModal}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleCreateSMS}>
