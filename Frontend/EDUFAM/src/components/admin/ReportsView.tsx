@@ -78,22 +78,7 @@ const ReportsView: React.FC = () => {
   };
 
   // Events PDF
-  const handleDownloadEventsPDF = () => {
-    const events = JSON.parse(localStorage.getItem('edufam_events') || '[]');
-    const doc = new jsPDF();
-    doc.text('Events Reports', 14, 16);
-    autoTable(doc, {
-      head: [['Title', 'Start Date', 'End Date', 'Description']],
-      body: events.map((ev: { title: string; start?: string; end?: string; description?: string }) => [
-        ev.title,
-        ev.start ? new Date(ev.start).toLocaleDateString() : '',
-        ev.end ? new Date(ev.end).toLocaleDateString() : '',
-        ev.description || '',
-      ]),
-      startY: 20,
-    });
-    doc.save('events_report.pdf');
-  };
+  // Removed unused handleDownloadEventsPDF function.
 
   // Class Performance Excel (placeholder)
   const handleDownloadClassPerfExcel = () => {
@@ -207,9 +192,47 @@ const ReportsView: React.FC = () => {
                 <ListGroup.Item>Class performance data coming soon.</ListGroup.Item>
               </ListGroup>
               <h6>Events Reports</h6>
-              <Button variant="outline-primary" className="mb-2" onClick={handleDownloadEventsPDF}>
-                <BsFiletypePdf className="me-2" />Download PDF
-              </Button>
+              <Button
+                variant="outline-primary"
+                className="mb-2"
+                onClick={() => {
+                  const events = JSON.parse(localStorage.getItem('edufam_events') || '[]');
+                  if (!events.length) {
+                    alert('No events to download.');
+                    return;
+                  }
+                  const header = ['Event Name', 'Date', 'Start Time', 'End Time', 'Description'];
+                  type Event = {
+                    title: string;
+                    start?: string;
+                    end?: string;
+                    description?: string;
+                  };
+                  const eventRows = (events as Event[]).map((ev) => [
+                    ev.title,
+                    ev.start ? new Date(ev.start).toLocaleDateString() : '',
+                    ev.start ? new Date(ev.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+                    ev.end ? new Date(ev.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+                    ev.description || ''
+                  ]);
+                  const win = window.open('', '_blank');
+                  if (win) {
+                    win.document.write('<html><head><title>Event Reports PDF</title></head><body>');
+                    win.document.write('<h2>Event Reports</h2>');
+                    win.document.write('<table border="1" cellpadding="8" style="border-collapse:collapse;font-family:sans-serif;font-size:1rem;">');
+                    win.document.write('<tr>' + header.map((h: string) => `<th>${h}</th>`).join('') + '</tr>');
+                    eventRows.forEach((row: string[]) => {
+                      win.document.write('<tr>' + row.map((cell: string) => `<td>${cell}</td>`).join('') + '</tr>');
+                    });
+                    win.document.write('</table>');
+                    win.document.write('</body></html>');
+                    win.document.close();
+                    win.print();
+                  } else {
+                    alert('Unable to open PDF window. Please check your browser settings.');
+                  }
+                }}
+              >Download PDF</Button>
               <ListGroup className="mb-4">
                 {(() => {
                   const events = JSON.parse(localStorage.getItem('edufam_events') || '[]');

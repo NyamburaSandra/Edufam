@@ -178,14 +178,15 @@ const UsersView: React.FC = () => {
   }, [pendingAccounts]);
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<EdufamUser>({
+    id: 0,
     type: 'student',
     name: '',
     email: '',
     studentId: '',
     class: '',
     subject: '',
-    children: [] as string[], // Array of student IDs for parent-child linking
+    children: [],
     phoneNumber: ''
   });
 
@@ -246,7 +247,7 @@ const UsersView: React.FC = () => {
     
     // Common validation
     if (formData.type === 'student') {
-      if (!formData.name.trim() || !formData.studentId.trim()) {
+  if (!formData.name.trim() || !(formData.studentId && formData.studentId.trim())) {
         showMessage('Please fill in all required fields (name and student ID)', 'danger');
         return;
       }
@@ -274,7 +275,7 @@ const UsersView: React.FC = () => {
         user.id === formData.id ? {
           ...formData,
           email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
-          studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
+        studentId: formData.type === 'student' && formData.studentId ? formData.studentId.trim() : '',
           class: formData.type === 'student' ? formData.class : undefined,
           subject: formData.type === 'teacher' ? formData.subject : undefined,
           children: formData.type === 'parent' ? formData.children : undefined,
@@ -291,11 +292,12 @@ const UsersView: React.FC = () => {
         type: formData.type as 'teacher' | 'student' | 'parent',
         name: formData.name.trim(),
         email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
-        studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
+        studentId: formData.type === 'student' ? (formData.studentId ?? '').trim() : undefined,
         class: formData.type === 'student' ? formData.class : undefined,
         subject: formData.type === 'teacher' ? formData.subject : undefined,
         children: formData.type === 'parent' ? formData.children : undefined,
         phoneNumber: formData.type === 'parent' ? formData.phoneNumber : undefined,
+      children: formData.type === 'parent' && Array.isArray(formData.children) ? formData.children : [],
         status: 'approved',
         dateAdded: new Date().toISOString().split('T')[0]
       };
@@ -314,6 +316,12 @@ const UsersView: React.FC = () => {
       studentId: '', 
       class: '', 
       subject: '', 
+      type: 'student',
+      name: '',
+      email: '',
+      studentId: '',
+      class: '',
+      subject: '',
       children: [],
       phoneNumber: ''
     });
@@ -356,6 +364,7 @@ const UsersView: React.FC = () => {
     if (userToEdit) {
       setEditingUser(userToEdit);
       setFormData({
+        id: userToEdit.id,
         type: userToEdit.type,
         name: userToEdit.name,
         email: userToEdit.email || '',
@@ -385,7 +394,7 @@ const UsersView: React.FC = () => {
         type: formData.type as 'student' | 'teacher' | 'parent',
         name: formData.name,
         email: formData.type === 'student' ? `${formData.studentId}@school.edu` : formData.email.trim(),
-        studentId: formData.type === 'student' ? formData.studentId.trim() : undefined,
+        studentId: formData.type === 'student' ? (formData.studentId ?? '').trim() : undefined,
         class: formData.type === 'student' ? formData.class : undefined,
         subject: formData.type === 'teacher' ? formData.subject : undefined,
         children: formData.type === 'parent' ? formData.children : undefined,
@@ -873,7 +882,7 @@ const UsersView: React.FC = () => {
                               </small>
                             </div>
                             <ChildSelector 
-                              selectedChildren={formData.children}
+                          selectedChildren={formData.children || []}
                               onChildrenChange={(children) => handleFormChange('children', children)}
                             />
                           </div>
@@ -898,7 +907,7 @@ const UsersView: React.FC = () => {
                     <Button 
                       variant="secondary" 
                       className="me-2"
-                      onClick={() => setFormData({ type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [], phoneNumber: '' })}
+                      onClick={() => setFormData({ id: 0, type: 'student', name: '', email: '', studentId: '', class: '', subject: '', children: [], phoneNumber: '' })}
                     >
                       Reset
                     </Button>

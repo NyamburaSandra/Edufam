@@ -195,8 +195,30 @@ main {
 
 /* Add smooth transition for all hover effects */
 .social-icon {
-  transition: all 0.3s ease !important;
-} 
+  width: 44px;
+  height: 44px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* Slightly larger icon font and reset line-height to keep perfect centering */
+.social-icon i {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* Stronger hover lift for social icons */
+.social-icon:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+}
 
 /* App container takes full height and uses flexbox for layout */
 .app-container {

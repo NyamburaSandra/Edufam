@@ -1,5 +1,10 @@
 // Seed localStorage with users_seed_data.json if not already present
 import usersSeedData from './data/users_seed_data.json';
+// Stronger typing for the imported seed JSON to avoid `any`
+type UsersSeedFile = {
+  users_seed: Array<Record<string, unknown>>;
+  pending_accounts_seed?: Array<Record<string, unknown>>;
+};
 import seedData from './data/seed_data.json';
 
 // Seed pending accounts only once using a flag
@@ -8,6 +13,26 @@ if (!localStorage.getItem(pendingSeedFlag)) {
   localStorage.setItem('edufam_pending_accounts', JSON.stringify(usersSeedData.pending_accounts_seed));
   localStorage.setItem(pendingSeedFlag, 'true');
 }
+// Normalize `edufam_users` storage shape if an older deployment stored the entire seed object
+function normalizeUsersStorage() {
+  const raw = localStorage.getItem('edufam_users');
+  if (!raw) return;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return;
+    if (parsed && parsed.users_seed && Array.isArray(parsed.users_seed)) {
+      localStorage.setItem('edufam_users', JSON.stringify(parsed.users_seed));
+      return;
+    }
+    // Fallback: reset to empty array to avoid runtime errors
+    localStorage.setItem('edufam_users', JSON.stringify([]));
+  } catch {
+    localStorage.setItem('edufam_users', JSON.stringify([]));
+  }
+}
+
+// Run normalization early
+normalizeUsersStorage();
 function shouldSeedFeedbacks() {
   const raw = localStorage.getItem('edufam_feedbacks');
   if (!raw) return true;
@@ -35,7 +60,9 @@ function shouldSeedUsers() {
   return false;
 }
 if (shouldSeedUsers()) {
-  localStorage.setItem('edufam_users', JSON.stringify(usersSeedData));
+  // `usersSeedData` is an object that contains the actual array under `users_seed`.
+  const usersArray = ((usersSeedData as unknown) as UsersSeedFile).users_seed || [];
+  localStorage.setItem('edufam_users', JSON.stringify(usersArray));
 }
 import "./App.css";
 // import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
