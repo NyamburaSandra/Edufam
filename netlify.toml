@@ -1,6 +1,7 @@
 [build]
-  command = "cd Frontend/EDUFAM && npm ci && npm run build"
-  publish = "Frontend/EDUFAM/dist"
+  base = "Frontend/EDUFAM"
+  command = "npm ci && npm run build"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
