@@ -295,9 +295,7 @@ const UsersView: React.FC = () => {
         studentId: formData.type === 'student' ? (formData.studentId ?? '').trim() : undefined,
         class: formData.type === 'student' ? formData.class : undefined,
         subject: formData.type === 'teacher' ? formData.subject : undefined,
-        children: formData.type === 'parent' ? formData.children : undefined,
         phoneNumber: formData.type === 'parent' ? formData.phoneNumber : undefined,
-      children: formData.type === 'parent' && Array.isArray(formData.children) ? formData.children : [],
         status: 'approved',
         dateAdded: new Date().toISOString().split('T')[0]
       };
@@ -316,12 +314,6 @@ const UsersView: React.FC = () => {
       studentId: '', 
       class: '', 
       subject: '', 
-      type: 'student',
-      name: '',
-      email: '',
-      studentId: '',
-      class: '',
-      subject: '',
       children: [],
       phoneNumber: ''
     });
